@@ -1,4 +1,4 @@
-package br.ufrn.dimap.forall.analyzer
+package br.ufrn.dimap.forall.transmut.analyzer
 
 import java.nio.file.Files
 import java.nio.file.Path

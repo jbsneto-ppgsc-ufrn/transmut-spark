@@ -1,4 +1,4 @@
-package br.ufrn.dimap.forall.analyzer
+package br.ufrn.dimap.forall.transmut.analyzer
 
 import java.nio.file._
 
@@ -8,7 +8,7 @@ import scala.meta.internal.semanticdb.TextDocuments
 import scala.meta.internal.semanticdb.TypeRef
 import scala.meta.internal.semanticdb.SignatureMessage.SealedValue._
 
-import br.ufrn.dimap.forall.model._
+import br.ufrn.dimap.forall.transmut.model._
 
 object TypesAnalyzer {
   

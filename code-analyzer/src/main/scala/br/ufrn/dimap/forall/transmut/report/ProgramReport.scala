@@ -1,6 +1,6 @@
-package br.ufrn.dimap.forall.report
+package br.ufrn.dimap.forall.transmut.report
 
-import br.ufrn.dimap.forall.model._
+import br.ufrn.dimap.forall.transmut.model._
 
 import scala.collection.mutable.Set
 
@@ -62,7 +62,7 @@ object ProgramReport {
        |<div class="row">
        |<div class="col" >
        |<figure class="figure">
-       |<h3>DAG:</h3>
+       |<h3>Program Dataflow:</h3>
        |<div id="cy"></div>
        |</figure>
        |</div>
