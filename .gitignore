@@ -27,6 +27,7 @@ build
 .scala_dependencies
 .cache
 .cache-main
+.cache-tests
 
 #general
 *.class

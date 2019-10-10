@@ -27,7 +27,9 @@ lazy val codeAnalyzer = (project in file("code-analyzer"))
 
 lazy val commonDependencies = Seq(
   "org.scalameta" %% "scalameta" % "4.2.0",
-  "org.scalameta" %% "semanticdb" % "4.1.0"
+  "org.scalameta" %% "semanticdb" % "4.1.0",
+  "org.scalactic" %% "scalactic" % "3.0.8",
+  "org.scalatest" %% "scalatest" % "3.0.8" % "test"
 )
 
 lazy val commonSettings = Seq(

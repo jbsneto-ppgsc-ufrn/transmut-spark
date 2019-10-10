@@ -25,4 +25,6 @@ trait Transformation extends Element {
   
   def outputTypes = outgoingEdges.map(e => e.dataset.datasetType)
   
+  def isLoadTransformation = outgoingEdges.isEmpty
+  
 }

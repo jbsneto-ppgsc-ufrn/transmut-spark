@@ -4,7 +4,7 @@ import br.ufrn.dimap.forall.transmut.model._
 import scala.collection.mutable.ListBuffer
 import scala.meta.Tree
 
-class SparkRDDTransformation(override val id: Long) extends Transformation {
+abstract class SparkRDDTransformation(override val id: Long) extends Transformation {
   
   def this(id: Long, name: String, params: List[Tree], source: Tree) {
     this(id)
@@ -41,9 +41,4 @@ class SparkRDDTransformation(override val id: Long) extends Transformation {
     _edges += edge
   }
   
-}
-
-object SparkRDDTransformation {
-  def apply(id: Long, name: String, params: List[Tree], source: Tree) = new SparkRDDTransformation(id, name, params, source)
-  def apply(id: Long, name: String, source: Tree) = new SparkRDDTransformation(id, name, List(), source)
 }

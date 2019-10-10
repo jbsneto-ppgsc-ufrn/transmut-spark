@@ -220,6 +220,13 @@ object ProgramReport {
     |       'background-color': 'red',
     |       'shape': 'ellipse'
     |      }
+    |   },
+    |   {
+    |      selector: '[loadTransformation]',
+    |      style: {
+    |        'background-color': 'red',
+    |        'shape': 'rectangle'
+    |       }
     |   }
     |  ],
     |  layout: {
@@ -238,7 +245,7 @@ object ProgramReport {
 
   def generateTransformationNode(transformation: Transformation) =
     s"""{ // transformation node ${transformation.id}
-    |  data: { id: 'transformation_${transformation.id}' , name : '${transformation.name}' , transformation : 'true' }
+    |  data: { id: 'transformation_${transformation.id}' , name : '${transformation.name}' , transformation : 'true' ${if(transformation.isLoadTransformation) ", loadTransformation: 'true'" else ""} }
     |}""".stripMargin
 
   def generateEdgeNode(edge: Edge) =
