@@ -6,6 +6,7 @@ import br.ufrn.dimap.forall.transmut.model.ProgramSource
 import br.ufrn.dimap.forall.transmut.model.Program
 import scala.meta.Tree
 import br.ufrn.dimap.forall.transmut.model.Element
+import scala.meta.contrib._
 
 case class SparkRDDProgramSource(override val id: Long) extends ProgramSource {
 
@@ -28,6 +29,15 @@ case class SparkRDDProgramSource(override val id: Long) extends ProgramSource {
 
   def addProgram(p: SparkRDDProgram) {
     _programs += p
+  }
+
+  override def equals(that: Any): Boolean = that match {
+    case that: SparkRDDProgramSource => {
+      that.id == id &&
+        that.tree.isEqual(tree) &&
+        that.programs == programs
+    }
+    case _ => false
   }
 
 }

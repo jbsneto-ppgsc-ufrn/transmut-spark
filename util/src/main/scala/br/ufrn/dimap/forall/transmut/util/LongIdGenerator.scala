@@ -1,4 +1,4 @@
-package br.ufrn.dimap.forall.util
+package br.ufrn.dimap.forall.transmut.util
 
 class LongIdGenerator extends IdGenerator[Long] {
   

@@ -3,6 +3,7 @@ package br.ufrn.dimap.forall.transmut.spark.model
 import br.ufrn.dimap.forall.transmut.model.Dataset
 import br.ufrn.dimap.forall.transmut.model.Edge
 import scala.meta.Tree
+import scala.meta.contrib._
 
 case class SparkRDDUnaryTransformation(override val id: Long) extends SparkRDDTransformation(id) {
 
@@ -31,6 +32,27 @@ case class SparkRDDUnaryTransformation(override val id: Long) extends SparkRDDTr
 
   def inputDataset: Option[Dataset] = if (inputEdge.isDefined) Some(inputEdge.get.dataset) else None
   def outputDataset: Option[Dataset] = if (outputEdge.isDefined) Some(outputEdge.get.dataset) else None
+
+  override def copy(id: Long = this.id, name: String = this.name, source: Tree = this.source, params: List[Tree] = this.params, edges: List[Edge] = this.edges) = {
+    var copyTransformation = SparkRDDUnaryTransformation(id, name, params, source)
+    copyTransformation.edges = edges
+    copyTransformation._inputEdge = this.inputEdge
+    copyTransformation._outputEdge = this.outputEdge
+    copyTransformation
+  }
+
+  override def equals(that: Any): Boolean = that match {
+    case that: SparkRDDUnaryTransformation => {
+      that.id == id &&
+        that.name == name &&
+        that.source.isEqual(source) &&
+        that.params == params &&
+        that.edges == edges &&
+        that.inputEdge == inputEdge &&
+        that.outputEdge == outputEdge
+    }
+    case _ => false
+  }
 
 }
 

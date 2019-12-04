@@ -7,8 +7,9 @@ lazy val global = (project in file("."))
   )
   .aggregate(
     util,
-    codeAnalyzer
-  )
+    codeAnalyzer,
+    mutationManager
+  ) 
 
 lazy val util = (project in file("util"))
   .settings(
@@ -24,6 +25,14 @@ lazy val codeAnalyzer = (project in file("code-analyzer"))
     libraryDependencies ++= commonDependencies
   )
   .dependsOn(util)
+
+lazy val mutationManager = (project in file("mutation-manager"))
+  .settings(
+    name := "mutation-manager",
+    commonSettings,
+    libraryDependencies ++= commonDependencies
+  )
+  .dependsOn(util, codeAnalyzer)
 
 lazy val commonDependencies = Seq(
   "org.scalameta" %% "scalameta" % "4.2.0",

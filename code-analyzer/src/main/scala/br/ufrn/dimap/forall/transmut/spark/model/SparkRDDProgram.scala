@@ -2,6 +2,7 @@ package br.ufrn.dimap.forall.transmut.spark.model
 
 import scala.collection.mutable.ListBuffer
 import scala.meta.Tree
+import scala.meta.contrib._
 
 import br.ufrn.dimap.forall.transmut.model.Program
 
@@ -27,6 +28,18 @@ case class SparkRDDProgram(override val id: Long, override val name: String, ove
 
   def addEdge(edge: SparkRDDEdge) {
     _edges += edge
+  }
+
+  override def equals(that: Any): Boolean = that match {
+    case that: SparkRDDProgram => {
+      that.id == id &&
+        that.name == name &&
+        that.tree.isEqual(tree) &&
+        that.edges == edges &&
+        that.datasets == datasets &&
+        that.transformations == transformations
+    }
+    case _ => false
   }
 
 }

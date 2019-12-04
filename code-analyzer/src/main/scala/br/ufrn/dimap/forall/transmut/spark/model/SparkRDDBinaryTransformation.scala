@@ -1,12 +1,13 @@
 package br.ufrn.dimap.forall.transmut.spark.model
 
 import scala.meta.Tree
+import scala.meta.contrib._
 
 import br.ufrn.dimap.forall.transmut.model.Dataset
 import br.ufrn.dimap.forall.transmut.model.Edge
 
 case class SparkRDDBinaryTransformation(override val id: Long) extends SparkRDDTransformation(id) {
-  
+
   def this(id: Long, _name: String, _params: List[Tree], _source: Tree) {
     this(id)
     name = _name
@@ -40,6 +41,30 @@ case class SparkRDDBinaryTransformation(override val id: Long) extends SparkRDDT
     addEdge(edge)
     _outputEdge = Some(edge)
   }
+
+  override def copy(id: Long = this.id, name: String = this.name, source: Tree = this.source, params: List[Tree] = this.params, edges: List[Edge] = this.edges) = {
+    var copyTransformation = SparkRDDBinaryTransformation(id, name, params, source)
+    copyTransformation.edges = edges
+    copyTransformation._firstInputEdge = this.firstInputEdge
+    copyTransformation._secondInputEdge = this.secondInputEdge
+    copyTransformation._outputEdge = this.outputEdge
+    copyTransformation
+  }
+
+  override def equals(that: Any): Boolean = that match {
+    case that: SparkRDDBinaryTransformation => {
+      that.id == id &&
+        that.name == name &&
+        that.source.isEqual(source) &&
+        that.params == params &&
+        that.edges == edges &&
+        that.firstInputEdge == firstInputEdge &&
+        that.secondInputEdge == secondInputEdge &&
+        that.outputEdge == outputEdge
+    }
+    case _ => false
+  }
+
 }
 
 object SparkRDDBinaryTransformation {

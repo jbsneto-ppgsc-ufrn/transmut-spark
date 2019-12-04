@@ -27,4 +27,6 @@ trait Transformation extends Element {
   
   def isLoadTransformation = outgoingEdges.isEmpty
   
+  def copy(id : Long = this.id, name : String = this.name, source : Tree = this.source, params : List[Tree] = this.params, edges : List[Edge] = this.edges) : Transformation
+  
 }

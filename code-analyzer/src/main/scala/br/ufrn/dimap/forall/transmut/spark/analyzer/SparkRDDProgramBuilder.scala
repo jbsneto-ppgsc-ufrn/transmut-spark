@@ -6,7 +6,7 @@ import scala.meta.Tree
 import br.ufrn.dimap.forall.transmut.analyzer.ProgramBuilder
 import br.ufrn.dimap.forall.transmut.model._
 import br.ufrn.dimap.forall.transmut.spark.model._
-import br.ufrn.dimap.forall.util.LongIdGenerator
+import br.ufrn.dimap.forall.transmut.util.LongIdGenerator
 
 object SparkRDDProgramBuilder extends ProgramBuilder {
 

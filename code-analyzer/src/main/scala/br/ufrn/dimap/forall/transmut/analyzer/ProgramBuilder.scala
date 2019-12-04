@@ -4,7 +4,7 @@ import scala.meta._
 import scala.meta.Tree
 
 import br.ufrn.dimap.forall.transmut.model._
-import br.ufrn.dimap.forall.util.LongIdGenerator
+import br.ufrn.dimap.forall.transmut.util.LongIdGenerator
 
 trait ProgramBuilder {
 

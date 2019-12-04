@@ -9,5 +9,7 @@ trait Edge extends Element {
   def transformation: Transformation
 
   def direction: DirectionsEnum
+  
+  def copy(id: Long = this.id, dataset: Dataset = this.dataset, transformation: Transformation = this.transformation, direction : DirectionsEnum = this.direction) : Edge
 
 }
