@@ -15,6 +15,7 @@ import br.ufrn.dimap.forall.transmut.model.TupleType
 import br.ufrn.dimap.forall.transmut.spark.model.SparkRDDBinaryTransformation
 import br.ufrn.dimap.forall.transmut.model.DirectionsEnum
 import br.ufrn.dimap.forall.transmut.model.ReferencesTypeEnum
+import br.ufrn.dimap.forall.transmut.mutation.operator.MutationOperatorsEnum
 
 class SparkRDDSetTransformationReplacementTestSuite extends FunSuite {
 
@@ -128,6 +129,13 @@ class SparkRDDSetTransformationReplacementTestSuite extends FunSuite {
     val mutantFirstDataset = mutants(2)
     val mutantSecondDataset = mutants(3)
     val mutantCommutative = mutants(4)
+    
+    // Mutation Operator Type Verification
+    assert(mutantIntersection.mutationOperator == MutationOperatorsEnum.STR)
+    assert(mutantSubtract.mutationOperator == MutationOperatorsEnum.STR)
+    assert(mutantFirstDataset.mutationOperator == MutationOperatorsEnum.STR)
+    assert(mutantSecondDataset.mutationOperator == MutationOperatorsEnum.STR)
+    assert(mutantCommutative.mutationOperator == MutationOperatorsEnum.STR)
 
     // Intersection Mutant
     assert(mutantIntersection.original == original)
@@ -258,6 +266,13 @@ class SparkRDDSetTransformationReplacementTestSuite extends FunSuite {
     val mutantFirstDataset = mutants(2)
     val mutantSecondDataset = mutants(3)
     val mutantCommutative = mutants(4)
+    
+    // Mutation Operator Type Verification
+    assert(mutantUnion.mutationOperator == MutationOperatorsEnum.STR)
+    assert(mutantSubtract.mutationOperator == MutationOperatorsEnum.STR)
+    assert(mutantFirstDataset.mutationOperator == MutationOperatorsEnum.STR)
+    assert(mutantSecondDataset.mutationOperator == MutationOperatorsEnum.STR)
+    assert(mutantCommutative.mutationOperator == MutationOperatorsEnum.STR)
 
     // Union Mutant
     assert(mutantUnion.original == original)
@@ -388,6 +403,13 @@ class SparkRDDSetTransformationReplacementTestSuite extends FunSuite {
     val mutantFirstDataset = mutants(2)
     val mutantSecondDataset = mutants(3)
     val mutantCommutative = mutants(4)
+    
+    // Mutation Operator Type Verification
+    assert(mutantUnion.mutationOperator == MutationOperatorsEnum.STR)
+    assert(mutantIntersection.mutationOperator == MutationOperatorsEnum.STR)
+    assert(mutantFirstDataset.mutationOperator == MutationOperatorsEnum.STR)
+    assert(mutantSecondDataset.mutationOperator == MutationOperatorsEnum.STR)
+    assert(mutantCommutative.mutationOperator == MutationOperatorsEnum.STR)
 
     // Intersection Mutant
     assert(mutantUnion.original == original)

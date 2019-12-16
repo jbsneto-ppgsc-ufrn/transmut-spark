@@ -12,7 +12,7 @@ import br.ufrn.dimap.forall.transmut.model.Transformation
 
 object SparkRDDOrderTransformationDeletion extends MutationOperator[Transformation] {
 
-  def mutationOperatorType = MutationOperatorsEnum.FTD
+  def mutationOperatorType = MutationOperatorsEnum.OTD
 
   def isApplicable(element: Transformation): Boolean = element.isInstanceOf[SparkRDDUnaryTransformation] && (element.name == "sortBy" || element.name == "sortByKey")
 
@@ -27,7 +27,7 @@ object SparkRDDOrderTransformationDeletion extends MutationOperator[Transformati
         case q"$dset.sortByKey" => q"$dset"
       }
       mutated.params = Nil
-      List(MutantTransformation(idGenerator.getId, original, mutated))
+      List(MutantTransformation(idGenerator.getId, original, mutated, mutationOperatorType))
     } else {
       Nil
     }

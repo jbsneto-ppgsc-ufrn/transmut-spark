@@ -27,7 +27,7 @@ object SparkRDDDistinctTransformationDeletion extends MutationOperator[Transform
         case q"$dset.distinct" => q"$dset"
       }
       mutated.params = Nil
-      List(MutantTransformation(idGenerator.getId, original, mutated))
+      List(MutantTransformation(idGenerator.getId, original, mutated, mutationOperatorType))
     } else {
       Nil
     }

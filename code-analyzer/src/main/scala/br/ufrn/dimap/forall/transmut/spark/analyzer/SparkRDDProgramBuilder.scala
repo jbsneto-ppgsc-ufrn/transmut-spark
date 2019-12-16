@@ -12,9 +12,9 @@ object SparkRDDProgramBuilder extends ProgramBuilder {
 
   val datasetType = "org/apache/spark/rdd/RDD#"
 
-  val supportedUnaryTransformations = Set("map", "flatMap", "filter", "distinct", "sortBy", "aggregateByKey", "groupByKey", "reduceByKey", "sortByKey")
+  val supportedUnaryTransformations = Set("map", "flatMap", "filter", "distinct", "sortBy", "aggregateByKey", "reduceByKey", "sortByKey", "combineByKey")
 
-  val supportedBinaryTransformations = Set("union", "subtract", "intersection", "subtractByKey", "join", "leftOuterJoin", "rightOuterJoin", "fullOuterJoin")
+  val supportedBinaryTransformations = Set("union", "subtract", "intersection", "join", "leftOuterJoin", "rightOuterJoin", "fullOuterJoin")
 
   // Class that aggregates all ID generators
   private class IdsGeneratorAggregator {

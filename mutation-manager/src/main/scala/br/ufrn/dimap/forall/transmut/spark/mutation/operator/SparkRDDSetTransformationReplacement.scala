@@ -35,7 +35,7 @@ object SparkRDDSetTransformationReplacement extends MutationOperator[Transformat
     mutated.source = mutated.source.transform {
       case q"$firstDataset.$setTransformation($secondDataset)" => q"$firstDataset.union($secondDataset)"
     }
-    MutantTransformation(idGenerator.getId, original, mutated)
+    MutantTransformation(idGenerator.getId, original, mutated, mutationOperatorType)
   }
 
   private def intersectionMutant(original: SparkRDDBinaryTransformation, idGenerator: LongIdGenerator): MutantTransformation = {
@@ -44,7 +44,7 @@ object SparkRDDSetTransformationReplacement extends MutationOperator[Transformat
     mutated.source = mutated.source.transform {
       case q"$firstDataset.$setTransformation($secondDataset)" => q"$firstDataset.intersection($secondDataset)"
     }
-    MutantTransformation(idGenerator.getId, original, mutated)
+    MutantTransformation(idGenerator.getId, original, mutated, mutationOperatorType)
   }
 
   private def subtractMutant(original: SparkRDDBinaryTransformation, idGenerator: LongIdGenerator): MutantTransformation = {
@@ -53,7 +53,7 @@ object SparkRDDSetTransformationReplacement extends MutationOperator[Transformat
     mutated.source = mutated.source.transform {
       case q"$firstDataset.$setTransformation($secondDataset)" => q"$firstDataset.subtract($secondDataset)"
     }
-    MutantTransformation(idGenerator.getId, original, mutated)
+    MutantTransformation(idGenerator.getId, original, mutated, mutationOperatorType)
   }
 
   private def firstDatasetMutant(original: SparkRDDBinaryTransformation, idGenerator: LongIdGenerator): MutantTransformation = {
@@ -63,7 +63,7 @@ object SparkRDDSetTransformationReplacement extends MutationOperator[Transformat
       case q"$firstDataset.$setTransformation($secondDataset)" => q"$firstDataset"
     }
     mutated.params = Nil
-    MutantTransformation(idGenerator.getId, original, mutated)
+    MutantTransformation(idGenerator.getId, original, mutated, mutationOperatorType)
   }
 
   private def secondDatasetMutant(original: SparkRDDBinaryTransformation, idGenerator: LongIdGenerator): MutantTransformation = {
@@ -73,7 +73,7 @@ object SparkRDDSetTransformationReplacement extends MutationOperator[Transformat
       case q"$firstDataset.$setTransformation($secondDataset)" => q"$secondDataset"
     }
     mutated.params = Nil
-    MutantTransformation(idGenerator.getId, original, mutated)
+    MutantTransformation(idGenerator.getId, original, mutated, mutationOperatorType)
   }
 
   private def commutativeMutant(original: SparkRDDBinaryTransformation, idGenerator: LongIdGenerator): MutantTransformation = {
@@ -89,7 +89,7 @@ object SparkRDDSetTransformationReplacement extends MutationOperator[Transformat
       }
       case _ => {}
     }
-    MutantTransformation(idGenerator.getId, original, mutated)
+    MutantTransformation(idGenerator.getId, original, mutated, mutationOperatorType)
   }
 
 }

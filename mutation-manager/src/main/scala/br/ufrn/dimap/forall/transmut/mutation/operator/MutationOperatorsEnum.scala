@@ -8,5 +8,8 @@ object MutationOperatorsEnum extends Enumeration {
   val DTD = Value("Distinct Transformation Deletion")
   val OTD = Value("Order Transformation Deletion")
   val STR = Value("Set Transformation Replacement")
+  val ATR = Value("Aggregation Transformation Replacement")
+  val DTI = Value("Distinct Transformation Insertion")
+  val JTR = Value("Join Transformation Replacement")
   
 }

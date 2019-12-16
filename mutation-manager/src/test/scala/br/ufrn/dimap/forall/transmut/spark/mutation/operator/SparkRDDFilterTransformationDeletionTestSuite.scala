@@ -11,6 +11,7 @@ import br.ufrn.dimap.forall.transmut.model.ParameterReference
 import br.ufrn.dimap.forall.transmut.model.BaseType
 import br.ufrn.dimap.forall.transmut.model.ParameterizedType
 import br.ufrn.dimap.forall.transmut.util.LongIdGenerator
+import br.ufrn.dimap.forall.transmut.mutation.operator.MutationOperatorsEnum
 
 class SparkRDDFilterTransformationDeletionTestSuite extends FunSuite {
 
@@ -47,6 +48,8 @@ class SparkRDDFilterTransformationDeletionTestSuite extends FunSuite {
     assert(mutants.size == 1)
 
     val mutant = mutants.head
+    
+    assert(mutant.mutationOperator == MutationOperatorsEnum.FTD)
 
     assert(mutant.original == original)
     assert(mutant.mutated != original)

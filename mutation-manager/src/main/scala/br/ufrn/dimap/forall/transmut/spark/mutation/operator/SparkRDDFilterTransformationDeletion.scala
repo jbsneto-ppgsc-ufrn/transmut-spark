@@ -25,7 +25,7 @@ object SparkRDDFilterTransformationDeletion extends MutationOperator[Transformat
         case q"$dset.filter(..$pars)" => q"$dset"
       }
       mutated.params = Nil
-      List(MutantTransformation(idGenerator.getId, original, mutated))
+      List(MutantTransformation(idGenerator.getId, original, mutated, mutationOperatorType))
     } else {
       Nil
     }
