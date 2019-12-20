@@ -4,6 +4,8 @@ object MutationOperatorsEnum extends Enumeration {
   
   type MutationOperatorsEnum = Value
   
+  val UTS = Value("Unary Transformation Swap")
+  val BTS = Value("Binary Transformation Swap")
   val UTR = Value("Unary Transformation Replacement")
   val BTR = Value("Binary Transformation Replacement")
   val UTD = Value("Unary Transformation Deletion")
