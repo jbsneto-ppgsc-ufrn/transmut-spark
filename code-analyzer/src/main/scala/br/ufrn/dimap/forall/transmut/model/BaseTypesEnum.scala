@@ -18,6 +18,17 @@ object BaseTypesEnum extends Enumeration {
   }
 
   def isBaseType(name: String) = baseTypsesStringSet.contains(name)
+  
+  def baseTypeName(bType: BaseTypesEnum.BaseTypesEnum) = bType match {
+    case Int => "Int"
+    case Long => "Long"
+    case Float => "Float"
+    case Double => "Double"
+    case Char => "Char"
+    case Boolean => "Boolean"
+    case String => "String"
+    case _ => "Error"
+  }
 
   private val baseTypsesStringSet =
     Set(

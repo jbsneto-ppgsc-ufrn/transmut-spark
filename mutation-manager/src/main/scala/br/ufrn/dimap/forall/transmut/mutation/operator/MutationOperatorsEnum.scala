@@ -9,6 +9,7 @@ object MutationOperatorsEnum extends Enumeration {
   val UTR = Value("Unary Transformation Replacement")
   val BTR = Value("Binary Transformation Replacement")
   val UTD = Value("Unary Transformation Deletion")
+  val MTR = Value("Mapping Transformation Replacement")
   val FTD = Value("Filter Transformation Deletion")
   val DTD = Value("Distinct Transformation Deletion")
   val OTD = Value("Order Transformation Deletion")
