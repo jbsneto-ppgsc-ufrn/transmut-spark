@@ -39,22 +39,27 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
     assert(programSource.programs.size == 1)
 
     val program = programSource.programs.head
+    
+    assert(program.programSource == programSource)
 
     assert(program.datasets.size == 3)
 
     assert(program.isDatasetByReferenceNameDefined("rdd1"))
+    assert(program.datasetByReferenceName("rdd1").get.program == program)
     assert(program.datasetByReferenceName("rdd1").get.reference.referenceType == ReferencesTypeEnum.Parameter)
     assert(program.datasetByReferenceName("rdd1").get.datasetType == ParameterizedType("org/apache/spark/rdd/RDD#", List(BaseType(BaseTypesEnum.Int))))
     assert(program.datasetByReferenceName("rdd1").get.isInputDataset)
     assert(!program.datasetByReferenceName("rdd1").get.isOutputDataset)
 
     assert(program.isDatasetByReferenceNameDefined("rdd2"))
+    assert(program.datasetByReferenceName("rdd2").get.program == program)
     assert(program.datasetByReferenceName("rdd2").get.reference.referenceType == ReferencesTypeEnum.Val)
     assert(program.datasetByReferenceName("rdd2").get.datasetType == ParameterizedType("org/apache/spark/rdd/RDD#", List(BaseType(BaseTypesEnum.Int))))
     assert(!program.datasetByReferenceName("rdd2").get.isInputDataset)
     assert(!program.datasetByReferenceName("rdd2").get.isOutputDataset)
 
     assert(program.isDatasetByReferenceNameDefined("rdd3"))
+    assert(program.datasetByReferenceName("rdd3").get.program == program)
     assert(program.datasetByReferenceName("rdd3").get.reference.referenceType == ReferencesTypeEnum.Val)
     assert(program.datasetByReferenceName("rdd3").get.datasetType == ParameterizedType("org/apache/spark/rdd/RDD#", List(BaseType(BaseTypesEnum.Int))))
     assert(!program.datasetByReferenceName("rdd3").get.isInputDataset)
@@ -63,6 +68,7 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
     assert(program.transformations.size == 2)
 
     assert(program.transformations(0).isInstanceOf[SparkRDDUnaryTransformation])
+    assert(program.transformations(0).asInstanceOf[SparkRDDUnaryTransformation].program == program)
     assert(program.transformations(0).asInstanceOf[SparkRDDUnaryTransformation].name == "map")
     assert(program.transformations(0).asInstanceOf[SparkRDDUnaryTransformation].params.size == 1)
     assert(program.transformations(0).asInstanceOf[SparkRDDUnaryTransformation].params.head.isEqual(q"a => a * 2"))
@@ -73,6 +79,7 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
     assert(program.transformations(0).asInstanceOf[SparkRDDUnaryTransformation].outputDataset.get == program.datasetByReferenceName("rdd2").get)
 
     assert(program.transformations(1).isInstanceOf[SparkRDDUnaryTransformation])
+    assert(program.transformations(1).asInstanceOf[SparkRDDUnaryTransformation].program == program)
     assert(program.transformations(1).asInstanceOf[SparkRDDUnaryTransformation].name == "filter")
     assert(program.transformations(1).asInstanceOf[SparkRDDUnaryTransformation].params.size == 1)
     assert(program.transformations(1).asInstanceOf[SparkRDDUnaryTransformation].params.head.isEqual(q"a => a < 100"))
@@ -127,16 +134,20 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
     assert(programSource.programs.size == 1)
 
     val program = programSource.programs.head
+    
+    assert(program.programSource == programSource)
 
     assert(program.datasets.size == 2)
 
     assert(program.isDatasetByReferenceNameDefined("rdd1"))
+    assert(program.datasetByReferenceName("rdd1").get.program == program)
     assert(program.datasetByReferenceName("rdd1").get.reference.referenceType == ReferencesTypeEnum.Parameter)
     assert(program.datasetByReferenceName("rdd1").get.datasetType == ParameterizedType("org/apache/spark/rdd/RDD#", List(BaseType(BaseTypesEnum.Int))))
     assert(program.datasetByReferenceName("rdd1").get.isInputDataset)
     assert(!program.datasetByReferenceName("rdd1").get.isOutputDataset)
 
     assert(program.isDatasetByReferenceNameDefined("rdd2"))
+    assert(program.datasetByReferenceName("rdd2").get.program == program)
     assert(program.datasetByReferenceName("rdd2").get.reference.referenceType == ReferencesTypeEnum.Var)
     assert(program.datasetByReferenceName("rdd2").get.datasetType == ParameterizedType("org/apache/spark/rdd/RDD#", List(BaseType(BaseTypesEnum.Int))))
     assert(!program.datasetByReferenceName("rdd2").get.isInputDataset)
@@ -145,6 +156,7 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
     assert(program.transformations.size == 1)
 
     assert(program.transformations(0).isInstanceOf[SparkRDDUnaryTransformation])
+    assert(program.transformations(0).asInstanceOf[SparkRDDUnaryTransformation].program == program)
     assert(program.transformations(0).asInstanceOf[SparkRDDUnaryTransformation].name == "distinct")
     assert(program.transformations(0).asInstanceOf[SparkRDDUnaryTransformation].params.isEmpty)
     assert(!program.transformations(0).asInstanceOf[SparkRDDUnaryTransformation].isLoadTransformation)
@@ -195,34 +207,41 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
     assert(programSource.programs.size == 1)
 
     val program = programSource.programs.head
+    
+    assert(program.programSource == programSource)
 
     assert(program.datasets.size == 5)
 
     assert(program.isDatasetByReferenceNameDefined("rdd1"))
+    assert(program.datasetByReferenceName("rdd1").get.program == program)
     assert(program.datasetByReferenceName("rdd1").get.reference.referenceType == ReferencesTypeEnum.Parameter)
     assert(program.datasetByReferenceName("rdd1").get.datasetType == ParameterizedType("org/apache/spark/rdd/RDD#", List(BaseType(BaseTypesEnum.Int))))
     assert(program.datasetByReferenceName("rdd1").get.isInputDataset)
     assert(!program.datasetByReferenceName("rdd1").get.isOutputDataset)
 
     assert(program.isDatasetByReferenceNameDefined("rdd2"))
+    assert(program.datasetByReferenceName("rdd2").get.program == program)
     assert(program.datasetByReferenceName("rdd2").get.reference.referenceType == ReferencesTypeEnum.Parameter)
     assert(program.datasetByReferenceName("rdd2").get.datasetType == ParameterizedType("org/apache/spark/rdd/RDD#", List(BaseType(BaseTypesEnum.Int))))
     assert(program.datasetByReferenceName("rdd2").get.isInputDataset)
     assert(!program.datasetByReferenceName("rdd2").get.isOutputDataset)
 
     assert(program.isDatasetByReferenceNameDefined("rdd3"))
+    assert(program.datasetByReferenceName("rdd3").get.program == program)
     assert(program.datasetByReferenceName("rdd3").get.reference.referenceType == ReferencesTypeEnum.Val)
     assert(program.datasetByReferenceName("rdd3").get.datasetType == ParameterizedType("org/apache/spark/rdd/RDD#", List(BaseType(BaseTypesEnum.Int))))
     assert(!program.datasetByReferenceName("rdd3").get.isInputDataset)
     assert(!program.datasetByReferenceName("rdd3").get.isOutputDataset)
 
     assert(program.isDatasetByReferenceNameDefined("rdd4"))
+    assert(program.datasetByReferenceName("rdd4").get.program == program)
     assert(program.datasetByReferenceName("rdd4").get.reference.referenceType == ReferencesTypeEnum.Val)
     assert(program.datasetByReferenceName("rdd4").get.datasetType == ParameterizedType("org/apache/spark/rdd/RDD#", List(BaseType(BaseTypesEnum.Int))))
     assert(!program.datasetByReferenceName("rdd4").get.isInputDataset)
     assert(!program.datasetByReferenceName("rdd4").get.isOutputDataset)
 
     assert(program.isDatasetByReferenceNameDefined("rdd5"))
+    assert(program.datasetByReferenceName("rdd5").get.program == program)
     assert(program.datasetByReferenceName("rdd5").get.reference.referenceType == ReferencesTypeEnum.Val)
     assert(program.datasetByReferenceName("rdd5").get.datasetType == ParameterizedType("org/apache/spark/rdd/RDD#", List(BaseType(BaseTypesEnum.Int))))
     assert(!program.datasetByReferenceName("rdd5").get.isInputDataset)
@@ -231,6 +250,7 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
     assert(program.transformations.size == 3)
 
     assert(program.transformations(0).isInstanceOf[SparkRDDBinaryTransformation])
+    assert(program.transformations(0).asInstanceOf[SparkRDDBinaryTransformation].program == program)
     assert(program.transformations(0).asInstanceOf[SparkRDDBinaryTransformation].name == "intersection")
     assert(program.transformations(0).asInstanceOf[SparkRDDBinaryTransformation].params.size == 1)
     assert(!program.transformations(0).asInstanceOf[SparkRDDBinaryTransformation].isLoadTransformation)
@@ -242,6 +262,7 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
     assert(program.transformations(0).asInstanceOf[SparkRDDBinaryTransformation].outputDataset.get == program.datasetByReferenceName("rdd3").get)
 
     assert(program.transformations(1).isInstanceOf[SparkRDDBinaryTransformation])
+    assert(program.transformations(1).asInstanceOf[SparkRDDBinaryTransformation].program == program)
     assert(program.transformations(1).asInstanceOf[SparkRDDBinaryTransformation].name == "subtract")
     assert(program.transformations(1).asInstanceOf[SparkRDDBinaryTransformation].params.size == 1)
     assert(!program.transformations(1).asInstanceOf[SparkRDDBinaryTransformation].isLoadTransformation)
@@ -253,6 +274,7 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
     assert(program.transformations(1).asInstanceOf[SparkRDDBinaryTransformation].outputDataset.get == program.datasetByReferenceName("rdd4").get)
 
     assert(program.transformations(2).isInstanceOf[SparkRDDBinaryTransformation])
+    assert(program.transformations(2).asInstanceOf[SparkRDDBinaryTransformation].program == program)
     assert(program.transformations(2).asInstanceOf[SparkRDDBinaryTransformation].name == "union")
     assert(program.transformations(2).asInstanceOf[SparkRDDBinaryTransformation].params.size == 1)
     assert(!program.transformations(2).asInstanceOf[SparkRDDBinaryTransformation].isLoadTransformation)
@@ -331,28 +353,34 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
     assert(programSource.programs.size == 1)
 
     val program = programSource.programs.head
+    
+    assert(program.programSource == programSource)
 
     assert(program.datasets.size == 4)
 
     assert(program.isDatasetByReferenceNameDefined("rdd1"))
+    assert(program.datasetByReferenceName("rdd1").get.program == program)
     assert(program.datasetByReferenceName("rdd1").get.reference.referenceType == ReferencesTypeEnum.Parameter)
     assert(program.datasetByReferenceName("rdd1").get.datasetType == ParameterizedType("org/apache/spark/rdd/RDD#", List(TupleType(BaseType(BaseTypesEnum.Long), BaseType(BaseTypesEnum.Double)))))
     assert(program.datasetByReferenceName("rdd1").get.isInputDataset)
     assert(!program.datasetByReferenceName("rdd1").get.isOutputDataset)
 
     assert(program.isDatasetByReferenceNameDefined("rdd2"))
+    assert(program.datasetByReferenceName("rdd2").get.program == program)
     assert(program.datasetByReferenceName("rdd2").get.reference.referenceType == ReferencesTypeEnum.Parameter)
     assert(program.datasetByReferenceName("rdd2").get.datasetType == ParameterizedType("org/apache/spark/rdd/RDD#", List(TupleType(BaseType(BaseTypesEnum.Long), BaseType(BaseTypesEnum.String)))))
     assert(program.datasetByReferenceName("rdd2").get.isInputDataset)
     assert(!program.datasetByReferenceName("rdd2").get.isOutputDataset)
 
     assert(program.isDatasetByReferenceNameDefined("rdd3"))
+    assert(program.datasetByReferenceName("rdd3").get.program == program)
     assert(program.datasetByReferenceName("rdd3").get.reference.referenceType == ReferencesTypeEnum.Val)
     assert(program.datasetByReferenceName("rdd3").get.datasetType == ParameterizedType("org/apache/spark/rdd/RDD#", List(TupleType(BaseType(BaseTypesEnum.Long), BaseType(BaseTypesEnum.Double)))))
     assert(!program.datasetByReferenceName("rdd3").get.isInputDataset)
     assert(!program.datasetByReferenceName("rdd3").get.isOutputDataset)
 
     assert(program.isDatasetByReferenceNameDefined("rdd4"))
+    assert(program.datasetByReferenceName("rdd4").get.program == program)
     assert(program.datasetByReferenceName("rdd4").get.reference.referenceType == ReferencesTypeEnum.Val)
     assert(program.datasetByReferenceName("rdd4").get.datasetType == ParameterizedType("org/apache/spark/rdd/RDD#", List(TupleType(BaseType(BaseTypesEnum.Long), TupleType(BaseType(BaseTypesEnum.Double), BaseType(BaseTypesEnum.String))))))
     assert(!program.datasetByReferenceName("rdd4").get.isInputDataset)
@@ -361,6 +389,7 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
     assert(program.transformations.size == 2)
 
     assert(program.transformations(0).isInstanceOf[SparkRDDUnaryTransformation])
+    assert(program.transformations(0).asInstanceOf[SparkRDDUnaryTransformation].program == program)
     assert(program.transformations(0).asInstanceOf[SparkRDDUnaryTransformation].name == "reduceByKey")
     assert(program.transformations(0).asInstanceOf[SparkRDDUnaryTransformation].params.size == 1)
     assert(!program.transformations(0).asInstanceOf[SparkRDDUnaryTransformation].isLoadTransformation)
@@ -370,6 +399,7 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
     assert(program.transformations(0).asInstanceOf[SparkRDDUnaryTransformation].outputDataset.get == program.datasetByReferenceName("rdd3").get)
 
     assert(program.transformations(1).isInstanceOf[SparkRDDBinaryTransformation])
+    assert(program.transformations(1).asInstanceOf[SparkRDDBinaryTransformation].program == program)
     assert(program.transformations(1).asInstanceOf[SparkRDDBinaryTransformation].name == "join")
     assert(program.transformations(1).asInstanceOf[SparkRDDBinaryTransformation].params.size == 1)
     assert(!program.transformations(1).asInstanceOf[SparkRDDBinaryTransformation].isLoadTransformation)
@@ -431,22 +461,27 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
     assert(programSource.programs.size == 1)
 
     val program = programSource.programs.head
+    
+    assert(program.programSource == programSource)
 
     assert(program.datasets.size == 3)
 
     assert(program.isDatasetByReferenceNameDefined("rdd1"))
+    assert(program.datasetByReferenceName("rdd1").get.program == program)
     assert(program.datasetByReferenceName("rdd1").get.reference.referenceType == ReferencesTypeEnum.Parameter)
     assert(program.datasetByReferenceName("rdd1").get.datasetType == ParameterizedType("org/apache/spark/rdd/RDD#", List(BaseType(BaseTypesEnum.Int))))
     assert(program.datasetByReferenceName("rdd1").get.isInputDataset)
     assert(!program.datasetByReferenceName("rdd1").get.isOutputDataset)
 
     assert(program.isDatasetByReferenceNameDefined("rdd2"))
+    assert(program.datasetByReferenceName("rdd2").get.program == program)
     assert(program.datasetByReferenceName("rdd2").get.reference.referenceType == ReferencesTypeEnum.Val)
     assert(program.datasetByReferenceName("rdd2").get.datasetType == ParameterizedType("org/apache/spark/rdd/RDD#", List(BaseType(BaseTypesEnum.Int))))
     assert(!program.datasetByReferenceName("rdd2").get.isInputDataset)
     assert(!program.datasetByReferenceName("rdd2").get.isOutputDataset)
 
     assert(program.isDatasetByReferenceNameDefined("rdd3"))
+    assert(program.datasetByReferenceName("rdd3").get.program == program)
     assert(program.datasetByReferenceName("rdd3").get.reference.referenceType == ReferencesTypeEnum.Val)
     assert(program.datasetByReferenceName("rdd3").get.datasetType == ParameterizedType("org/apache/spark/rdd/RDD#", List(TupleType(BaseType(BaseTypesEnum.Int), BaseType(BaseTypesEnum.Int)))))
     assert(!program.datasetByReferenceName("rdd3").get.isInputDataset)
@@ -455,6 +490,7 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
     assert(program.transformations.size == 2)
 
     assert(program.transformations(0).isInstanceOf[SparkRDDOperation])
+    assert(program.transformations(0).asInstanceOf[SparkRDDOperation].program == program)
     assert(program.transformations(0).asInstanceOf[SparkRDDOperation].name == "cache")
     assert(program.transformations(0).asInstanceOf[SparkRDDOperation].params.isEmpty)
     assert(!program.transformations(0).asInstanceOf[SparkRDDOperation].isLoadTransformation)
@@ -464,6 +500,7 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
     assert(program.transformations(0).asInstanceOf[SparkRDDOperation].outgoingDatasets(0) == program.datasetByReferenceName("rdd2").get)
 
     assert(program.transformations(1).isInstanceOf[SparkRDDOperation])
+    assert(program.transformations(1).asInstanceOf[SparkRDDOperation].program == program)
     assert(program.transformations(1).asInstanceOf[SparkRDDOperation].name == "zip")
     assert(program.transformations(1).asInstanceOf[SparkRDDOperation].params.size == 1)
     // In not supported transformations the parameters are treated generically
@@ -523,10 +560,13 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
     assert(programSource.programs.size == 1)
 
     val program = programSource.programs.head
+    
+    assert(program.programSource == programSource)
 
     assert(program.datasets.size == 1)
 
     assert(program.isDatasetByReferenceNameDefined("rdd1"))
+    assert(program.datasetByReferenceName("rdd1").get.program == program)
     assert(program.datasetByReferenceName("rdd1").get.reference.referenceType == ReferencesTypeEnum.Parameter)
     assert(program.datasetByReferenceName("rdd1").get.datasetType == ParameterizedType("org/apache/spark/rdd/RDD#", List(BaseType(BaseTypesEnum.Int))))
     assert(program.datasetByReferenceName("rdd1").get.isInputDataset)
@@ -535,6 +575,7 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
     assert(program.transformations.size == 1)
 
     assert(program.transformations(0).isInstanceOf[SparkRDDOperation])
+    assert(program.transformations(0).asInstanceOf[SparkRDDOperation].program == program)
     assert(program.transformations(0).asInstanceOf[SparkRDDOperation].name == "reduce")
     assert(program.transformations(0).asInstanceOf[SparkRDDOperation].params.size == 1)
     assert(program.transformations(0).asInstanceOf[SparkRDDOperation].params.head.isEqual(q"(a, b) => a + b"))
@@ -580,16 +621,20 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
     assert(programSource.programs.size == 1)
 
     val program = programSource.programs.head
+    
+    assert(program.programSource == programSource)
 
     assert(program.datasets.size == 2)
 
     assert(program.isDatasetByReferenceNameDefined("rdd1"))
+    assert(program.datasetByReferenceName("rdd1").get.program == program)
     assert(program.datasetByReferenceName("rdd1").get.reference.referenceType == ReferencesTypeEnum.Val)
     assert(program.datasetByReferenceName("rdd1").get.datasetType == ParameterizedType("org/apache/spark/rdd/RDD#", List(BaseType(BaseTypesEnum.Int))))
     assert(program.datasetByReferenceName("rdd1").get.isInputDataset)
     assert(!program.datasetByReferenceName("rdd1").get.isOutputDataset)
 
     assert(program.isDatasetByReferenceNameDefined("rdd2"))
+    assert(program.datasetByReferenceName("rdd2").get.program == program)
     assert(program.datasetByReferenceName("rdd2").get.reference.referenceType == ReferencesTypeEnum.Val)
     assert(program.datasetByReferenceName("rdd2").get.datasetType == ParameterizedType("org/apache/spark/rdd/RDD#", List(BaseType(BaseTypesEnum.Int))))
     assert(!program.datasetByReferenceName("rdd2").get.isInputDataset)
@@ -598,6 +643,7 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
     assert(program.transformations.size == 1)
 
     assert(program.transformations(0).isInstanceOf[SparkRDDUnaryTransformation])
+    assert(program.transformations(0).asInstanceOf[SparkRDDUnaryTransformation].program == program)
     assert(program.transformations(0).asInstanceOf[SparkRDDUnaryTransformation].name == "map")
     assert(program.transformations(0).asInstanceOf[SparkRDDUnaryTransformation].params.size == 1)
     assert(program.transformations(0).asInstanceOf[SparkRDDUnaryTransformation].params.head.isEqual(q"a => a * 2"))
@@ -651,22 +697,27 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
     assert(programSource.programs.size == 1)
 
     val program = programSource.programs.head
+    
+    assert(program.programSource == programSource)
 
     assert(program.datasets.size == 3)
 
     assert(program.isDatasetByReferenceNameDefined("rdd1"))
+    assert(program.datasetByReferenceName("rdd1").get.program == program)
     assert(program.datasetByReferenceName("rdd1").get.reference.referenceType == ReferencesTypeEnum.Val)
     assert(program.datasetByReferenceName("rdd1").get.datasetType == ParameterizedType("org/apache/spark/rdd/RDD#", List(BaseType(BaseTypesEnum.Int))))
     assert(program.datasetByReferenceName("rdd1").get.isInputDataset)
     assert(!program.datasetByReferenceName("rdd1").get.isOutputDataset)
 
     assert(program.isDatasetByReferenceNameDefined("rdd2"))
+    assert(program.datasetByReferenceName("rdd2").get.program == program)
     assert(program.datasetByReferenceName("rdd2").get.reference.referenceType == ReferencesTypeEnum.Val)
     assert(program.datasetByReferenceName("rdd2").get.datasetType == ParameterizedType("org/apache/spark/rdd/RDD#", List(BaseType(BaseTypesEnum.Int))))
     assert(program.datasetByReferenceName("rdd2").get.isInputDataset)
     assert(!program.datasetByReferenceName("rdd2").get.isOutputDataset)
 
     assert(program.isDatasetByReferenceNameDefined("rdd3"))
+    assert(program.datasetByReferenceName("rdd3").get.program == program)
     assert(program.datasetByReferenceName("rdd3").get.reference.referenceType == ReferencesTypeEnum.Val)
     assert(program.datasetByReferenceName("rdd3").get.datasetType == ParameterizedType("org/apache/spark/rdd/RDD#", List(BaseType(BaseTypesEnum.Int))))
     assert(!program.datasetByReferenceName("rdd3").get.isInputDataset)
@@ -675,6 +726,7 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
     assert(program.transformations.size == 1)
 
     assert(program.transformations(0).isInstanceOf[SparkRDDBinaryTransformation])
+    assert(program.transformations(0).asInstanceOf[SparkRDDBinaryTransformation].program == program)
     assert(program.transformations(0).asInstanceOf[SparkRDDBinaryTransformation].name == "union")
     assert(program.transformations(0).asInstanceOf[SparkRDDBinaryTransformation].params.size == 1)
     assert(!program.transformations(0).asInstanceOf[SparkRDDBinaryTransformation].isLoadTransformation)

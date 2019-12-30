@@ -6,10 +6,10 @@ import br.ufrn.dimap.forall.transmut.model._
 import scala.meta.Tree
 import scala.meta.contrib._
 
-case class SparkRDD(override val id: Long) extends Dataset {
+case class SparkRDD(override val id: Long, override val program: SparkRDDProgram) extends Dataset {
 
-  def this(id: Long, ref: Reference, sourc: Tree) {
-    this(id)
+  def this(id: Long, program: SparkRDDProgram, ref: Reference, sourc: Tree) {
+    this(id, program)
     _reference = ref
     _source = sourc
   }
@@ -42,8 +42,8 @@ case class SparkRDD(override val id: Long) extends Dataset {
     _edges += edge
   }
 
-  override def copy(id: Long = this.id, reference: Reference = this.reference, source: Tree = this.source, edges: List[Edge] = this.edges) = {
-    var copyDataset = SparkRDD(id, reference, source)
+  override def copy(id: Long = this.id, program: Program = this.program, reference: Reference = this.reference, source: Tree = this.source, edges: List[Edge] = this.edges) = {
+    var copyDataset = SparkRDD(id, program.asInstanceOf[SparkRDDProgram], reference, source)
     copyDataset.edges = edges
     copyDataset
   }
@@ -51,6 +51,7 @@ case class SparkRDD(override val id: Long) extends Dataset {
   override def equals(that: Any): Boolean = that match {
     case that: SparkRDD => {
       that.id == id &&
+        that.program == program &&
         that.reference == reference &&
         that.source.isEqual(source) &&
         that.edges == edges
@@ -61,5 +62,5 @@ case class SparkRDD(override val id: Long) extends Dataset {
 }
 
 object SparkRDD {
-  def apply(id: Long, reference: Reference, source: Tree) = new SparkRDD(id, reference, source)
+  def apply(id: Long, program: SparkRDDProgram, reference: Reference, source: Tree) = new SparkRDD(id, program, reference, source)
 }

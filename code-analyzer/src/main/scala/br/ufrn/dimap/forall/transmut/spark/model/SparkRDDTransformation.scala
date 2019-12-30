@@ -5,10 +5,10 @@ import scala.collection.mutable.ListBuffer
 import scala.meta.Tree
 import scala.meta.contrib._
 
-abstract class SparkRDDTransformation(override val id: Long) extends Transformation {
+abstract class SparkRDDTransformation(override val id: Long, override val program: SparkRDDProgram) extends Transformation {
 
-  def this(id: Long, name: String, params: List[Tree], source: Tree) {
-    this(id)
+  def this(id: Long, program: SparkRDDProgram, name: String, params: List[Tree], source: Tree) {
+    this(id, program)
     _name = name
     _params = params
     _source = source
@@ -49,6 +49,7 @@ abstract class SparkRDDTransformation(override val id: Long) extends Transformat
   override def equals(that: Any): Boolean = that match {
     case that: SparkRDDTransformation => {
       that.id == id &&
+        that.program == program &&
         that.name == name &&
         that.source.isEqual(source) &&
         that.params == params &&

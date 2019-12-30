@@ -5,11 +5,12 @@ import scala.meta.contrib._
 
 import br.ufrn.dimap.forall.transmut.model.Dataset
 import br.ufrn.dimap.forall.transmut.model.Edge
+import br.ufrn.dimap.forall.transmut.model.Program
 
-case class SparkRDDBinaryTransformation(override val id: Long) extends SparkRDDTransformation(id) {
+case class SparkRDDBinaryTransformation(override val id: Long, override val program: SparkRDDProgram) extends SparkRDDTransformation(id, program) {
 
-  def this(id: Long, _name: String, _params: List[Tree], _source: Tree) {
-    this(id)
+  def this(id: Long, program: SparkRDDProgram, _name: String, _params: List[Tree], _source: Tree) {
+    this(id, program)
     name = _name
     params = _params
     source = _source
@@ -42,8 +43,8 @@ case class SparkRDDBinaryTransformation(override val id: Long) extends SparkRDDT
     _outputEdge = Some(edge)
   }
 
-  override def copy(id: Long = this.id, name: String = this.name, source: Tree = this.source, params: List[Tree] = this.params, edges: List[Edge] = this.edges) = {
-    var copyTransformation = SparkRDDBinaryTransformation(id, name, params, source)
+  override def copy(id: Long = this.id, program: Program = this.program, name: String = this.name, source: Tree = this.source, params: List[Tree] = this.params, edges: List[Edge] = this.edges) = {
+    var copyTransformation = SparkRDDBinaryTransformation(id, program.asInstanceOf[SparkRDDProgram], name, params, source)
     copyTransformation.edges = edges
     copyTransformation._firstInputEdge = this.firstInputEdge
     copyTransformation._secondInputEdge = this.secondInputEdge
@@ -54,6 +55,7 @@ case class SparkRDDBinaryTransformation(override val id: Long) extends SparkRDDT
   override def equals(that: Any): Boolean = that match {
     case that: SparkRDDBinaryTransformation => {
       that.id == id &&
+        that.program == program &&
         that.name == name &&
         that.source.isEqual(source) &&
         that.params == params &&
@@ -68,6 +70,6 @@ case class SparkRDDBinaryTransformation(override val id: Long) extends SparkRDDT
 }
 
 object SparkRDDBinaryTransformation {
-  def apply(id: Long, name: String, params: List[Tree], source: Tree) = new SparkRDDBinaryTransformation(id, name, params, source)
-  def apply(id: Long, name: String, source: Tree) = new SparkRDDBinaryTransformation(id, name, List(), source)
+  def apply(id: Long, program: SparkRDDProgram, name: String, params: List[Tree], source: Tree) = new SparkRDDBinaryTransformation(id, program, name, params, source)
+  def apply(id: Long, program: SparkRDDProgram, name: String, source: Tree) = new SparkRDDBinaryTransformation(id, program, name, List(), source)
 }

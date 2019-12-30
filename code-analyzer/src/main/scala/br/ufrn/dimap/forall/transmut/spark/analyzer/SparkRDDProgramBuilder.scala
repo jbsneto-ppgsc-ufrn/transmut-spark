@@ -41,7 +41,7 @@ object SparkRDDProgramBuilder extends ProgramBuilder {
     for (name <- programNames) {
       programSource.tree.traverse {
         case d: Defn.Def if d.name.value == name => {
-          val program = buildProgramFromTree(name, d, refenceTypes, ids)
+          val program = buildProgramFromTree(programSource, name, d, refenceTypes, ids)
           if (program.isDefined) {
             programSource.addProgram(program.get.asInstanceOf[SparkRDDProgram])
           }
@@ -52,7 +52,7 @@ object SparkRDDProgramBuilder extends ProgramBuilder {
     programSource
   }
 
-  private def buildProgramFromTree(programName: String, programTree: Tree, refenceTypes: Map[String, Reference], ids: IdsGeneratorAggregator): Option[Program] = {
+  private def buildProgramFromTree(programSource: SparkRDDProgramSource, programName: String, programTree: Tree, refenceTypes: Map[String, Reference], ids: IdsGeneratorAggregator): Option[Program] = {
 
     var programReturn: Option[Program] = None
 
@@ -60,7 +60,7 @@ object SparkRDDProgramBuilder extends ProgramBuilder {
 
       case q"..$mods def $methodName[..$tparams](...$paramss): $decltpe = $body" if methodName.value == programName => {
 
-        val program = SparkRDDProgram(ids.programId, programName, programTree)
+        val program = SparkRDDProgram(ids.programId, programName, programTree, programSource)
 
         // Input Datasets from Parameters
         paramss.foreach { p =>
@@ -73,7 +73,7 @@ object SparkRDDProgramBuilder extends ProgramBuilder {
               val originalReference = refenceTypes.get(datasetName).get
               val datasetReference = ParameterReference(originalReference.name, originalReference.valueType)
               val datasetSource = programTree
-              val dataset = SparkRDD(datasetId, datasetReference, datasetSource)
+              val dataset = SparkRDD(datasetId, program, datasetReference, datasetSource)
               program.addDataset(dataset)
             }
           }
@@ -166,7 +166,7 @@ object SparkRDDProgramBuilder extends ProgramBuilder {
                     // The types analyzer only generates "val" references, here I adjust if it is "var" reference
                     val datasetReference = if (isValReference) ValReference(originalReference.name, originalReference.valueType) else VarReference(originalReference.name, originalReference.valueType)
                     val datasetSource = treeElement
-                    val dataset = SparkRDD(datasetId, datasetReference, datasetSource)
+                    val dataset = SparkRDD(datasetId, program, datasetReference, datasetSource)
                     Some(dataset)
                   } else None
                 }
@@ -184,18 +184,18 @@ object SparkRDDProgramBuilder extends ProgramBuilder {
                     // The types analyzer only generates "val" references, here I adjust if it is "var" reference
                     val datasetReference = if (isValReference) ValReference(originalReference.name, originalReference.valueType) else VarReference(originalReference.name, originalReference.valueType)
                     val datasetSource = treeElement
-                    val dataset = SparkRDD(datasetId, datasetReference, datasetSource)
+                    val dataset = SparkRDD(datasetId, program, datasetReference, datasetSource)
                     Some(dataset)
                   } else None
                 }
 
                 val transformation: Option[SparkRDDTransformation] = if (supportedUnaryTransformations.contains(transformationName.get)) {
-                  Some(SparkRDDUnaryTransformation(ids.transformationId, transformationName.get, transformationParams, treeElement))
+                  Some(SparkRDDUnaryTransformation(ids.transformationId, program, transformationName.get, transformationParams, treeElement))
                 } else if (supportedBinaryTransformations.contains(transformationName.get)) {
-                  Some(SparkRDDBinaryTransformation(ids.transformationId, transformationName.get, transformationParams, treeElement))
+                  Some(SparkRDDBinaryTransformation(ids.transformationId, program, transformationName.get, transformationParams, treeElement))
                 } else if (firstInputDataset.isDefined) {
                   // For other RDD operations that are not supported transformations, including actions (the input dataset should be an RDD)
-                  Some(SparkRDDOperation(ids.transformationId, transformationName.get, transformationParams, treeElement))
+                  Some(SparkRDDOperation(ids.transformationId, program, transformationName.get, transformationParams, treeElement))
                 } else None
 
                 val secondInputDataset: Option[SparkRDD] = if (secondInputDatasetReferenceName.isDefined && supportedBinaryTransformations.contains(transformationName.get)) {
@@ -212,7 +212,7 @@ object SparkRDDProgramBuilder extends ProgramBuilder {
                       // The types analyzer only generates "val" references, here I adjust if it is "var" reference
                       val datasetReference = if (isValReference) ValReference(originalReference.name, originalReference.valueType) else VarReference(originalReference.name, originalReference.valueType)
                       val datasetSource = treeElement
-                      val dataset = SparkRDD(datasetId, datasetReference, datasetSource)
+                      val dataset = SparkRDD(datasetId, program, datasetReference, datasetSource)
                       Some(dataset)
                     } else None
                   }

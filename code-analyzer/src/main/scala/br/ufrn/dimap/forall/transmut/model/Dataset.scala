@@ -4,6 +4,8 @@ import scala.meta.Tree
 
 trait Dataset extends Element {
   
+  def program: Program
+  
   def reference: Reference
   
   def name = reference.name
@@ -26,6 +28,6 @@ trait Dataset extends Element {
   
   def isOutputDataset = outgoingEdges.isEmpty
   
-  def copy(id: Long = this.id, reference: Reference = this.reference, source : Tree = this.source, edges : List[Edge] = this.edges) : Dataset
+  def copy(id: Long = this.id, program: Program = this.program, reference: Reference = this.reference, source : Tree = this.source, edges : List[Edge] = this.edges) : Dataset
   
 }

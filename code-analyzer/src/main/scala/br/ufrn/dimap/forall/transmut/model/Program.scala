@@ -4,6 +4,8 @@ import scala.meta._
 import scala.collection.mutable._
 
 trait Program extends Element {
+  
+  def programSource: ProgramSource
 
   def name: String
 
