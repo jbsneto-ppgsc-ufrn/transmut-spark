@@ -30,6 +30,18 @@ case class SparkRDDProgramSource(override val id: Long) extends ProgramSource {
   def addProgram(p: SparkRDDProgram) {
     _programs += p
   }
+  
+  def removeProgram(p: SparkRDDProgram) {
+    val index = _programs.indexOf(p)
+    _programs.remove(index)
+  }
+
+  override def copy(id: Long = this.id, tree: Tree = this.tree, programs: List[Program] = this.programs): ProgramSource = {
+    val copyProgramSoucer = SparkRDDProgramSource(id)
+    copyProgramSoucer.tree = tree
+    programs.foreach(p => copyProgramSoucer.addProgram(p.copy().asInstanceOf[SparkRDDProgram]))
+    copyProgramSoucer
+  }
 
   override def equals(that: Any): Boolean = that match {
     case that: SparkRDDProgramSource => {

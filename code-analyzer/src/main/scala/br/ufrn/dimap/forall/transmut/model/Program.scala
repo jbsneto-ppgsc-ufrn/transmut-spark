@@ -24,5 +24,7 @@ trait Program extends Element {
   def datasetByReferenceName(name: String): Option[Dataset] = datasets.filter(d => d.reference.name == name).headOption
 
   def isDatasetByReferenceNameDefined(name: String) = datasetByReferenceName(name).isDefined
+  
+  def copy(id: Long = this.id, programSource : ProgramSource = this.programSource, name: String = this.name, tree: Tree = this.tree, datasets: List[Dataset] = this.datasets, transformations: List[Transformation] = this.transformations, edges : List[Edge] = this.edges) : Program
 
 }

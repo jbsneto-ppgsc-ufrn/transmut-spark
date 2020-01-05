@@ -9,4 +9,6 @@ trait ProgramSource extends Element {
 
   def programs: List[Program]
 
+  def copy(id: Long = this.id, tree: Tree = this.tree, programs: List[Program] = this.programs) : ProgramSource
+  
 }
