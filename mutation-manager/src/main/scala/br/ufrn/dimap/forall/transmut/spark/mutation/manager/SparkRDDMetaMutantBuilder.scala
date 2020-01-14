@@ -52,7 +52,7 @@ object SparkRDDMetaMutantBuilder extends MetaMutantBuilder {
   }
 
   private def buildMetaMutantMatchExpression(program: SparkRDDProgram, mutants: List[MutantProgram]): Term.Match = {
-    val matchValue = q"""System.getProperty("CURRENT_MUTANT")"""
+    val matchValue = q"""sys.props.get("CURRENT_MUTANT")"""
     val defaultProgramCase = buildDefaultProgramCaseFromOriginalProgram(program)
     val mutantProgramCases = mutants.map(mutantProgram => buildMutantProgramCaseFromMutantProgram(mutantProgram))
     val cases = mutantProgramCases :+ defaultProgramCase
@@ -72,7 +72,7 @@ object SparkRDDMetaMutantBuilder extends MetaMutantBuilder {
 
   private def buildMutantProgramCaseFromMutantProgram(mutantProgram: MutantProgram): Case = {
     val id: Lit = Lit.String(mutantProgram.id.toString())
-    val pattern: Pat = p"$id"
+    val pattern: Pat = p"Some($id)"
     var expression: Term = q"{}"
     mutantProgram.mutated.tree.traverse {
       case q"..$mods def $methodName[..$tparams](...$paramss): $decltpe = $body" if methodName.value == mutantProgram.original.name => {
