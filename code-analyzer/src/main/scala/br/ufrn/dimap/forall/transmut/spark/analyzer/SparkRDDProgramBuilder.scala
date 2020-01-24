@@ -7,6 +7,12 @@ import br.ufrn.dimap.forall.transmut.analyzer.ProgramBuilder
 import br.ufrn.dimap.forall.transmut.model._
 import br.ufrn.dimap.forall.transmut.spark.model._
 import br.ufrn.dimap.forall.transmut.util.LongIdGenerator
+import java.nio.file.Files
+import java.nio.file.Path
+import br.ufrn.dimap.forall.transmut.util.IOFiles
+import br.ufrn.dimap.forall.transmut.analyzer.CodeParser
+import br.ufrn.dimap.forall.transmut.analyzer.TypesAnalyzer
+import br.ufrn.dimap.forall.transmut.exception.ProgramBuildException
 
 object SparkRDDProgramBuilder extends ProgramBuilder {
 
@@ -32,11 +38,43 @@ object SparkRDDProgramBuilder extends ProgramBuilder {
     def edgesId = edgesIds.getId
   }
 
-  def buildProgramSourceFromProgramNames(programNames: List[String], tree: Tree, refenceTypes: Map[String, Reference]): SparkRDDProgramSource = {
-
+  override def buildProgramSources(sources: List[String], programs: List[String], srcDir: Path, semanticdbDir: Path): List[SparkRDDProgramSource] = {
+    val filesInSrcDir = IOFiles.getListOfFiles(srcDir.toFile)
+    val filesInSemanticdbDir = IOFiles.getListOfFiles(semanticdbDir.toFile)
+    val sourceSemanticdbTuplePaths = scala.collection.mutable.ListBuffer.empty[(Path, Path)] // List of (source, semanticdb)
+    for (source <- sources) {
+      val sourcePath = filesInSrcDir.filter(f => f.isFile() && f.getAbsolutePath.contains(source)).headOption
+      if (sourcePath.isEmpty)
+        throw new ProgramBuildException("Source " + source + " does not exists in " + srcDir.toFile().getAbsolutePath)
+      val semanticdbPath = filesInSemanticdbDir.filter(f => f.isFile() && f.getAbsolutePath.contains(source) && f.getAbsolutePath.contains("semanticdb")).headOption
+      if (semanticdbPath.isEmpty)
+        throw new ProgramBuildException("Semanticdb document for " + source + " does not exists in " + semanticdbDir.toFile().getAbsolutePath)
+      sourceSemanticdbTuplePaths += ((sourcePath.get.toPath(), semanticdbPath.get.toPath()))
+    }
+    val programSources = scala.collection.mutable.ListBuffer.empty[SparkRDDProgramSource]
     val ids = new IdsGeneratorAggregator
+    for (sourceSemanticdb <- sourceSemanticdbTuplePaths) {
+      val sourcePath = sourceSemanticdb._1
+      val semanticdbPath = sourceSemanticdb._2
+      val tree = CodeParser.getTreeFromPath(sourcePath)
+      val referenceTypes = TypesAnalyzer.getReferenceMapFromPath(semanticdbPath)
+      val programSource = buildProgramSourceFromProgramNames(programs, tree, referenceTypes, sourcePath, ids)
+      programSources += programSource
+    }
+    // Verify if the programs in programs list were created
+    val programsNames = programSources.flatMap(ps => ps.programs.map(p => p.name))
+    for (program <- programs) {
+      if (!programsNames.contains(program))
+        throw new ProgramBuildException("Program " + program + " does not exists in the program sources")
+    }
+    programSources.toList
+  }
 
-    val programSource = SparkRDDProgramSource(ids.programSourceId, tree)
+  // For tests where the source file is not necessary, it creates a temp file.
+  def buildProgramSourceFromProgramNames(programNames: List[String], tree: Tree, refenceTypes: Map[String, Reference]): SparkRDDProgramSource = buildProgramSourceFromProgramNames(programNames, tree, refenceTypes, Files.createTempFile("TempProgramSource", ".scala"), new IdsGeneratorAggregator)
+
+  def buildProgramSourceFromProgramNames(programNames: List[String], tree: Tree, refenceTypes: Map[String, Reference], source: Path, ids: IdsGeneratorAggregator): SparkRDDProgramSource = {
+    val programSource = SparkRDDProgramSource(ids.programSourceId, tree, source)
 
     for (name <- programNames) {
       programSource.tree.traverse {
@@ -158,7 +196,7 @@ object SparkRDDProgramBuilder extends ProgramBuilder {
                   Some(program.datasetByReferenceName(firstInputDatasetReferenceName.get).get.asInstanceOf[SparkRDD])
                 } else {
                   val referenceName = refenceTypes.get(firstInputDatasetReferenceName.get)
-                  // Only creates a new dataset if the reference is an RDD 
+                  // Only creates a new dataset if the reference is an RDD
                   if (referenceName.isDefined && referenceName.get.valueType.name == datasetType) {
                     val datasetId = ids.datasetId
                     val datasetName = firstInputDatasetReferenceName.get
@@ -176,7 +214,7 @@ object SparkRDDProgramBuilder extends ProgramBuilder {
                   Some(program.datasetByReferenceName(outputDatasetReferenceName.get).get.asInstanceOf[SparkRDD])
                 } else {
                   val referenceName = refenceTypes.get(outputDatasetReferenceName.get)
-                  // Only creates a new dataset if the reference is an RDD 
+                  // Only creates a new dataset if the reference is an RDD
                   if (referenceName.isDefined && referenceName.get.valueType.name == datasetType) {
                     val datasetId = ids.datasetId
                     val datasetName = outputDatasetReferenceName.get
@@ -204,7 +242,7 @@ object SparkRDDProgramBuilder extends ProgramBuilder {
                     Some(program.datasetByReferenceName(secondInputDatasetReferenceName.get).get.asInstanceOf[SparkRDD])
                   } else {
                     val referenceName = refenceTypes.get(secondInputDatasetReferenceName.get)
-                    // Only creates a new dataset if the reference is an RDD 
+                    // Only creates a new dataset if the reference is an RDD
                     if (referenceName.isDefined && referenceName.get.valueType.name == datasetType) {
                       val datasetId = ids.datasetId
                       val datasetName = secondInputDatasetReferenceName.get
@@ -282,7 +320,7 @@ object SparkRDDProgramBuilder extends ProgramBuilder {
               }
 
             } else {
-              throw new Exception("Expression not defined: " + dv.toString)
+              throw new ProgramBuildException("Expression not defined: " + dv.toString)
             }
           }
         }

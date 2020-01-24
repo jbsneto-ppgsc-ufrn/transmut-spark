@@ -7,17 +7,27 @@ import br.ufrn.dimap.forall.transmut.model.Program
 import scala.meta.Tree
 import br.ufrn.dimap.forall.transmut.model.Element
 import scala.meta.contrib._
+import java.nio.file.Path
 
 case class SparkRDDProgramSource(override val id: Long) extends ProgramSource {
 
-  def this(id: Long, t: Tree) {
+  def this(id: Long, t: Tree, s: Path) {
     this(id)
-    _tree = t
+    tree = t
+    source = s
   }
 
   private var _programs: ListBuffer[SparkRDDProgram] = scala.collection.mutable.ListBuffer.empty[SparkRDDProgram]
 
   private var _tree: Tree = _
+
+  private var _source: Path = _
+
+  override def source = _source
+
+  def source_=(s: Path) {
+    _source = s
+  }
 
   override def tree = _tree
 
@@ -30,14 +40,15 @@ case class SparkRDDProgramSource(override val id: Long) extends ProgramSource {
   def addProgram(p: SparkRDDProgram) {
     _programs += p
   }
-  
+
   def removeProgram(p: SparkRDDProgram) {
     val index = _programs.indexOf(p)
     _programs.remove(index)
   }
 
-  override def copy(id: Long = this.id, tree: Tree = this.tree, programs: List[Program] = this.programs): ProgramSource = {
+  override def copy(id: Long = this.id, tree: Tree = this.tree, source: Path = this.source, programs: List[Program] = this.programs): ProgramSource = {
     val copyProgramSoucer = SparkRDDProgramSource(id)
+    copyProgramSoucer.source = source
     copyProgramSoucer.tree = tree
     programs.foreach(p => copyProgramSoucer.addProgram(p.copy().asInstanceOf[SparkRDDProgram]))
     copyProgramSoucer
@@ -46,6 +57,7 @@ case class SparkRDDProgramSource(override val id: Long) extends ProgramSource {
   override def equals(that: Any): Boolean = that match {
     case that: SparkRDDProgramSource => {
       that.id == id &&
+        that.source.equals(source) &&
         that.tree.isEqual(tree) &&
         that.programs == programs
     }
@@ -55,5 +67,5 @@ case class SparkRDDProgramSource(override val id: Long) extends ProgramSource {
 }
 
 object SparkRDDProgramSource {
-  def apply(id: Long, tree: Tree) = new SparkRDDProgramSource(id, tree)
+  def apply(id: Long, tree: Tree, source: Path) = new SparkRDDProgramSource(id, tree, source)
 }

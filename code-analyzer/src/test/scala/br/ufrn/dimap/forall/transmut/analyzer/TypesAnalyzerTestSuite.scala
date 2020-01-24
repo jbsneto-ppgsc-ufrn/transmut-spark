@@ -13,7 +13,7 @@ class TypesAnalyzerTestSuite extends FunSuite {
   
   test("Test Case 1 - Program with all base type values"){
    
-    val refenceTypes = TypesAnalyzer.getReferenceMapFromPath("./src/test/resources/BaseTypesTestCase.scala.semanticdb") 
+    val refenceTypes = TypesAnalyzer.getReferenceMapFromPath("./src/test/resources/meta/BaseTypesTestCase.scala.semanticdb") 
     
     assert(refenceTypes.contains("TypesAnalyzerBaseTypesTestCase"))
     assert(refenceTypes.get("TypesAnalyzerBaseTypesTestCase").get.valueType == ClassType("TypesAnalyzerBaseTypesTestCase"))
@@ -42,7 +42,7 @@ class TypesAnalyzerTestSuite extends FunSuite {
   
   test("Test Case 2 - Simple Spark Program"){
    
-    val refenceTypes = TypesAnalyzer.getReferenceMapFromPath("./src/test/resources/SparkProgramTestCase1.scala.semanticdb") 
+    val refenceTypes = TypesAnalyzer.getReferenceMapFromPath("./src/test/resources/meta/SparkProgramTestCase1.scala.semanticdb") 
     
     assert(refenceTypes.contains("SparkProgramTestCase1"))
     assert(refenceTypes.get("SparkProgramTestCase1").get.valueType == ClassType("SparkProgramTestCase1"))

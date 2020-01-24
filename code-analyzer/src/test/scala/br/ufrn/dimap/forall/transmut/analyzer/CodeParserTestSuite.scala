@@ -6,11 +6,11 @@ import scala.meta.contrib._
 
 import org.scalatest.FunSuite
 
-class CodeAnalyzerTestSuite extends FunSuite {
+class CodeParserTestSuite extends FunSuite {
   
-  test("Test Case 1 - BaseTypesTestCase.scala"){
+  test("Test Case 1 - Parsing BaseTypesTestCase.scala"){
     
-    val tree = CodeAnalyzer.getTreeFromPath("./src/test/resources/BaseTypesTestCase.scala")
+    val tree = CodeParser.getTreeFromPath("./src/test/resources/src/BaseTypesTestCase.scala")
     
     val sourceContentTree = tree match {
       case Source(content) => Some(content.head)
@@ -34,9 +34,9 @@ class CodeAnalyzerTestSuite extends FunSuite {
     
   }
   
-  test("Test Case 2 - SparkProgramTestCase1.scala"){
+  test("Test Case 2 - Parsing SparkProgramTestCase1.scala"){
     
-    val tree = CodeAnalyzer.getTreeFromPath("./src/test/resources/SparkProgramTestCase1.scala")
+    val tree = CodeParser.getTreeFromPath("./src/test/resources/src/SparkProgramTestCase1.scala")
     
     val sourceContentTree = tree match {
       case Source(content) => Some(content)

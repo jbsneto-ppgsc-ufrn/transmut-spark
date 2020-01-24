@@ -9,10 +9,107 @@ import br.ufrn.dimap.forall.transmut.model._
 import br.ufrn.dimap.forall.transmut.spark.model.SparkRDDUnaryTransformation
 import br.ufrn.dimap.forall.transmut.spark.model.SparkRDDBinaryTransformation
 import br.ufrn.dimap.forall.transmut.spark.model.SparkRDDOperation
+import java.nio.file.Paths
+import java.nio.file.Files
+import br.ufrn.dimap.forall.transmut.exception.ProgramBuildException
 
 class SparkRDDProgramBuilderTestSuite extends FunSuite {
 
-  test("Test Case 1 - Program with parameterized unary transformations using val references") {
+  test("Test Case 1 - Build program source") {
+    val sources = List("SparkProgramTestCase1.scala")
+    val programs = List("program")
+    val srcDir = Paths.get("./src/test/resources/src/")
+    val semanticdbDir = Paths.get("./src/test/resources/meta/")
+
+    val programSources = SparkRDDProgramBuilder.buildProgramSources(sources, programs, srcDir, semanticdbDir)
+
+    assert(!programSources.isEmpty)
+    assert(programSources.size == 1)
+
+    val expectedSource = Paths.get("./src/test/resources/src/SparkProgramTestCase1.scala").toAbsolutePath
+    assert(programSources.head.source.toAbsolutePath() == expectedSource)
+
+    val sourceContentTree = programSources.head.tree match {
+      case Source(content) => Some(content)
+      case _               => None
+    }
+
+    val expectedTree: Tree = q"""
+      import org.apache.spark.rdd.RDD
+
+      object SparkProgramTestCase1 {
+        def program(rdd1: RDD[Int]) = {
+          val rdd2 = rdd1.map(_.toString())
+          val rdd3 = rdd2.persist
+          val rdd4 = rdd3.map(v => (v.toInt, v))
+          val rdd5 = rdd4.keys
+          rdd5
+        }
+      }"""
+
+    val expectedContentTree = expectedTree match {
+      case Term.Block(content) => Some(content)
+      case _                   => None
+    }
+
+    assert(sourceContentTree.isDefined)
+    assert(expectedContentTree.isDefined)
+    assert(sourceContentTree.get.structure == expectedContentTree.get.structure)
+
+    assert(programSources.head.programs.size == 1)
+    assert(programSources.head.programs.head.name == "program")
+  }
+
+  test("Test Case 2 - Try to build program source with source that does not exist") {
+    val sources = List("NotExistentProgramSource.scala")
+    val programs = List("program")
+    val srcDir = Paths.get("./src/test/resources/src/")
+    val semanticdbDir = Paths.get("./src/test/resources/meta/")
+
+    val caught =
+      intercept[ProgramBuildException] {
+        val programSources = SparkRDDProgramBuilder.buildProgramSources(sources, programs, srcDir, semanticdbDir)
+      }
+    val errorMsg = caught.getMessage
+    assert(errorMsg.contains("NotExistentProgramSource.scala"))
+    assert(errorMsg.contains("does not exists in"))
+    assert(errorMsg.contains(srcDir.toFile().getAbsolutePath))
+  }
+
+  test("Test Case 3 - Try to build program source with semanticdb document that does not exist") {
+    val sources = List("BaseTypesTestCase2.scala")
+    val programs = List("program")
+    val srcDir = Paths.get("./src/test/resources/src/")
+    val semanticdbDir = Paths.get("./src/test/resources/meta/")
+
+    val caught =
+      intercept[ProgramBuildException] {
+        val programSources = SparkRDDProgramBuilder.buildProgramSources(sources, programs, srcDir, semanticdbDir)
+      }
+    val errorMsg = caught.getMessage
+    assert(errorMsg.contains("Semanticdb document for"))
+    assert(errorMsg.contains("BaseTypesTestCase2.scala"))
+    assert(errorMsg.contains("does not exists in"))
+    assert(errorMsg.contains(semanticdbDir.toFile().getAbsolutePath))
+  }
+
+  test("Test Case 4 - Try to build program source with program that does not exist") {
+    val sources = List("SparkProgramTestCase1.scala")
+    val programs = List("notExistentProgram")
+    val srcDir = Paths.get("./src/test/resources/src/")
+    val semanticdbDir = Paths.get("./src/test/resources/meta/")
+
+    val caught =
+      intercept[ProgramBuildException] {
+        val programSources = SparkRDDProgramBuilder.buildProgramSources(sources, programs, srcDir, semanticdbDir)
+      }
+    val errorMsg = caught.getMessage
+    assert(errorMsg.contains("Program "))
+    assert(errorMsg.contains("notExistentProgram"))
+    assert(errorMsg.contains("does not exists in the program sources"))
+  }
+
+  test("Test Case 5 - Build program with parameterized unary transformations using val references") {
 
     val tree: Tree = q"""
       import org.apache.spark.rdd.RDD
@@ -39,7 +136,7 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
     assert(programSource.programs.size == 1)
 
     val program = programSource.programs.head
-    
+
     assert(program.programSource == programSource)
 
     assert(program.datasets.size == 3)
@@ -109,7 +206,7 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
 
   }
 
-  test("Test Case 2 - Program with a not parameterized unary transformation using var references") {
+  test("Test Case 6 - Build program with a not parameterized unary transformation using var references") {
 
     val tree: Tree = q"""
       import org.apache.spark.rdd.RDD
@@ -134,7 +231,7 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
     assert(programSource.programs.size == 1)
 
     val program = programSource.programs.head
-    
+
     assert(program.programSource == programSource)
 
     assert(program.datasets.size == 2)
@@ -177,7 +274,7 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
 
   }
 
-  test("Test Case 3 - Program with binary transformations (Set Transformations)") {
+  test("Test Case 7 - Build program with binary transformations (Set Transformations)") {
 
     val tree: Tree = q"""
       import org.apache.spark.rdd.RDD
@@ -207,7 +304,7 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
     assert(programSource.programs.size == 1)
 
     val program = programSource.programs.head
-    
+
     assert(program.programSource == programSource)
 
     assert(program.datasets.size == 5)
@@ -325,7 +422,7 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
 
   }
 
-  test("Test Case 4 - Program with Key-Value RDDs and Key-Value unary and  binary transformations (Join Transformation)") {
+  test("Test Case 8 - Build program with Key-Value RDDs and Key-Value unary and  binary transformations (Join Transformation)") {
 
     val tree: Tree = q"""
       import org.apache.spark.rdd.RDD
@@ -353,7 +450,7 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
     assert(programSource.programs.size == 1)
 
     val program = programSource.programs.head
-    
+
     assert(program.programSource == programSource)
 
     assert(program.datasets.size == 4)
@@ -434,7 +531,7 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
 
   }
 
-  test("Test Case 5 - Program with not supported RDD transformations") {
+  test("Test Case 9 - Build program with not supported RDD transformations") {
 
     val tree: Tree = q"""
       import org.apache.spark.rdd.RDD
@@ -461,7 +558,7 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
     assert(programSource.programs.size == 1)
 
     val program = programSource.programs.head
-    
+
     assert(program.programSource == programSource)
 
     assert(program.datasets.size == 3)
@@ -535,7 +632,7 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
 
   }
 
-  test("Test Case 6 - Program with not supported RDD transformation (Action)") {
+  test("Test Case 10 - Build program with not supported RDD transformation (Action)") {
 
     val tree: Tree = q"""
       import org.apache.spark.rdd.RDD
@@ -560,7 +657,7 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
     assert(programSource.programs.size == 1)
 
     val program = programSource.programs.head
-    
+
     assert(program.programSource == programSource)
 
     assert(program.datasets.size == 1)
@@ -592,7 +689,7 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
 
   }
 
-  test("Test Case 7 - Program with the input RDD being created inside the program rather than being passed as parameter and an unary transformation") {
+  test("Test Case 11 - Build program with the input RDD being created inside the program rather than being passed as parameter and an unary transformation") {
 
     val tree: Tree = q"""
       import org.apache.spark.SparkContext
@@ -621,7 +718,7 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
     assert(programSource.programs.size == 1)
 
     val program = programSource.programs.head
-    
+
     assert(program.programSource == programSource)
 
     assert(program.datasets.size == 2)
@@ -664,8 +761,8 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
     assert(program.edges(1).direction == DirectionsEnum.TransformationToDataset)
 
   }
-  
-  test("Test Case 8 - Program with the input RDDs being created inside the program rather than being passed as parameter and a binary transformation") {
+
+  test("Test Case 12 - Build program with the input RDDs being created inside the program rather than being passed as parameter and a binary transformation") {
 
     val tree: Tree = q"""
       import org.apache.spark.SparkContext
@@ -697,7 +794,7 @@ class SparkRDDProgramBuilderTestSuite extends FunSuite {
     assert(programSource.programs.size == 1)
 
     val program = programSource.programs.head
-    
+
     assert(program.programSource == programSource)
 
     assert(program.datasets.size == 3)

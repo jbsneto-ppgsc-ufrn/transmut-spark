@@ -6,17 +6,20 @@ lazy val global = (project in file("."))
    commonSettings
   )
   .aggregate(
+    core,
     util,
     codeAnalyzer,
-    mutationManager
+    mutationManager,
+    mutationAnalyzer
   ) 
 
-lazy val util = (project in file("util"))
+lazy val core = (project in file("core"))
   .settings(
-    name := "util",
+    name := "core",
     commonSettings,
     libraryDependencies ++= commonDependencies
   )
+  .dependsOn(util, codeAnalyzer, mutationManager, mutationAnalyzer)
 
 lazy val codeAnalyzer = (project in file("code-analyzer"))
   .settings(
@@ -34,7 +37,24 @@ lazy val mutationManager = (project in file("mutation-manager"))
   )
   .dependsOn(util, codeAnalyzer)
 
+lazy val mutationAnalyzer = (project in file("mutation-analyzer"))
+  .settings(
+    name := "mutation-analyzer",
+    commonSettings,
+    libraryDependencies ++= commonDependencies
+  )
+  .dependsOn(util, codeAnalyzer, mutationManager)
+
+lazy val util = (project in file("util"))
+  .settings(
+    name := "util",
+    commonSettings,
+    libraryDependencies ++= commonDependencies
+  )
+
 lazy val commonDependencies = Seq(
+  "com.github.pureconfig" %% "pureconfig" % "0.12.2",
+  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
   "org.scalameta" %% "scalameta" % "4.2.0",
   "org.scalameta" %% "semanticdb" % "4.1.0",
   "org.scalactic" %% "scalactic" % "3.0.8",
