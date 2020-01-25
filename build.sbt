@@ -1,5 +1,3 @@
-
-
 lazy val global = (project in file("."))
   .settings(
    name := "mutation-transformation-testing-tool",
@@ -10,8 +8,22 @@ lazy val global = (project in file("."))
     util,
     codeAnalyzer,
     mutationManager,
-    mutationAnalyzer
+    mutationAnalyzer, 
+    sbtTransmut
   ) 
+
+lazy val sbtTransmut = (project in file("sbt-transmut"))
+  .enablePlugins(SbtPlugin)
+  .settings(
+    name := "sbt-transmut",
+    commonSettings,
+    libraryDependencies ++= commonDependencies,
+    scriptedLaunchOpts := { scriptedLaunchOpts.value ++
+      Seq("-Xmx1024M", "-Dplugin.version=" + version.value)
+    },
+    scriptedBufferLog := false
+  )
+  .dependsOn(util, codeAnalyzer, mutationManager, mutationAnalyzer, core)
 
 lazy val core = (project in file("core"))
   .settings(
@@ -54,7 +66,7 @@ lazy val util = (project in file("util"))
 
 lazy val commonDependencies = Seq(
   "com.github.pureconfig" %% "pureconfig" % "0.12.2",
-  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
+  "org.clapper" %% "grizzled-slf4j" % "1.3.4",
   "org.scalameta" %% "scalameta" % "4.2.0",
   "org.scalameta" %% "semanticdb" % "4.1.0",
   "org.scalactic" %% "scalactic" % "3.0.8",
@@ -64,7 +76,7 @@ lazy val commonDependencies = Seq(
 lazy val commonSettings = Seq(
   organization := "br.ufrn.dimap.forall",
   scalaVersion := "2.12.8",
-  version := "0.1",
+  version := "0.1-SNAPSHOT",
   fork in Test := true,
   javaOptions ++= Seq("-Xms512M", "-Xmx2048M", "-XX:MaxPermSize=2048M", "-XX:+CMSClassUnloadingEnabled"),
   parallelExecution in Test := false

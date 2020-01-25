@@ -8,8 +8,6 @@ import br.ufrn.dimap.forall.transmut.mutation.runner.TestSuccess
 
 object MutantAnalyzer {
 
-  def analyzeMutants(metaMutant: MetaMutantProgramSource, mutantsResults: List[TestResult[MutantProgramSource]]): (MetaMutantProgramSource, List[MutantResult[MutantProgramSource]]) = analyzeMutants(metaMutant, mutantsResults, List())
-
   def analyzeMutants(metaMutant: MetaMutantProgramSource, mutantsResults: List[TestResult[MutantProgramSource]], equivalentsIds: List[Long]): (MetaMutantProgramSource, List[MutantResult[MutantProgramSource]]) = {
     val mutantsVerdicts: List[MutantResult[MutantProgramSource]] = mutantsResults.map(testResult => fromTestResultToMutantResult(testResult, equivalentsIds))
     (metaMutant, mutantsVerdicts)

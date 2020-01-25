@@ -9,7 +9,7 @@ object ConfigReader {
 
   def readConfig(configFile: File): Config = {
     if (isConfigFileExists(configFile))
-      ConfigSource.file(configFile).loadOrThrow[Config]
+      ConfigSource.file(configFile).at("transmut").loadOrThrow[Config]
     else
       throw new Exception("Configuration file does not exists: " + configFile.getAbsolutePath)
   }

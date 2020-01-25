@@ -46,7 +46,7 @@ trait MutationTestingProcess {
     // Original Program and Mutants Execution
     reporter.reportMutantExecutionStart
     val metaMutantsTestResults = metaMutants.map(metaMutant => mutantRunner.runMutationTestProcess(metaMutant, config.equivalentMutants))
-    val metaMutantsVerdicts = metaMutantsTestResults.map(m => MutantAnalyzer.analyzeMutants(m._1, m._2))
+    val metaMutantsVerdicts = metaMutantsTestResults.map(m => MutantAnalyzer.analyzeMutants(m._1, m._2, config.equivalentMutants))
     reporter.reportMutantExecutionEnd(metaMutantsVerdicts)
 
     reporter.reportProcessEnd
