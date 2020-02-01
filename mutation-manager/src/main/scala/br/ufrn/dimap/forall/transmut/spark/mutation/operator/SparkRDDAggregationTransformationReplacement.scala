@@ -89,11 +89,11 @@ object SparkRDDAggregationTransformationReplacement extends MutationOperator[Tra
     val paramType = getFunctionParameterTypeName(original).parse[Type].get
     mutated.source = mutated.source.transform {
       case q"$rdd.$tranf($func)" => q"""$rdd.$tranf((firstParameter: $paramType, secondParameter: $paramType) => {
-      val originalFunction = $func
+      val originalFunction = ($func)(_,_)
       originalFunction(firstParameter, firstParameter)
       })"""
       case q"$rdd.$tranf($firstParam, $secondParam, $func)" => q"""$rdd.$tranf($firstParam, $secondParam, (firstParameter: $paramType, secondParameter: $paramType) => {
-      val originalFunction = $func
+      val originalFunction = ($func)(_,_)
       originalFunction(firstParameter, firstParameter)
       })"""
     }
@@ -113,11 +113,11 @@ object SparkRDDAggregationTransformationReplacement extends MutationOperator[Tra
     val paramType = getFunctionParameterTypeName(original).parse[Type].get
     mutated.source = mutated.source.transform {
       case q"$rdd.$tranf($func)" => q"""$rdd.$tranf((firstParameter: $paramType, secondParameter: $paramType) => {
-      val originalFunction = $func
+      val originalFunction = ($func)(_,_)
       originalFunction(secondParameter, secondParameter)
       })"""
       case q"$rdd.$tranf($firstParam, $secondParam, $func)" => q"""$rdd.$tranf($firstParam, $secondParam, (firstParameter: $paramType, secondParameter: $paramType) => {
-      val originalFunction = $func
+      val originalFunction = ($func)(_,_)
       originalFunction(secondParameter, secondParameter)
       })"""
     }
@@ -138,11 +138,11 @@ object SparkRDDAggregationTransformationReplacement extends MutationOperator[Tra
     val paramType = getFunctionParameterTypeName(original).parse[Type].get
     mutated.source = mutated.source.transform {
       case q"$rdd.$tranf($func)" => q"""$rdd.$tranf((firstParameter: $paramType, secondParameter: $paramType) => {
-      val originalFunction = $func
+      val originalFunction = ($func)(_,_)
       originalFunction(secondParameter, firstParameter)
       })"""
       case q"$rdd.$tranf($firstParam, $secondParam, $func)" => q"""$rdd.$tranf($firstParam, $secondParam, (firstParameter: $paramType, secondParameter: $paramType) => {
-      val originalFunction = $func
+      val originalFunction = ($func)(_,_)
       originalFunction(secondParameter, firstParameter)
       })"""
     }

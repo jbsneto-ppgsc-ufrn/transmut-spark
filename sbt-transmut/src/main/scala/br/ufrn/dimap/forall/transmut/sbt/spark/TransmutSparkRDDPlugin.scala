@@ -29,7 +29,8 @@ object TransmutSparkRDDPlugin extends AutoPlugin {
     transmut := {
       implicit val config = transmutConfig.value
       val currentState = state.value
-      val process = new TransmutSparkRDDProcess(currentState)
+      val logger = streams.value.log
+      val process = new TransmutSparkRDDProcess(currentState, logger)
       process.runProcess()
     })
 
@@ -46,9 +47,6 @@ object TransmutSparkRDDPlugin extends AutoPlugin {
       }
       if (config.transmutDir == config.defaultTransmutDir) {
         config.transmutDir = (target.value / "transmut").toPath()
-      }
-      if (config.transmutSrcDir == config.defaultTransmutSrcDir) {
-        config.transmutDir = (target.value / "transmut" / "mutated-src").toPath()
       }
       config
     } else {

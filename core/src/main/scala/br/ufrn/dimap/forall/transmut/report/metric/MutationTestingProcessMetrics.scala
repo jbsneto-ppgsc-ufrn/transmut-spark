@@ -7,39 +7,60 @@ import br.ufrn.dimap.forall.transmut.mutation.analyzer.MutantKilled
 import br.ufrn.dimap.forall.transmut.mutation.analyzer.MutantSurvived
 import br.ufrn.dimap.forall.transmut.mutation.analyzer.MutantEquivalent
 import br.ufrn.dimap.forall.transmut.mutation.analyzer.MutantError
+import scala.concurrent.duration.Duration
 
-case class MutationTestingProcessMetrics(metaMutant: MetaMutantProgramSource, mutantsVerdicts: List[MutantResult[MutantProgramSource]]) {
+case class MutationTestingProcessMetrics(metaMutantsVerdicts: List[(MetaMutantProgramSource, List[MutantResult[MutantProgramSource]])], processDuration: Duration) {
 
-  def metaMutantMetrics = MetaMutantProgramSourceMetrics(metaMutant)
+  def programSources = metaMutantsVerdicts.map(m => m._1.original)
 
-  def mutationScore = numKilledMutants.toFloat / (metaMutantMetrics.numMutants - numEquivalentMutants)
+  def metaMutantProgramSources = metaMutantsVerdicts.map(m => m._1)
 
-  def killedMutants = mutantsVerdicts.filter(r => r match {
+  def mutantProgramSourcesResults = metaMutantsVerdicts.flatMap(m => m._2)
+
+  def totalMutants = mutantProgramSourcesResults.size
+  
+  def metaMutantProgramSourcesMetrics = metaMutantsVerdicts.map(mv => MetaMutantProgramSourceMetrics(mv._1, mv._2))
+  
+  def totalMetaMutanProgramSources = metaMutantProgramSourcesMetrics.size
+  
+  def metaMutantProgramsMetrics = metaMutantProgramSourcesMetrics.flatMap(m => m.metaMutantProgramsMetrics)
+  
+  def totalMetaMutantPrograms = metaMutantProgramsMetrics.size
+  
+  def totalDatasets = metaMutantProgramsMetrics.map(m => m.totalDatasets).sum
+  
+  def totalTransformations = metaMutantProgramsMetrics.map(m => m.totalTransformations).sum
+  
+  def mutantProgramsMetrics = metaMutantProgramsMetrics.flatMap(m => m.mutantsMetrics)
+
+  def killedMutants = mutantProgramSourcesResults.filter(r => r match {
     case MutantKilled(m) => true
     case _               => false
   }).map(mr => mr.mutant)
 
-  def numKilledMutants = killedMutants.size
+  def totalKilledMutants = killedMutants.size
 
-  def survivedMutants = mutantsVerdicts.filter(r => r match {
+  def survivedMutants = mutantProgramSourcesResults.filter(r => r match {
     case MutantSurvived(m) => true
     case _                 => false
   }).map(mr => mr.mutant)
 
-  def numSurvivedMutants = survivedMutants.size
+  def totalSurvivedMutants = survivedMutants.size
 
-  def equivalentMutants = mutantsVerdicts.filter(r => r match {
+  def equivalentMutants = mutantProgramSourcesResults.filter(r => r match {
     case MutantEquivalent(m) => true
     case _                   => false
   }).map(mr => mr.mutant)
 
-  def numEquivalentMutants = equivalentMutants.size
+  def totalEquivalentMutants = equivalentMutants.size
 
-  def errorMutants = mutantsVerdicts.filter(r => r match {
+  def errorMutants = mutantProgramSourcesResults.filter(r => r match {
     case MutantError(m) => true
     case _              => false
   }).map(mr => mr.mutant)
 
-  def numErrorMutants = errorMutants.size
+  def totalErrorMutants = errorMutants.size
 
+  def totalMutationScore = totalKilledMutants.toFloat / (totalMutants - totalEquivalentMutants)
+  
 }

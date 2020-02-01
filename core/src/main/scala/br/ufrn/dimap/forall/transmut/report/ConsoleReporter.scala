@@ -11,11 +11,19 @@ import br.ufrn.dimap.forall.transmut.report.metric.MutationTestingProcessMetrics
 
 object ConsoleReporter extends Reporter {
 
+  def apply(inf: String => Unit) = {
+    this.info = inf
+    this
+  }
+
   private var programSources: List[ProgramSource] = List()
   private var metaMutants: List[MetaMutantProgramSource] = List()
   private var metaMutantsVerdicts: List[(MetaMutantProgramSource, List[MutantResult[MutantProgramSource]])] = List()
+  private var info: String => Unit = println(_)
 
-  def info(msg: String) = println(msg)
+  override def onAdditionalInformation(msg: String) {
+    info(msg)
+  }
 
   override def onProcessStart {
     info("Starting the mutation testing process...")
@@ -49,79 +57,83 @@ object ConsoleReporter extends Reporter {
   }
 
   override def onProcessEnd() {
+    val mutationTestingProcessMetrics = MutationTestingProcessMetrics(metaMutantsVerdicts, processDuration)
+    val metaMutantProgramSourcesMetrics = mutationTestingProcessMetrics.metaMutantProgramSourcesMetrics
     info("------------------------------------------------------------------------------------")
     info("MUTATION TESTING PROCESS RESULTS")
     info("------------------------------------------------------------------------------------")
-    timeMetricsReport()
-    programSourcesReport(programSources)
-    metaMutantsReport(metaMutants)
-    mutationTestingProcessReport(metaMutantsVerdicts)
+    programSourcesReport(metaMutantProgramSourcesMetrics)
+    metaMutantsReport(metaMutantProgramSourcesMetrics)
+    mutationTestingProcessReport(metaMutantProgramSourcesMetrics)
+    generalMutationTestingProcessReport(mutationTestingProcessMetrics)
   }
 
-  def timeMetricsReport() {
-    val metrics = timeMetrics
+  def generalMutationTestingProcessReport(metric: MutationTestingProcessMetrics) {
+    info("Mutation Testing Process Duration: " + metric.processDuration.toSeconds + " seconds")
     info("------------------------------------------------------------------------------------")
-    info("Program Sources Build Duration: " + metrics.processDuration.toSeconds + " seconds")
-    info("Mutants Generation Duration: " + metrics.processDuration.toSeconds + " seconds")
-    info("Mutants Tests Duration: " + metrics.processDuration.toSeconds + " seconds")
-    info("Mutation Testing Process Total Duration: " + metrics.processDuration.toSeconds + " seconds")
+    info("General Mutation Testing Results: ")
+    info("------------------------------------------------------------------------------------")
+    info("Program Sources: " + metric.totalMetaMutanProgramSources)
+    info("Programs: " + metric.totalMetaMutantPrograms)
+    info("Total Number of Mutants: " + metric.totalMutants)
+    info("Total Number of Killed Mutants: " + metric.totalKilledMutants)
+    info("Total Number of Survived Mutants: " + metric.totalSurvivedMutants)
+    info("Total Number of Equivalent Mutants: " + metric.totalEquivalentMutants)
+    info("Total Number of Error Mutants: " + metric.totalErrorMutants)
+    info("General Mutation Score: " + f"${(metric.totalMutationScore * 100)}%.2f%%")
     info("------------------------------------------------------------------------------------")
   }
 
-  def programSourcesReport(programSources: List[ProgramSource]) {
+  def programSourcesReport(metaProgramSourcesMetrics: List[MetaMutantProgramSourceMetrics]) {
     info("Program Sources Metrics: ")
-    programSources.foreach { programSource =>
-      val metrics = ProgramSourceMetrics(programSource)
+    metaProgramSourcesMetrics.foreach { metrics =>
       info("------------------------------------------------------------------------------------")
-      info("Program Source: " + programSource.source.getFileName.toString())
-      info("Number of Programs: " + metrics.numPrograms)
+      info("Program Source: " + metrics.sourceName)
+      info("Number of Programs: " + metrics.totalPrograms)
       info("Programs: ")
-      metrics.programsMetrics.foreach { metric =>
-        info("Program: " + metric.program.name)
-        info("Number of Datasets: " + metric.numDatasets)
-        info("Number of Transformations: " + metric.numTransformations)
+      metrics.metaMutantProgramsMetrics.foreach { metric =>
+        info("Program: " + metric.name)
+        info("Number of Datasets: " + metric.totalDatasets)
+        info("Number of Transformations: " + metric.totalTransformations)
       }
       info("------------------------------------------------------------------------------------")
     }
   }
 
-  def metaMutantsReport(metaMutants: List[MetaMutantProgramSource]) {
+  def metaMutantsReport(metaProgramSourcesMetrics: List[MetaMutantProgramSourceMetrics]) {
     info("Mutant Metrics: ")
-    metaMutants.foreach { metaMutant =>
-      val metrics = MetaMutantProgramSourceMetrics(metaMutant)
+    metaProgramSourcesMetrics.foreach { programSourceMetric =>
       info("------------------------------------------------------------------------------------")
-      info("Program Source: " + metaMutant.mutated.source.getFileName.toString())
-      info("Total Number of Mutants: " + metrics.numMutants)
-      metrics.metaMutantProgramsMetrics.foreach { metric =>
-        info("Program: " + metric.metaMutant.original.name)
-        info("Number of Mutants: " + metric.numMutants)
+      info("Program Source: " + programSourceMetric.sourceName)
+      info("Total Number of Mutants: " + programSourceMetric.totalMutants)
+      programSourceMetric.metaMutantProgramsMetrics.foreach { programMetric =>
+        info("Program: " + programMetric.name)
+        info("Number of Mutants: " + programMetric.totalMutants)
         info("Number of Mutants For Each Mutation Operator: ")
-        metric.numMutantsPerOperator.foreach { op =>
-          info(MutationOperatorsEnum.mutationOperatorsNameFromEnum(op._1) + ": " + op._2)
+        programMetric.numMutantsPerOperator.foreach { op =>
+          if (op._2 > 0)
+            info(MutationOperatorsEnum.mutationOperatorsNameFromEnum(op._1) + ": " + op._2)
         }
       }
       info("------------------------------------------------------------------------------------")
     }
   }
 
-  def mutationTestingProcessReport(metaMutantsVerdicts: List[(MetaMutantProgramSource, List[MutantResult[MutantProgramSource]])]) {
+  def mutationTestingProcessReport(metaProgramSourcesMetrics: List[MetaMutantProgramSourceMetrics]) {
     info("Mutation Testing Results: ")
-    metaMutantsVerdicts.foreach { metaMutantsVerdict =>
-      val metaMutant = metaMutantsVerdict._1
-      val mutantsResults = metaMutantsVerdict._2
-      val metrics = MutationTestingProcessMetrics(metaMutant, mutantsResults)
+    metaProgramSourcesMetrics.foreach { metaMutantProgramSource =>
       info("------------------------------------------------------------------------------------")
-      info("Program Source: " + metaMutant.mutated.source.getFileName.toString())
-      info("Total Number of Mutants: " + metrics.metaMutantMetrics.numMutants)
-      info("Number of Killed Mutants: " + metrics.numKilledMutants)
-      info("Number of Survived Mutants: " + metrics.numSurvivedMutants)
-      info("Number of Equivalent Mutants: " + metrics.numEquivalentMutants)
-      info("Number of Error Mutants: " + metrics.numErrorMutants)
-      info("Mutation Score: " + metrics.mutationScore)
-      info("List of Killed Mutants IDs: " + metrics.killedMutants.map(_.id).mkString(", "))
-      info("List of Survived Mutants IDs: " + metrics.survivedMutants.map(_.id).mkString(", "))
-      info("List of Equivalent Mutants IDs: " + metrics.equivalentMutants.map(_.id).mkString(", "))
-      info("List of Error Mutants IDs: " + metrics.errorMutants.map(_.id).mkString(", "))
+      info("Program Source: " + metaMutantProgramSource.sourceName)
+      info("Total Number of Mutants: " + metaMutantProgramSource.totalMutants)
+      info("Number of Killed Mutants: " + metaMutantProgramSource.totalKilledMutants)
+      info("Number of Survived Mutants: " + metaMutantProgramSource.totalSurvivedMutants)
+      info("Number of Equivalent Mutants: " + metaMutantProgramSource.totalEquivalentMutants)
+      info("Number of Error Mutants: " + metaMutantProgramSource.totalErrorMutants)
+      info("Mutation Score: " + f"${(metaMutantProgramSource.mutationScore * 100)}%.2f%%")
+      info("List of Killed Mutants IDs: " + metaMutantProgramSource.killedMutants.map(_.id).mkString(", "))
+      info("List of Survived Mutants IDs: " + metaMutantProgramSource.survivedMutants.map(_.id).mkString(", "))
+      info("List of Equivalent Mutants IDs: " + metaMutantProgramSource.equivalentMutants.map(_.id).mkString(", "))
+      info("List of Error Mutants IDs: " + metaMutantProgramSource.errorMutants.map(_.id).mkString(", "))
     }
     info("------------------------------------------------------------------------------------")
   }

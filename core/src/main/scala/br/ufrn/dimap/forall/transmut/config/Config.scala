@@ -10,13 +10,16 @@ case class Config(
   equivalentMutants:  List[Long]   = List(),
   var srcDir:         Path         = Paths.get("src/main/scala/"),
   var semanticdbDir:  Path         = Paths.get("target/scala-2.12/meta/"),
-  var transmutDir:    Path         = Paths.get("target/transmut/"),
-  var transmutSrcDir: Path         = Paths.get("target/transmut/mutated-src")) {
+  var transmutDir:    Path         = Paths.get("target/transmut/")) {
 
   val defaultSrcDir: Path = Paths.get("src/main/scala/")
   val defaultSemanticdbDir: Path = Paths.get("target/scala-2.12/meta/")
   val defaultTransmutDir: Path = Paths.get("target/transmut/")
-  val defaultTransmutSrcDir: Path = Paths.get("target/transmut/mutated-src")
+  
+  val transmutReportsDir = Paths.get(transmutDir.toString(), "reports")
+  val transmutHtmlReportsDir = Paths.get(transmutReportsDir.toString(), "html")
+  val transmutSrcDir = Paths.get(transmutDir.toString(), "mutated-src")
+  val transmutMutantsDir = Paths.get(transmutDir.toString(), "mutants")
 
   def mutationOperatorsList: List[MutationOperatorsEnum.MutationOperatorsEnum] = {
     if (mutationOperators.contains("ALL"))

@@ -15,11 +15,10 @@ import br.ufrn.dimap.forall.transmut.util.LongIdGenerator
 
 object SparkRDDMutationManager extends MutationManager {
 
-  def generateMutantsFromProgramSource(programSource: ProgramSource, mutationOperators: List[MutationOperatorsEnum]): List[MutantProgramSource] = {
+  def generateMutantsFromProgramSource(programSource: ProgramSource, mutationOperators: List[MutationOperatorsEnum], idGenerator: LongIdGenerator): List[MutantProgramSource] = {
     if (programSource.isInstanceOf[SparkRDDProgramSource]) {
       val sparkRDDProgramSource = programSource.asInstanceOf[SparkRDDProgramSource]
       val mutants = scala.collection.mutable.ListBuffer.empty[Mutant[Program]]
-      val idGenerator = LongIdGenerator.generator
       for (program <- sparkRDDProgramSource.programs) {
         mutants ++= generateMutantsFromProgram(program, mutationOperators, idGenerator)
       }
@@ -29,12 +28,7 @@ object SparkRDDMutationManager extends MutationManager {
     }
   }
 
-  def generateMutantsFromProgram(program: Program, mutationOperators: List[MutationOperatorsEnum]): List[MutantProgram] = {
-    val idGenerator = LongIdGenerator.generator
-    generateMutantsFromProgram(program, mutationOperators, idGenerator)
-  }
-
-  private def generateMutantsFromProgram(program: Program, mutationOperators: List[MutationOperatorsEnum], idGenerator: LongIdGenerator): List[MutantProgram] = {
+  def generateMutantsFromProgram(program: Program, mutationOperators: List[MutationOperatorsEnum], idGenerator: LongIdGenerator): List[MutantProgram] = {
     if (program.isInstanceOf[SparkRDDProgram]) {
       val sparkRDDProgram = program.asInstanceOf[SparkRDDProgram]
       val transformations = sparkRDDProgram.transformations

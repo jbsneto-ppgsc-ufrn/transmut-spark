@@ -1,31 +1,39 @@
 package br.ufrn.dimap.forall.transmut.report
 
+import scala.concurrent.duration.Duration
+import scala.concurrent.duration.MILLISECONDS
+
 import br.ufrn.dimap.forall.transmut.model.ProgramSource
+import br.ufrn.dimap.forall.transmut.mutation.analyzer.MutantResult
 import br.ufrn.dimap.forall.transmut.mutation.model.MetaMutantProgramSource
 import br.ufrn.dimap.forall.transmut.mutation.model.MutantProgramSource
-import br.ufrn.dimap.forall.transmut.mutation.runner.TestResult
-import br.ufrn.dimap.forall.transmut.report.metric.TimeMetrics
-import br.ufrn.dimap.forall.transmut.mutation.analyzer.MutantResult
 
 trait Reporter {
 
-  protected var processStartTime = System.currentTimeMillis()
-  protected var programBuildStartTime = System.currentTimeMillis()
-  protected var programBuildEndTime = System.currentTimeMillis()
-  protected var mutantGenerationStartTime = System.currentTimeMillis()
-  protected var mutantGenerationEndTime = System.currentTimeMillis()
-  protected var mutantExecutionStartTime = System.currentTimeMillis()
-  protected var mutantExecutionEndTime = System.currentTimeMillis()
-  protected var processEndTime = System.currentTimeMillis()
+  var _processStartTime = 0l
+  var _processEndTime = 0l
 
-  def onProcessStart() {}
-  def onProgramBuildStart() {}
-  def onProgramBuildEnd(programSources: List[ProgramSource]) {}
-  def onMutantGenerationStart() {}
-  def onMutantGenerationEnd(metaMutants: List[MetaMutantProgramSource]) {}
-  def onMutantExecutionStart() {}
-  def onMutantExecutionEnd(metaMutantsVerdicts: List[(MetaMutantProgramSource, List[MutantResult[MutantProgramSource]])]) {}
-  def onProcessEnd() {}
+  def processStartTime = _processStartTime
+
+  def processStartTime_=(start: Long) {
+    _processStartTime = start
+  }
+
+  def processEndTime = _processEndTime
+
+  def processEndTime_=(end: Long) {
+    _processEndTime = end
+  }
+
+  def onProcessStart(): Unit
+  def onProgramBuildStart(): Unit
+  def onProgramBuildEnd(programSources: List[ProgramSource]): Unit
+  def onMutantGenerationStart(): Unit
+  def onMutantGenerationEnd(metaMutants: List[MetaMutantProgramSource]): Unit
+  def onMutantExecutionStart(): Unit
+  def onMutantExecutionEnd(metaMutantsVerdicts: List[(MetaMutantProgramSource, List[MutantResult[MutantProgramSource]])]): Unit
+  def onProcessEnd(): Unit
+  def onAdditionalInformation(msg: String) {}
 
   def reportProcessStart {
     processStartTime = System.currentTimeMillis()
@@ -33,32 +41,26 @@ trait Reporter {
   }
 
   def reportProgramBuildStart {
-    programBuildStartTime = System.currentTimeMillis()
     onProgramBuildStart
   }
 
   def reportProgramBuildEnd(programSources: List[ProgramSource]) {
-    programBuildEndTime = System.currentTimeMillis()
     onProgramBuildEnd(programSources)
   }
 
   def reportMutantGenerationStart {
-    mutantGenerationStartTime = System.currentTimeMillis()
     onMutantGenerationStart
   }
 
   def reportMutantGenerationEnd(metaMutants: List[MetaMutantProgramSource]) {
-    mutantGenerationEndTime = System.currentTimeMillis()
     onMutantGenerationEnd(metaMutants)
   }
 
   def reportMutantExecutionStart {
-    mutantExecutionStartTime = System.currentTimeMillis()
     onMutantExecutionStart
   }
 
   def reportMutantExecutionEnd(metaMutantsVerdicts: List[(MetaMutantProgramSource, List[MutantResult[MutantProgramSource]])]) {
-    mutantExecutionEndTime = System.currentTimeMillis()
     onMutantExecutionEnd(metaMutantsVerdicts)
   }
 
@@ -67,14 +69,10 @@ trait Reporter {
     onProcessEnd
   }
 
-  def timeMetrics = TimeMetrics(
-    processStartTime,
-    programBuildStartTime,
-    programBuildEndTime,
-    mutantGenerationStartTime,
-    mutantGenerationEndTime,
-    mutantExecutionStartTime,
-    mutantExecutionEndTime,
-    processEndTime)
+  def reportAdditionalInformation(msg: String) {
+    onAdditionalInformation(msg)
+  }
+
+  def processDuration = Duration(processEndTime - processStartTime, MILLISECONDS)
 
 }

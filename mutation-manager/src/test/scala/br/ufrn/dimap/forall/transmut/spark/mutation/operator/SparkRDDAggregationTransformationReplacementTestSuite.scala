@@ -150,7 +150,7 @@ class SparkRDDAggregationTransformationReplacementTestSuite extends FunSuite {
     assert(mutantFirstParameterReplacement.mutated.source != mutantFirstParameterReplacement.original.source)
     assert(mutantFirstParameterReplacement.original.source.isEqual(q"val rdd2 = rdd1.reduceByKey((x: Double, y: Double) => if(x > y) x else y)"))
     assert(mutantFirstParameterReplacement.mutated.source.isEqual(q"""val rdd2 = rdd1.reduceByKey((firstParameter: Double, secondParameter: Double) => {
-      val originalFunction = (x: Double, y: Double) => if(x > y) x else y
+      val originalFunction = ((x: Double, y: Double) => if(x > y) x else y)(_,_)
       originalFunction(firstParameter, firstParameter)
       })"""))
 
@@ -159,7 +159,7 @@ class SparkRDDAggregationTransformationReplacementTestSuite extends FunSuite {
     assert(!mutantFirstParameterReplacement.mutated.params(0).isEqual(mutantFirstParameterReplacement.original.params(0)))
     assert(mutantFirstParameterReplacement.original.params(0).isEqual(q"(x: Double, y: Double) => if(x > y) x else y"))
     assert(mutantFirstParameterReplacement.mutated.params(0).isEqual(q"""(firstParameter: Double, secondParameter: Double) => {
-      val originalFunction = (x: Double, y: Double) => if(x > y) x else y
+      val originalFunction = ((x: Double, y: Double) => if(x > y) x else y)(_,_)
       originalFunction(firstParameter, firstParameter)
       }"""))
 
@@ -176,7 +176,7 @@ class SparkRDDAggregationTransformationReplacementTestSuite extends FunSuite {
     assert(mutantSecondParameterReplacement.mutated.source != mutantSecondParameterReplacement.original.source)
     assert(mutantSecondParameterReplacement.original.source.isEqual(q"val rdd2 = rdd1.reduceByKey((x: Double, y: Double) => if(x > y) x else y)"))
     assert(mutantSecondParameterReplacement.mutated.source.isEqual(q"""val rdd2 = rdd1.reduceByKey((firstParameter: Double, secondParameter: Double) => {
-      val originalFunction = (x: Double, y: Double) => if(x > y) x else y
+      val originalFunction = ((x: Double, y: Double) => if(x > y) x else y)(_,_)
       originalFunction(secondParameter, secondParameter)
       })"""))
 
@@ -185,7 +185,7 @@ class SparkRDDAggregationTransformationReplacementTestSuite extends FunSuite {
     assert(!mutantSecondParameterReplacement.mutated.params(0).isEqual(mutantSecondParameterReplacement.original.params(0)))
     assert(mutantSecondParameterReplacement.original.params(0).isEqual(q"(x: Double, y: Double) => if(x > y) x else y"))
     assert(mutantSecondParameterReplacement.mutated.params(0).isEqual(q"""(firstParameter: Double, secondParameter: Double) => {
-      val originalFunction = (x: Double, y: Double) => if(x > y) x else y
+      val originalFunction = ((x: Double, y: Double) => if(x > y) x else y)(_,_)
       originalFunction(secondParameter, secondParameter)
       }"""))
 
@@ -202,7 +202,7 @@ class SparkRDDAggregationTransformationReplacementTestSuite extends FunSuite {
     assert(mutantCommutativeReplacement.mutated.source != mutantCommutativeReplacement.original.source)
     assert(mutantCommutativeReplacement.original.source.isEqual(q"val rdd2 = rdd1.reduceByKey((x: Double, y: Double) => if(x > y) x else y)"))
     assert(mutantCommutativeReplacement.mutated.source.isEqual(q"""val rdd2 = rdd1.reduceByKey((firstParameter: Double, secondParameter: Double) => {
-      val originalFunction = (x: Double, y: Double) => if(x > y) x else y
+      val originalFunction = ((x: Double, y: Double) => if(x > y) x else y)(_,_)
       originalFunction(secondParameter, firstParameter)
       })"""))
 
@@ -211,7 +211,7 @@ class SparkRDDAggregationTransformationReplacementTestSuite extends FunSuite {
     assert(!mutantCommutativeReplacement.mutated.params(0).isEqual(mutantCommutativeReplacement.original.params(0)))
     assert(mutantCommutativeReplacement.original.params(0).isEqual(q"(x: Double, y: Double) => if(x > y) x else y"))
     assert(mutantCommutativeReplacement.mutated.params(0).isEqual(q"""(firstParameter: Double, secondParameter: Double) => {
-      val originalFunction = (x: Double, y: Double) => if(x > y) x else y
+      val originalFunction = ((x: Double, y: Double) => if(x > y) x else y)(_,_)
       originalFunction(secondParameter, firstParameter)
       }"""))
 
@@ -321,7 +321,7 @@ class SparkRDDAggregationTransformationReplacementTestSuite extends FunSuite {
     assert(mutantFirstParameterReplacement.mutated.source != mutantFirstParameterReplacement.original.source)
     assert(mutantFirstParameterReplacement.original.source.isEqual(q"val rdd2 = rdd1.reduceByKey(max)"))
     assert(mutantFirstParameterReplacement.mutated.source.isEqual(q"""val rdd2 = rdd1.reduceByKey((firstParameter: Double, secondParameter: Double) => {
-      val originalFunction = max
+      val originalFunction = (max)(_,_)
       originalFunction(firstParameter, firstParameter)
       })"""))
 
@@ -330,7 +330,7 @@ class SparkRDDAggregationTransformationReplacementTestSuite extends FunSuite {
     assert(!mutantFirstParameterReplacement.mutated.params(0).isEqual(mutantFirstParameterReplacement.original.params(0)))
     assert(mutantFirstParameterReplacement.original.params(0).isEqual(q"max"))
     assert(mutantFirstParameterReplacement.mutated.params(0).isEqual(q"""(firstParameter: Double, secondParameter: Double) => {
-      val originalFunction = max
+      val originalFunction = (max)(_,_)
       originalFunction(firstParameter, firstParameter)
       }"""))
 
@@ -347,7 +347,7 @@ class SparkRDDAggregationTransformationReplacementTestSuite extends FunSuite {
     assert(mutantSecondParameterReplacement.mutated.source != mutantSecondParameterReplacement.original.source)
     assert(mutantSecondParameterReplacement.original.source.isEqual(q"val rdd2 = rdd1.reduceByKey(max)"))
     assert(mutantSecondParameterReplacement.mutated.source.isEqual(q"""val rdd2 = rdd1.reduceByKey((firstParameter: Double, secondParameter: Double) => {
-      val originalFunction = max
+      val originalFunction = (max)(_,_)
       originalFunction(secondParameter, secondParameter)
       })"""))
 
@@ -356,7 +356,7 @@ class SparkRDDAggregationTransformationReplacementTestSuite extends FunSuite {
     assert(!mutantSecondParameterReplacement.mutated.params(0).isEqual(mutantSecondParameterReplacement.original.params(0)))
     assert(mutantSecondParameterReplacement.original.params(0).isEqual(q"max"))
     assert(mutantSecondParameterReplacement.mutated.params(0).isEqual(q"""(firstParameter: Double, secondParameter: Double) => {
-      val originalFunction = max
+      val originalFunction = (max)(_,_)
       originalFunction(secondParameter, secondParameter)
       }"""))
 
@@ -373,7 +373,7 @@ class SparkRDDAggregationTransformationReplacementTestSuite extends FunSuite {
     assert(mutantCommutativeReplacement.mutated.source != mutantCommutativeReplacement.original.source)
     assert(mutantCommutativeReplacement.original.source.isEqual(q"val rdd2 = rdd1.reduceByKey(max)"))
     assert(mutantCommutativeReplacement.mutated.source.isEqual(q"""val rdd2 = rdd1.reduceByKey((firstParameter: Double, secondParameter: Double) => {
-      val originalFunction = max
+      val originalFunction = (max)(_,_)
       originalFunction(secondParameter, firstParameter)
       })"""))
 
@@ -382,7 +382,7 @@ class SparkRDDAggregationTransformationReplacementTestSuite extends FunSuite {
     assert(!mutantCommutativeReplacement.mutated.params(0).isEqual(mutantCommutativeReplacement.original.params(0)))
     assert(mutantCommutativeReplacement.original.params(0).isEqual(q"max"))
     assert(mutantCommutativeReplacement.mutated.params(0).isEqual(q"""(firstParameter: Double, secondParameter: Double) => {
-      val originalFunction = max
+      val originalFunction = (max)(_,_)
       originalFunction(secondParameter, firstParameter)
       }"""))
 
@@ -513,7 +513,7 @@ class SparkRDDAggregationTransformationReplacementTestSuite extends FunSuite {
             (tuple: (Double, String)) => tuple._1,
             (accumulator: Double, element: (Double, String)) => accumulator + element._1,
             (firstParameter: Double, secondParameter: Double) => {
-              val originalFunction = (accumulator1: Double, accumulator2: Double) => accumulator1 + accumulator2
+              val originalFunction = ((accumulator1: Double, accumulator2: Double) => accumulator1 + accumulator2)(_,_)
               originalFunction(firstParameter, firstParameter)
             })"""))
 
@@ -523,7 +523,7 @@ class SparkRDDAggregationTransformationReplacementTestSuite extends FunSuite {
     assert(mutantFirstParameterReplacement.mutated.params(1).isEqual(mutantFirstParameterReplacement.original.params(1)))
     assert(mutantFirstParameterReplacement.original.params(2).isEqual(q"(accumulator1: Double, accumulator2: Double) => accumulator1 + accumulator2"))
     assert(mutantFirstParameterReplacement.mutated.params(2).isEqual(q"""(firstParameter: Double, secondParameter: Double) => {
-              val originalFunction = (accumulator1: Double, accumulator2: Double) => accumulator1 + accumulator2
+              val originalFunction = ((accumulator1: Double, accumulator2: Double) => accumulator1 + accumulator2)(_,_)
               originalFunction(firstParameter, firstParameter)
             }"""))
 
@@ -546,7 +546,7 @@ class SparkRDDAggregationTransformationReplacementTestSuite extends FunSuite {
             (tuple: (Double, String)) => tuple._1,
             (accumulator: Double, element: (Double, String)) => accumulator + element._1,
             (firstParameter: Double, secondParameter: Double) => {
-              val originalFunction = (accumulator1: Double, accumulator2: Double) => accumulator1 + accumulator2
+              val originalFunction = ((accumulator1: Double, accumulator2: Double) => accumulator1 + accumulator2)(_,_)
               originalFunction(secondParameter, secondParameter)
             })"""))
 
@@ -556,7 +556,7 @@ class SparkRDDAggregationTransformationReplacementTestSuite extends FunSuite {
     assert(mutantSecondParameterReplacement.mutated.params(1).isEqual(mutantSecondParameterReplacement.original.params(1)))
     assert(mutantSecondParameterReplacement.original.params(2).isEqual(q"(accumulator1: Double, accumulator2: Double) => accumulator1 + accumulator2"))
     assert(mutantSecondParameterReplacement.mutated.params(2).isEqual(q"""(firstParameter: Double, secondParameter: Double) => {
-              val originalFunction = (accumulator1: Double, accumulator2: Double) => accumulator1 + accumulator2
+              val originalFunction = ((accumulator1: Double, accumulator2: Double) => accumulator1 + accumulator2)(_,_)
               originalFunction(secondParameter, secondParameter)
             }"""))
 
@@ -579,7 +579,7 @@ class SparkRDDAggregationTransformationReplacementTestSuite extends FunSuite {
             (tuple: (Double, String)) => tuple._1,
             (accumulator: Double, element: (Double, String)) => accumulator + element._1,
             (firstParameter: Double, secondParameter: Double) => {
-              val originalFunction = (accumulator1: Double, accumulator2: Double) => accumulator1 + accumulator2
+              val originalFunction = ((accumulator1: Double, accumulator2: Double) => accumulator1 + accumulator2)(_,_)
               originalFunction(secondParameter, firstParameter)
             })"""))
 
@@ -589,7 +589,7 @@ class SparkRDDAggregationTransformationReplacementTestSuite extends FunSuite {
     assert(mutantCommutativeReplacement.mutated.params(1).isEqual(mutantCommutativeReplacement.original.params(1)))
     assert(mutantCommutativeReplacement.original.params(2).isEqual(q"(accumulator1: Double, accumulator2: Double) => accumulator1 + accumulator2"))
     assert(mutantCommutativeReplacement.mutated.params(2).isEqual(q"""(firstParameter: Double, secondParameter: Double) => {
-              val originalFunction = (accumulator1: Double, accumulator2: Double) => accumulator1 + accumulator2
+              val originalFunction = ((accumulator1: Double, accumulator2: Double) => accumulator1 + accumulator2)(_,_)
               originalFunction(secondParameter, firstParameter)
             }"""))
 
@@ -706,7 +706,7 @@ class SparkRDDAggregationTransformationReplacementTestSuite extends FunSuite {
     assert(mutantFirstParameterReplacement.original.source.isEqual(q"""val rdd2 = rdd1.combineByKey(createCombiner, mergeValue, mergeCombiner)"""))
     assert(mutantFirstParameterReplacement.mutated.source.isEqual(q"""val rdd2 = rdd1.combineByKey(createCombiner, mergeValue,
       (firstParameter: Double, secondParameter: Double) => {
-              val originalFunction = mergeCombiner
+              val originalFunction = (mergeCombiner)(_,_)
               originalFunction(firstParameter, firstParameter)
             })"""))
 
@@ -716,7 +716,7 @@ class SparkRDDAggregationTransformationReplacementTestSuite extends FunSuite {
     assert(mutantFirstParameterReplacement.mutated.params(1).isEqual(mutantFirstParameterReplacement.original.params(1)))
     assert(mutantFirstParameterReplacement.original.params(2).isEqual(q"mergeCombiner"))
     assert(mutantFirstParameterReplacement.mutated.params(2).isEqual(q"""(firstParameter: Double, secondParameter: Double) => {
-              val originalFunction = mergeCombiner
+              val originalFunction = (mergeCombiner)(_,_)
               originalFunction(firstParameter, firstParameter)
             }"""))
 
@@ -734,7 +734,7 @@ class SparkRDDAggregationTransformationReplacementTestSuite extends FunSuite {
     assert(mutantSecondParameterReplacement.original.source.isEqual(q"""val rdd2 = rdd1.combineByKey(createCombiner, mergeValue, mergeCombiner)"""))
     assert(mutantSecondParameterReplacement.mutated.source.isEqual(q"""val rdd2 = rdd1.combineByKey(createCombiner, mergeValue,
       (firstParameter: Double, secondParameter: Double) => {
-              val originalFunction = mergeCombiner
+              val originalFunction = (mergeCombiner)(_,_)
               originalFunction(secondParameter, secondParameter)
             })"""))
 
@@ -744,7 +744,7 @@ class SparkRDDAggregationTransformationReplacementTestSuite extends FunSuite {
     assert(mutantSecondParameterReplacement.mutated.params(1).isEqual(mutantSecondParameterReplacement.original.params(1)))
     assert(mutantSecondParameterReplacement.original.params(2).isEqual(q"mergeCombiner"))
     assert(mutantSecondParameterReplacement.mutated.params(2).isEqual(q"""(firstParameter: Double, secondParameter: Double) => {
-              val originalFunction = mergeCombiner
+              val originalFunction = (mergeCombiner)(_,_)
               originalFunction(secondParameter, secondParameter)
             }"""))
 
@@ -762,7 +762,7 @@ class SparkRDDAggregationTransformationReplacementTestSuite extends FunSuite {
     assert(mutantCommutativeReplacement.original.source.isEqual(q"""val rdd2 = rdd1.combineByKey(createCombiner, mergeValue, mergeCombiner)"""))
     assert(mutantCommutativeReplacement.mutated.source.isEqual(q"""val rdd2 = rdd1.combineByKey(createCombiner, mergeValue,
       (firstParameter: Double, secondParameter: Double) => {
-              val originalFunction = mergeCombiner
+              val originalFunction = (mergeCombiner)(_,_)
               originalFunction(secondParameter, firstParameter)
             })"""))
 
@@ -772,47 +772,9 @@ class SparkRDDAggregationTransformationReplacementTestSuite extends FunSuite {
     assert(mutantCommutativeReplacement.mutated.params(1).isEqual(mutantCommutativeReplacement.original.params(1)))
     assert(mutantCommutativeReplacement.original.params(2).isEqual(q"mergeCombiner"))
     assert(mutantCommutativeReplacement.mutated.params(2).isEqual(q"""(firstParameter: Double, secondParameter: Double) => {
-              val originalFunction = mergeCombiner
+              val originalFunction = (mergeCombiner)(_,_)
               originalFunction(secondParameter, firstParameter)
             }"""))
 
   }
-
-//  test("Test Case 6 - aggregateByKey with reference functions") {
-//
-//    val idGenerator = LongIdGenerator.generator
-//
-//    val tree: Tree = q"""
-//      import org.apache.spark.rdd.RDD
-//
-//      object SparkProgram {
-//      
-//        val zeroValue = 0.0d
-//        def seqOp = (accumulator: Double, element: (Double, String)) => accumulator + element._1
-//        def combOp = (accumulator1: Double, accumulator2: Double) => accumulator1 + accumulator2
-//      
-//        def program(rdd1: RDD[(Long, (Double, String))]) : RDD[(Long, Double)] = {
-//          val rdd2 = rdd1.aggregateByKey(zeroValue)(seqOp, combOp)
-//          rdd2
-//        }
-//        
-//      }"""
-//
-//    val refenceTypes = scala.collection.mutable.Map[String, Reference]()
-//    refenceTypes += ("rdd1" -> ParameterReference("rdd1", ParameterizedType("org/apache/spark/rdd/RDD#", List(TupleType(BaseType(BaseTypesEnum.Long), TupleType(BaseType(BaseTypesEnum.Double), BaseType(BaseTypesEnum.String)))))))
-//    refenceTypes += ("rdd2" -> ValReference("rdd2", ParameterizedType("org/apache/spark/rdd/RDD#", List(TupleType(BaseType(BaseTypesEnum.Long), BaseType(BaseTypesEnum.Double))))))
-//
-//    val programNames = List("program")
-//
-//    val programSource = SparkRDDProgramBuilder.buildProgramSourceFromProgramNames(programNames, tree, refenceTypes.toMap)
-//
-//    assert(programSource.programs.size == 1)
-//
-//    val program = programSource.programs.head
-//
-//    val original = program.transformations.head
-//
-//    assert(SparkRDDAggregationTransformationReplacement.isApplicable(original))
-//  }
-
 }

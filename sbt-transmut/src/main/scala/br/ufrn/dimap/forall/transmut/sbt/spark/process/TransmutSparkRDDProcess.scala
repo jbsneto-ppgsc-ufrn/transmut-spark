@@ -14,12 +14,14 @@ import br.ufrn.dimap.forall.transmut.mutation.runner.MutantRunner
 import br.ufrn.dimap.forall.transmut.spark.mutation.manager._
 import br.ufrn.dimap.forall.transmut.sbt.spark.runner.SbtSparkRDDRunner
 import br.ufrn.dimap.forall.transmut.util.IOFiles
+import br.ufrn.dimap.forall.transmut.report.CompoundReporter
+import br.ufrn.dimap.forall.transmut.report.html.HTMLReporter
 
-class TransmutSparkRDDProcess(state: State)(implicit val config: Config) extends MutationTestingProcess {
+class TransmutSparkRDDProcess(state: State, logger: Logger)(implicit val config: Config) extends MutationTestingProcess {
 
   var runner = new SbtSparkRDDRunner(state)
-  
-  def reporter = ConsoleReporter
+
+  def reporter = CompoundReporter(ConsoleReporter(logger.info(_)), HTMLReporter(logger.info(_)))
 
   def programBuilder = SparkRDDProgramBuilder
 
@@ -34,6 +36,12 @@ class TransmutSparkRDDProcess(state: State)(implicit val config: Config) extends
     IOFiles.copyDirectory(config.srcDir.toFile(), config.transmutSrcDir.toFile())
   }
 
-  override def posProcess() {}
+  override def posProcess() {
+    // Copy only the meta mutants to the transmut mutants directory
+    metaMutants.foreach { meta =>
+      IOFiles.copyFile(meta.mutated.source.toFile(), config.transmutMutantsDir.toFile())
+    }
+    reporter.reportAdditionalInformation("Meta Mutants copied to " + config.transmutMutantsDir.toString())
+  }
 
 }

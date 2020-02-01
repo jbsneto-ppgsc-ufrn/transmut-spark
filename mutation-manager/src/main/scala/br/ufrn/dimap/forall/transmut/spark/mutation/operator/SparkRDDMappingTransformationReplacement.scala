@@ -57,7 +57,7 @@ object SparkRDDMappingTransformationReplacement extends MutationOperator[Transfo
       val transformer = new Transformer {
         override def apply(tree: Tree): Tree = tree match {
           case q"$rdd.$tranf($func)" => q"""$rdd.$tranf((inputParameter: $inputType) => {
-                  val originalFunction = $func
+                  val originalFunction = ($func)(_)
                   val originalValue = originalFunction(inputParameter)
                   $term
               })"""
@@ -141,7 +141,7 @@ object SparkRDDMappingTransformationReplacement extends MutationOperator[Transfo
       val transformer = new Transformer {
         override def apply(tree: Tree): Tree = tree match {
           case q"$rdd.$tranf($func)" => q"""$rdd.$tranf((inputParameter: $inputType) => {
-              val originalFunction = $func
+              val originalFunction = ($func)(_)
               val originalValue = originalFunction(inputParameter)
               $term
            })"""

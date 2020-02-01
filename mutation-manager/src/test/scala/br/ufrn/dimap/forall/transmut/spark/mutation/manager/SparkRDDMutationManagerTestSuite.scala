@@ -237,7 +237,7 @@ class SparkRDDMutationManagerTestSuite extends FunSuite {
         def program(rdd1: RDD[String]) = {
           val rdd2 = rdd1.filter((x: String) => !x.isEmpty)
           val rdd3 = rdd2.map((inputParameter: String) => {
-            val originalFunction = (x: String) => x + "test"
+            val originalFunction = ((x: String) => x + "test")(_)
             val originalValue = originalFunction(inputParameter)
             ""
           })
@@ -325,7 +325,7 @@ class SparkRDDMutationManagerTestSuite extends FunSuite {
       object SparkProgram {
         def program(rdd1: RDD[(Long, Double)]) : RDD[(Long, Double)] = {
           val rdd2 = rdd1.reduceByKey((firstParameter: Double, secondParameter: Double) => {
-            val originalFunction = (x: Double, y: Double) => if(x > y) x else y
+            val originalFunction = ((x: Double, y: Double) => if(x > y) x else y)(_,_)
             originalFunction(firstParameter, firstParameter)
           })
           rdd2
@@ -340,7 +340,7 @@ class SparkRDDMutationManagerTestSuite extends FunSuite {
       object SparkProgram {
         def program(rdd1: RDD[(Long, Double)]) : RDD[(Long, Double)] = {
           val rdd2 = rdd1.reduceByKey((firstParameter: Double, secondParameter: Double) => {
-            val originalFunction = (x: Double, y: Double) => if(x > y) x else y
+            val originalFunction = ((x: Double, y: Double) => if(x > y) x else y)(_,_)
             originalFunction(secondParameter, secondParameter)
            })
           rdd2
@@ -355,7 +355,7 @@ class SparkRDDMutationManagerTestSuite extends FunSuite {
       object SparkProgram {
         def program(rdd1: RDD[(Long, Double)]) : RDD[(Long, Double)] = {
           val rdd2 = rdd1.reduceByKey((firstParameter: Double, secondParameter: Double) => {
-            val originalFunction = (x: Double, y: Double) => if(x > y) x else y
+            val originalFunction = ((x: Double, y: Double) => if(x > y) x else y)(_,_)
             originalFunction(secondParameter, firstParameter)
           })
           rdd2
