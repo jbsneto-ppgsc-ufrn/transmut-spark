@@ -15,12 +15,16 @@ case class MetaMutantProgramSourceMetrics(metaMutant: MetaMutantProgramSource, m
 
   def id = metaMutant.id
 
-  def sourceName = metaMutant.original.source.getFileName.toString()
+  def sourceName = metaMutant.original.source.getFileName.toString().replaceFirst(".scala", "")
 
   def originalProgramSourceMetrics = ProgramSourceMetrics(metaMutant.original)
 
   def metaMutantProgramsMetrics = metaMutant.metaMutantPrograms.map(m => MetaMutantProgramMetrics(m, mutantProgramVerdicts.filter(mt => mt.mutant.original.id == m.id)))
 
+  def mutantProgramsMetrics = metaMutantProgramsMetrics.flatMap(m => m.mutantsMetrics)
+  
+  def mutationOperatorsMetrics = MutationOperatorsMetrics(mutantProgramsMetrics)
+  
   def mutantProgramVerdicts: List[MutantResult[MutantProgram]] = mutantsVerdicts.map(r => r match {
     case MutantSurvived(m)   => MutantSurvived(m.mutantProgram)
     case MutantEquivalent(m) => MutantEquivalent(m.mutantProgram)
@@ -31,6 +35,10 @@ case class MetaMutantProgramSourceMetrics(metaMutant: MetaMutantProgramSource, m
   def programs = metaMutant.original.programs
 
   def totalPrograms = metaMutant.original.programs.size
+  
+  def totalDatasets = metaMutantProgramsMetrics.map(m => m.totalDatasets).sum
+  
+  def totalTransformations = metaMutantProgramsMetrics.map(m => m.totalTransformations).sum
 
   def mutants = metaMutant.mutants
 
@@ -65,6 +73,5 @@ case class MetaMutantProgramSourceMetrics(metaMutant: MetaMutantProgramSource, m
   def totalErrorMutants = errorMutants.size
 
   def mutationScore = totalKilledMutants.toFloat / (totalMutants - totalEquivalentMutants)
-
-  def numMutantsPerOperator = MutationOperatorsEnum.ALL.map(op => (op, metaMutant.mutants.filter(m => m.mutationOperator == op).size)).toMap
+  
 }

@@ -32,6 +32,8 @@ case class MutationTestingProcessMetrics(metaMutantsVerdicts: List[(MetaMutantPr
   def totalTransformations = metaMutantProgramsMetrics.map(m => m.totalTransformations).sum
   
   def mutantProgramsMetrics = metaMutantProgramsMetrics.flatMap(m => m.mutantsMetrics)
+  
+  def mutationOperatorsMetrics = MutationOperatorsMetrics(mutantProgramsMetrics)
 
   def killedMutants = mutantProgramSourcesResults.filter(r => r match {
     case MutantKilled(m) => true

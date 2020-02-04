@@ -110,9 +110,9 @@ object ConsoleReporter extends Reporter {
         info("Program: " + programMetric.name)
         info("Number of Mutants: " + programMetric.totalMutants)
         info("Number of Mutants For Each Mutation Operator: ")
-        programMetric.numMutantsPerOperator.foreach { op =>
+        programMetric.mutationOperatorsMetrics.totalMutantsPerOperator.foreach { op =>
           if (op._2 > 0)
-            info(MutationOperatorsEnum.mutationOperatorsNameFromEnum(op._1) + ": " + op._2)
+            info(op._1 + ": " + op._2)
         }
       }
       info("------------------------------------------------------------------------------------")

@@ -15,6 +15,13 @@ object IOFiles {
     writeContentToFile(newFile, content)
   }
 
+  def generateDirectory(baseDir: File, newDirName: String): File = {
+    val newDir = new File(baseDir, newDirName)
+    if (!newDir.exists())
+      newDir.mkdirs()
+    newDir
+  }
+
   def writeContentToFile(file: File, content: String) {
     val writer = new PrintWriter(file)
     writer.write(content)

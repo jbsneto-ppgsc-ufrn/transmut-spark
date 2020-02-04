@@ -12,11 +12,21 @@ case class MutantProgramMetrics(mutant: MutantProgram, mutantVerdict: MutantResu
 
   def mutantId = mutant.id
 
-  def originalProgramId = mutant.id
+  def originalProgramId = mutant.original.id
+  
+  def originalProgramName = mutant.original.name
+  
+  def originalProgramSourceId = mutant.original.programSource.id
+  
+  def originalProgramSourceName = mutant.original.programSource.source.getFileName.toString().replaceFirst(".scala", "")
 
   def name = mutant.original.name
   
-  def mutationOperator = MutationOperatorsEnum.mutationOperatorsNameFromEnum(mutant.mutationOperator)
+  def mutationOperator = mutant.mutationOperator
+  
+  def mutationOperatorName = MutationOperatorsEnum.mutationOperatorsNameFromEnum(mutant.mutationOperator)
+  
+  def mutationOperatorDescription = MutationOperatorsEnum.mutationOperatorsDescription(mutant.mutationOperator)
 
   def originalCode = mutant.original.tree.syntax
 

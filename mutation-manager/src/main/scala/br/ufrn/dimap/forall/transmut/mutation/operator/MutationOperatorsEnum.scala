@@ -53,4 +53,22 @@ object MutationOperatorsEnum extends Enumeration {
     case JTR => "JTR"
     case _ => throw new Exception("Inexistent Mutation Operator")
   }
+  
+  def mutationOperatorsDescription(operator: MutationOperatorsEnum): String = operator match {
+    case UTS => "Unary Transformation Swap"
+    case BTS => "Binary Transformation Swap"
+    case UTR => "Unary Transformation Replacement"
+    case BTR => "Binary Transformation Replacement"
+    case UTD => "Unary Transformation Deletion"
+    case MTR => "Mapping Transformation Replacement"
+    case FTD => "Filter Transformation Deletion"
+    case DTD => "Distinct Transformation Deletion"
+    case OTD => "Order Transformation Deletion"
+    case STR => "Set Transformation Replacement"
+    case ATR => "Aggregation Transformation Replacement"
+    case DTI => "Distinct Transformation Insertion"
+    case JTR => "Join Transformation Replacement"
+    case _ => throw new Exception("Inexistent Mutation Operator")
+  }
+  
 }

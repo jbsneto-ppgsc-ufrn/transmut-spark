@@ -14,15 +14,23 @@ case class MetaMutantProgramMetrics(metaMutant: MetaMutantProgram, mutantsVerdic
   
   def id = metaMutant.id
   
-  def name = metaMutant.original.name
+  def originalProgram = metaMutant.original
   
-  def code = metaMutant.original.tree.syntax
+  def name = originalProgram.name
   
-  def datasets = metaMutant.original.datasets
+  def code = originalProgram.tree.syntax
+  
+  def programSource = originalProgram.programSource
+  
+  def programSourceId = programSource.id
+  
+  def programSourceName = programSource.source.getFileName.toString().replaceFirst(".scala", "")
+  
+  def datasets = originalProgram.datasets
   
   def totalDatasets = datasets.size
   
-  def transformations = metaMutant.original.transformations
+  def transformations = originalProgram.transformations
   
   def totalTransformations = transformations.size
   
@@ -31,6 +39,8 @@ case class MetaMutantProgramMetrics(metaMutant: MetaMutantProgram, mutantsVerdic
   def totalMutants = mutants.size
   
   def mutantsMetrics = mutants.map(m => MutantProgramMetrics(m, mutantsVerdicts.filter(mr => mr.mutant.id == m.id).head))
+  
+  def mutationOperatorsMetrics = MutationOperatorsMetrics(mutantsMetrics)
   
   def killedMutants = mutantsVerdicts.filter(r => r match {
     case MutantKilled(m) => true
@@ -62,5 +72,4 @@ case class MetaMutantProgramMetrics(metaMutant: MetaMutantProgram, mutantsVerdic
 
   def mutationScore = totalKilledMutants.toFloat / (totalMutants - totalEquivalentMutants)
   
-  def numMutantsPerOperator = MutationOperatorsEnum.ALL.map(op => (op, metaMutant.mutants.filter(m => m.mutationOperator == op).size)).toMap
 }
