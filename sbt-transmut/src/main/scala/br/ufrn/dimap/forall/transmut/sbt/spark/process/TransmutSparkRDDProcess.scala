@@ -16,12 +16,13 @@ import br.ufrn.dimap.forall.transmut.sbt.spark.runner.SbtSparkRDDRunner
 import br.ufrn.dimap.forall.transmut.util.IOFiles
 import br.ufrn.dimap.forall.transmut.report.CompoundReporter
 import br.ufrn.dimap.forall.transmut.report.html.HTMLReporter
+import br.ufrn.dimap.forall.transmut.report.json.JSONReporter
 
 class TransmutSparkRDDProcess(state: State, logger: Logger)(implicit val config: Config) extends MutationTestingProcess {
 
   var runner = new SbtSparkRDDRunner(state)
 
-  def reporter = CompoundReporter(ConsoleReporter(logger.info(_)), HTMLReporter(logger.info(_)))
+  def reporter = CompoundReporter(ConsoleReporter(logger.info(_)), HTMLReporter(logger.info(_)), JSONReporter(logger.info(_)))
 
   def programBuilder = SparkRDDProgramBuilder
 

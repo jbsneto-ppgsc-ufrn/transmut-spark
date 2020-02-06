@@ -6,6 +6,12 @@ import java.io.PrintWriter
 
 object IOFiles {
 
+  def readContentFromFile(file: File) = {
+    val bytes = Files.readAllBytes(file.toPath())
+    val text = new String(bytes, "UTF-8")
+    text
+  }
+
   def generateFileWithContent(directory: File, fileName: String, content: String) {
     if (!directory.exists())
       directory.mkdirs()
@@ -23,7 +29,7 @@ object IOFiles {
   }
 
   def writeContentToFile(file: File, content: String) {
-    val writer = new PrintWriter(file)
+    val writer = new PrintWriter(file, "UTF-8")
     writer.write(content)
     writer.close()
   }

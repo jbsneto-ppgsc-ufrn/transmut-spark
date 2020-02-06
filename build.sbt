@@ -65,8 +65,10 @@ lazy val util = (project in file("util"))
   )
 
 lazy val commonDependencies = Seq(
+  "io.circe" %% "circe-core" % "0.12.3",
+  "io.circe" %% "circe-generic" % "0.12.3",
+  "io.circe" %% "circe-parser" % "0.12.3",
   "com.github.pureconfig" %% "pureconfig" % "0.12.2",
-  "org.clapper" %% "grizzled-slf4j" % "1.3.4",
   "org.scalameta" %% "scalameta" % "4.2.0",
   "org.scalameta" %% "semanticdb" % "4.1.0",
   "org.scalactic" %% "scalactic" % "3.0.8",

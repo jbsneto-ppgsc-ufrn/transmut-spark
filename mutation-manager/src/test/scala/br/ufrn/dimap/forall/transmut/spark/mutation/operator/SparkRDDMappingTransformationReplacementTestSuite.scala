@@ -159,14 +159,14 @@ class SparkRDDMappingTransformationReplacementTestSuite extends FunSuite {
     assert(mutantTail.mutated.edges == mutantTail.original.edges)
 
     assert(mutantTail.mutated.name != mutantTail.original.name)
-    assert(mutantTail.mutated.name == "flatMapTooriginalValue.tail")
+    assert(mutantTail.mutated.name == "flatMapTooriginalValue.toList.tail")
 
     assert(mutantTail.mutated.source != mutantTail.original.source)
     assert(mutantTail.original.source.isEqual(q"""val rdd2 = rdd1.flatMap((x: String) => x.split(" "))"""))
     assert(mutantTail.mutated.source.isEqual(q"""val rdd2 = rdd1.flatMap((inputParameter: String) => {
         val originalFunction = ((x: String) => x.split(" "))(_)
         val originalValue = originalFunction(inputParameter)
-        originalValue.tail
+        originalValue.toList.tail
       })"""))
 
     assert(mutantTail.mutated.params.size == 1)
@@ -176,7 +176,7 @@ class SparkRDDMappingTransformationReplacementTestSuite extends FunSuite {
     assert(mutantTail.mutated.params(0).isEqual(q"""(inputParameter: String) => {
         val originalFunction = ((x: String) => x.split(" "))(_)
         val originalValue = originalFunction(inputParameter)
-        originalValue.tail
+        originalValue.toList.tail
       }"""))
 
     // Reverse Mutant
@@ -189,14 +189,14 @@ class SparkRDDMappingTransformationReplacementTestSuite extends FunSuite {
     assert(mutantReverse.mutated.edges == mutantReverse.original.edges)
 
     assert(mutantReverse.mutated.name != mutantReverse.original.name)
-    assert(mutantReverse.mutated.name == "flatMapTooriginalValue.reverse")
+    assert(mutantReverse.mutated.name == "flatMapTooriginalValue.toList.reverse")
 
     assert(mutantReverse.mutated.source != mutantReverse.original.source)
     assert(mutantReverse.original.source.isEqual(q"""val rdd2 = rdd1.flatMap((x: String) => x.split(" "))"""))
     assert(mutantReverse.mutated.source.isEqual(q"""val rdd2 = rdd1.flatMap((inputParameter: String) => {
         val originalFunction = ((x: String) => x.split(" "))(_)
         val originalValue = originalFunction(inputParameter)
-        originalValue.reverse
+        originalValue.toList.reverse
       })"""))
 
     assert(mutantReverse.mutated.params.size == 1)
@@ -206,7 +206,7 @@ class SparkRDDMappingTransformationReplacementTestSuite extends FunSuite {
     assert(mutantReverse.mutated.params(0).isEqual(q"""(inputParameter: String) => {
         val originalFunction = ((x: String) => x.split(" "))(_)
         val originalValue = originalFunction(inputParameter)
-        originalValue.reverse
+        originalValue.toList.reverse
       }"""))
 
     // Reverse Mutant

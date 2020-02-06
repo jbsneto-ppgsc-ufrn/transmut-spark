@@ -32,6 +32,8 @@ case class MetaMutantProgramMetrics(metaMutant: MetaMutantProgram, mutantsVerdic
   
   def transformations = originalProgram.transformations
   
+  def edges = originalProgram.edges
+  
   def totalTransformations = transformations.size
   
   def mutants = metaMutant.mutants

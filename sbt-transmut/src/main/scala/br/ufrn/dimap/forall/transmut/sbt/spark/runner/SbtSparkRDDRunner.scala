@@ -8,6 +8,7 @@ import br.ufrn.dimap.forall.transmut.mutation.runner.TestResult
 import br.ufrn.dimap.forall.transmut.mutation.runner.TestSuccess
 import br.ufrn.dimap.forall.transmut.mutation.runner.TestError
 import br.ufrn.dimap.forall.transmut.mutation.runner.TestFailed
+import br.ufrn.dimap.forall.transmut.sbt.spark.TransmutSparkRDDPlugin.autoImport._
 
 import sbt._
 import sbt.Keys._
@@ -21,7 +22,7 @@ class SbtSparkRDDRunner(state: State)(implicit val config: Config) extends Mutan
   def runOriginalTest(programSource: ProgramSource): TestResult[ProgramSource] = {
     val extracted = Project.extract(state)
     val testState = extracted.appendWithSession(settings, state)
-    val result = Project.runTask((test in Test), testState)
+    val result = Project.runTask((transmutTest in Test), testState)
     val testResult = result match {
       case Some((_, Value(_))) => TestSuccess(programSource)
       case Some((_, Inc(_)))   => TestFailed(programSource)
@@ -35,7 +36,7 @@ class SbtSparkRDDRunner(state: State)(implicit val config: Config) extends Mutan
       val extracted = Project.extract(state)
       val mutantSetting: Def.Setting[_] = javaOptions in Test += s"-DCURRENT_MUTANT=${String.valueOf(mutant.id)}"
       val mutantState = extracted.appendWithSession(settings :+ mutantSetting, state)
-      val result = Project.runTask((test in Test), mutantState)
+      val result = Project.runTask((transmutTest in Test), mutantState)
       val testResult = result match {
         case Some((_, Value(_))) => TestSuccess(mutant)
         case Some((_, Inc(_)))   => TestFailed(mutant)

@@ -115,14 +115,14 @@ object SparkRDDMappingTransformationReplacement extends MutationOperator[Transfo
     val keyTerms = keyValuesTerms.map(t => {
       var term = t
       if(term.syntax.contains("originalValue")){
-        term = term.syntax.replaceFirst("originalValue", "originalValue._1").parse[Term].get
+        term = term.syntax.replaceAll("originalValue", "originalValue._1").parse[Term].get
       }
       q"($term, originalValue._2)"
     })
     val valueTerms = valueValuesTerms.map(t => {
       var term = t
       if(term.syntax.contains("originalValue")){
-        term = term.syntax.replaceFirst("originalValue", "originalValue._2").parse[Term].get
+        term = term.syntax.replaceAll("originalValue", "originalValue._2").parse[Term].get
       }
       q"(originalValue._1, $term)"
     })
@@ -132,7 +132,7 @@ object SparkRDDMappingTransformationReplacement extends MutationOperator[Transfo
   def generateFlatMapMutants(original: SparkRDDUnaryTransformation, idGenerator: LongIdGenerator): List[MutantTransformation] = {
     val inputType = getInputType(original).simplifiedName.parse[Type].get
     val outputType = getOutputType(original).simplifiedName
-    val mappingValues = List("originalValue.headOption", "originalValue.tail", "originalValue.reverse", s"List[$outputType]()").map(t => t.parse[Term].get)
+    val mappingValues = List("originalValue.headOption", "originalValue.toList.tail", "originalValue.toList.reverse", s"List[$outputType]()").map(t => t.parse[Term].get)
     val mutants = scala.collection.mutable.ListBuffer.empty[MutantTransformation]
     mappingValues.foreach { term =>
       val mutated = original.copy()

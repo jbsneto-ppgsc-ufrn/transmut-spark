@@ -14,8 +14,10 @@ import br.ufrn.dimap.forall.transmut.mutation.model.MutantProgram
 case class MetaMutantProgramSourceMetrics(metaMutant: MetaMutantProgramSource, mutantsVerdicts: List[MutantResult[MutantProgramSource]]) {
 
   def id = metaMutant.id
+  
+  def source = metaMutant.original.source
 
-  def sourceName = metaMutant.original.source.getFileName.toString().replaceFirst(".scala", "")
+  def sourceName = source.getFileName.toString().replaceFirst(".scala", "")
 
   def originalProgramSourceMetrics = ProgramSourceMetrics(metaMutant.original)
 
