@@ -81,7 +81,7 @@ trait MutationTestingProcess {
 
     // Original Program and Mutants Execution
     reporter.reportMutantExecutionStart
-    metaMutantsTestResults = metaMutants.map(metaMutant => mutantRunner.runMutationTestProcess(metaMutant, config.equivalentMutants))
+    metaMutantsTestResults = metaMutants.map(metaMutant => mutantRunner.runMutationTestProcess(metaMutant, config.equivalentMutants, config.isTestOnlyLivingMutants, config.livingMutants))
     metaMutantsVerdicts = metaMutantsTestResults.map(m => MutantAnalyzer.analyzeMutants(m._1, m._2, config.equivalentMutants))
     reporter.reportMutantExecutionEnd(metaMutantsVerdicts)
 

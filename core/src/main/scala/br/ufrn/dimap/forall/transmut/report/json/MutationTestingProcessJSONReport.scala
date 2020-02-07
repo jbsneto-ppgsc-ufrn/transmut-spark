@@ -22,6 +22,11 @@ object MutationTestingProcessJSONReport {
   implicit val mutationTestingProcessJSONDecoder: Decoder[MutationTestingProcessJSON] = deriveDecoder[MutationTestingProcessJSON]
   implicit val mutationTestingProcessJSONEncoder: Encoder[MutationTestingProcessJSON] = deriveEncoder[MutationTestingProcessJSON]
 
+  def readMutationTestingProcessJSONReportFile(file: File) = {
+    val jsonContent = IOFiles.readContentFromFile(file)
+    mutationTestingProcessJSONObjectFromJSONString(jsonContent)
+  }
+
   def generateMutationTestingProcessJSONReportFile(directory: File, fileName: String, metrics: MutationTestingProcessMetrics) {
     val content = generateProgramSourceJSONFromMetrics(metrics)
     IOFiles.generateFileWithContent(directory, fileName, content.toString())
@@ -29,6 +34,7 @@ object MutationTestingProcessJSONReport {
 
   def generateProgramSourceJSONObjectFromMetrics(metrics: MutationTestingProcessMetrics): MutationTestingProcessJSON = {
     MutationTestingProcessJSON(
+      metrics.processDuration.toSeconds,
       metrics.metaMutantProgramSourcesMetrics.map(ProgramSourceJSONReport.generateProgramSourceJSONObjectFromMetrics),
       metrics.metaMutantProgramsMetrics.map(ProgramJSONReport.generateProgramJSONObjectFromMetrics),
       metrics.mutantProgramsMetrics.map(MutantJSONReport.generateMutantJSONObjectFromMetrics),

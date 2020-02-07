@@ -20,6 +20,11 @@ object ProgramSourceJSONReport {
   implicit val programSourceJSONDecoder: Decoder[ProgramSourceJSON] = deriveDecoder[ProgramSourceJSON]
   implicit val programSourceJSONEncoder: Encoder[ProgramSourceJSON] = deriveEncoder[ProgramSourceJSON]
 
+  def readProgramSourceJSONReportFile(file: File) = {
+    val jsonContent = IOFiles.readContentFromFile(file)
+    programSourceJSONObjectFromJSONString(jsonContent)
+  }
+  
   def generateProgramSourceJSONReportFile(directory: File, fileName: String, metrics: MetaMutantProgramSourceMetrics) {
     val content = generateProgramSourceJSONFromMetrics(metrics)
     IOFiles.generateFileWithContent(directory, fileName, content.toString())
@@ -48,11 +53,11 @@ object ProgramSourceJSONReport {
     generateProgramSourceJSONObjectFromMetrics(metrics).asJson
   }
 
-  def mutationProgramSourceJSONObjectFromJSONString(json: String): ProgramSourceJSON = {
+  def programSourceJSONObjectFromJSONString(json: String): ProgramSourceJSON = {
     decode[ProgramSourceJSON](json).toOption.get
   }
 
-  def mutationProgramSourceJSONObjectFromJSONS(json: Json): ProgramSourceJSON = {
+  def programSourceJSONObjectFromJSONS(json: Json): ProgramSourceJSON = {
     json.as[ProgramSourceJSON].toOption.get
   }
 

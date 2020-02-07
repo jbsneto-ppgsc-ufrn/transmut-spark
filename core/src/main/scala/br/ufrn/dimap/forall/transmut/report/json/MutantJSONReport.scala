@@ -16,6 +16,11 @@ object MutantJSONReport {
   implicit val mutantJSONDecoder: Decoder[MutantJSON] = deriveDecoder[MutantJSON]
   implicit val mutantJSONEncoder: Encoder[MutantJSON] = deriveEncoder[MutantJSON]
 
+  def readMutantJSONReportFile(file: File) = {
+    val jsonContent = IOFiles.readContentFromFile(file)
+    mutantJSONObjectFromJSONString(jsonContent)
+  }
+
   def generateMutantJSONReportFile(directory: File, fileName: String, metrics: MutantProgramMetrics) {
     val content = generateMutantJSONFromMetrics(metrics)
     IOFiles.generateFileWithContent(directory, fileName, content.toString())

@@ -31,18 +31,35 @@ class SbtSparkRDDRunner(state: State)(implicit val config: Config) extends Mutan
     testResult
   }
 
-  def runMutantTest(mutant: MutantProgramSource, equivalentMutants: List[Long]): TestResult[MutantProgramSource] = {
+  def runMutantTest(mutant: MutantProgramSource, equivalentMutants: List[Long], testOnlyLivingMutants: Boolean = false, livingMutants: List[Long] = List()): TestResult[MutantProgramSource] = {
     if (!equivalentMutants.contains(mutant.id)) {
-      val extracted = Project.extract(state)
-      val mutantSetting: Def.Setting[_] = javaOptions in Test += s"-DCURRENT_MUTANT=${String.valueOf(mutant.id)}"
-      val mutantState = extracted.appendWithSession(settings :+ mutantSetting, state)
-      val result = Project.runTask((transmutTest in Test), mutantState)
-      val testResult = result match {
-        case Some((_, Value(_))) => TestSuccess(mutant)
-        case Some((_, Inc(_)))   => TestFailed(mutant)
-        case _                   => TestError(mutant)
+      if (testOnlyLivingMutants) {
+        if (livingMutants.contains(mutant.id)) {
+          val extracted = Project.extract(state)
+          val mutantSetting: Def.Setting[_] = javaOptions in Test += s"-DCURRENT_MUTANT=${String.valueOf(mutant.id)}"
+          val mutantState = extracted.appendWithSession(settings :+ mutantSetting, state)
+          val result = Project.runTask((transmutTest in Test), mutantState)
+          val testResult = result match {
+            case Some((_, Value(_))) => TestSuccess(mutant)
+            case Some((_, Inc(_)))   => TestFailed(mutant)
+            case _                   => TestError(mutant)
+          }
+          testResult
+        } else {
+          TestFailed(mutant)
+        }
+      } else {
+        val extracted = Project.extract(state)
+        val mutantSetting: Def.Setting[_] = javaOptions in Test += s"-DCURRENT_MUTANT=${String.valueOf(mutant.id)}"
+        val mutantState = extracted.appendWithSession(settings :+ mutantSetting, state)
+        val result = Project.runTask((transmutTest in Test), mutantState)
+        val testResult = result match {
+          case Some((_, Value(_))) => TestSuccess(mutant)
+          case Some((_, Inc(_)))   => TestFailed(mutant)
+          case _                   => TestError(mutant)
+        }
+        testResult
       }
-      testResult
     } else {
       TestSuccess(mutant)
     }

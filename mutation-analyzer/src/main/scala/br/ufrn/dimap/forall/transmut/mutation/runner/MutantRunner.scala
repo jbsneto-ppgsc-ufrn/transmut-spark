@@ -9,10 +9,10 @@ import br.ufrn.dimap.forall.transmut.exception.OriginalTestExecutionException
 
 trait MutantRunner {
 
-  def runMutationTestProcess(metaMutant: MetaMutantProgramSource, equivalentMutants: List[Long]): (MetaMutantProgramSource, List[TestResult[MutantProgramSource]]) = {
+  def runMutationTestProcess(metaMutant: MetaMutantProgramSource, equivalentMutants: List[Long], testOnlyLivingMutants: Boolean = false, livingMutants: List[Long] = List()): (MetaMutantProgramSource, List[TestResult[MutantProgramSource]]) = {
     val originalResult = runOriginalTest(metaMutant.original)
     val list = originalResult match {
-      case TestSuccess(_) => metaMutant.mutants.map(mutant => runMutantTest(mutant, equivalentMutants))
+      case TestSuccess(_) => metaMutant.mutants.map(mutant => runMutantTest(mutant, equivalentMutants, testOnlyLivingMutants, livingMutants))
       case _              => throw new OriginalTestExecutionException("The original program tests failed, fix them and run the mutation testisng process again!")
     }
     (metaMutant, list)
@@ -20,6 +20,6 @@ trait MutantRunner {
 
   def runOriginalTest(programSource: ProgramSource): TestResult[ProgramSource]
 
-  def runMutantTest(mutant: MutantProgramSource, equivalentMutants: List[Long]): TestResult[MutantProgramSource]
+  def runMutantTest(mutant: MutantProgramSource, equivalentMutants: List[Long], testOnlyLivingMutants: Boolean = false, livingMutants: List[Long] = List()): TestResult[MutantProgramSource]
 
 }

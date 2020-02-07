@@ -7,6 +7,7 @@ import sbt.plugins.JvmPlugin
 import br.ufrn.dimap.forall.transmut.config._
 import br.ufrn.dimap.forall.transmut.exception.ConfigurationException
 import br.ufrn.dimap.forall.transmut.sbt.spark.process.TransmutSparkRDDProcess
+import br.ufrn.dimap.forall.transmut.report.json.MutationTestingProcessJSONReport
 
 object TransmutSparkRDDPlugin extends AutoPlugin {
 
@@ -16,6 +17,7 @@ object TransmutSparkRDDPlugin extends AutoPlugin {
   object autoImport {
     lazy val transmutTest = taskKey[Unit]("TRANSMUT-Spark Custom Test Task") in Test
     lazy val transmut = taskKey[Unit]("Run TRANSMUT-Spark (Mutation Testing Process)")
+    lazy val transmutAlive = taskKey[Unit]("Run TRANSMUT-Spark (Mutation Testing Process) Only For Live Mutants From The Previous Run")
     lazy val transmutConfigFile = settingKey[File]("TRANSMUT-Spark Configuration File")
     lazy val transmutConfig = taskKey[Config]("Load the TRANSMUT-Spark Configuration")
   }
@@ -30,16 +32,49 @@ object TransmutSparkRDDPlugin extends AutoPlugin {
 
     transmutConfig := transmutConfigTask.value,
 
-    transmut := {
-      (compile in Compile).value // compile the project to generate semanticdb specifications
-      implicit val config = transmutConfig.value
-      val currentState = state.value
-      val logger = streams.value.log
+    transmut := transmutTask.value,
+
+    transmutAlive := transmutAliveTask.value)
+
+  def transmutTask = Def.task {
+    (compile in Compile).value // compile the project to generate semanticdb specifications
+    implicit val config = transmutConfig.value
+    val currentState = state.value
+    val logger = streams.value.log
+    val process = new TransmutSparkRDDProcess(currentState, logger)
+    process.runProcess()
+  }
+
+  def transmutAliveTask = Def.task {
+    (compile in Compile).value // compile the project to generate semanticdb specifications
+    implicit val config = transmutConfig.value
+    val logger = streams.value.log
+    val currentState = state.value
+    val directory = config.transmutJSONReportsDir.toFile()
+    val fileName = "Mutation-Testing-Process.json"
+    val mutationTestingProcessJSONFile = new File(directory, fileName)
+    var runProcess = true
+    if (directory.exists() && mutationTestingProcessJSONFile.exists()) {
+      val mutationTestingProcessJSON = MutationTestingProcessJSONReport.readMutationTestingProcessJSONReportFile(mutationTestingProcessJSONFile)
+      val livingMutantsIds = mutationTestingProcessJSON.mutants.filter(m => m.status == "Survived").map(m => m.id)
+      if (!livingMutantsIds.isEmpty) {
+        logger.info("List of living mutants from previous run of TRANSMUT-Spark that will run again: " + livingMutantsIds.mkString(", "))
+        config.livingMutants = livingMutantsIds
+        config.testLivingMutants = true
+      } else {
+        logger.info("There are no surviving mutants from the previous execution of TRANSMUT-Spark, the process is not going to run (Execute the 'transmut' task to run the whole process again)")
+        runProcess = false
+      }
+    } else {
+      logger.info("TRANSMUT-Spark has not been previously run, the whole process will run!")
+    }
+    if (runProcess) {
       val process = new TransmutSparkRDDProcess(currentState, logger)
       process.runProcess()
-    })
+    }
+  }
 
-   // Custom test task that runs testOnly if it is enabled (testOnly in config is not empty) or runs test (all tests) otherwise
+  // Custom test task that runs testOnly if it is enabled (testOnly in config is not empty) or runs test (all tests) otherwise
   def transmutTestTask = Def.taskDyn {
     val config = transmutConfig.value
     if (config.isTestOnlyEnabled)

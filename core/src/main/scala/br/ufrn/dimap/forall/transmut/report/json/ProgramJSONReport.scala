@@ -34,6 +34,11 @@ object ProgramJSONReport {
   implicit val edgeJSONDecoder: Decoder[EdgeJSON] = deriveDecoder[EdgeJSON]
   implicit val edgeJSONEncoder: Encoder[EdgeJSON] = deriveEncoder[EdgeJSON]
 
+  def readProgramJSONReportFile(file: File) = {
+    val jsonContent = IOFiles.readContentFromFile(file)
+    programJSONObjectFromJSONString(jsonContent)
+  }
+  
   def generateProgramJSONReportFile(directory: File, fileName: String, metrics: MetaMutantProgramMetrics) {
     val content = generateProgramJSONFromMetrics(metrics)
     IOFiles.generateFileWithContent(directory, fileName, content.toString())
@@ -64,11 +69,11 @@ object ProgramJSONReport {
     generateProgramJSONObjectFromMetrics(metrics).asJson
   }
 
-  def mutationProgramJSONObjectFromJSONString(json: String): ProgramJSON = {
+  def programJSONObjectFromJSONString(json: String): ProgramJSON = {
     decode[ProgramJSON](json).toOption.get
   }
 
-  def mutationProgramJSONObjectFromJSONS(json: Json): ProgramJSON = {
+  def programJSONObjectFromJSONS(json: Json): ProgramJSON = {
     json.as[ProgramJSON].toOption.get
   }
 

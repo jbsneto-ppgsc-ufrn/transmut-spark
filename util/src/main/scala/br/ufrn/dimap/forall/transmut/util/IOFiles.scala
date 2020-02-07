@@ -6,6 +6,11 @@ import java.io.PrintWriter
 
 object IOFiles {
 
+  def readContentFromFileName(directory: File, fileName: String) = {
+    val file = new File(directory, fileName)
+    readContentFromFile(file)
+  }
+
   def readContentFromFile(file: File) = {
     val bytes = Files.readAllBytes(file.toPath())
     val text = new String(bytes, "UTF-8")
