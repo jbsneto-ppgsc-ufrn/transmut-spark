@@ -72,7 +72,8 @@ lazy val commonDependencies = Seq(
   "org.scalameta" %% "scalameta" % "4.2.0",
   "org.scalameta" %% "semanticdb" % "4.1.0",
   "org.scalactic" %% "scalactic" % "3.0.8",
-  "org.scalatest" %% "scalatest" % "3.0.8" % "test"
+  "org.scalatest" %% "scalatest" % "3.0.8" % Test,
+  "org.scalamock" %% "scalamock" % "4.4.0" % Test
 )
 
 lazy val commonSettings = Seq(
@@ -83,4 +84,3 @@ lazy val commonSettings = Seq(
   javaOptions ++= Seq("-Xms512M", "-Xmx2048M", "-XX:MaxPermSize=2048M", "-XX:+CMSClassUnloadingEnabled"),
   parallelExecution in Test := false
 )
-
