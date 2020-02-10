@@ -70,7 +70,7 @@ trait MutationTestingProcess {
     reporter.reportProgramBuildEnd(programSources)
 
     // Mutants and Meta-Mutant Generation Process
-    reporter.reportMutantExecutionStart
+    reporter.reportMutantGenerationStart
     val mutantsIdGenerator = mutantManager.defaultMutantsIdGenerator // for each mutant to have a unique id
     metaMutants = programSources.map { programSource =>
       val mutants = mutantManager.generateMutantsFromProgramSource(programSource, config.mutationOperatorsList, mutantsIdGenerator)
