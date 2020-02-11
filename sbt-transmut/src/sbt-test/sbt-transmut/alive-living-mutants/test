@@ -1,0 +1,57 @@
+# Before execution the TRANSMUT folder and reports should not exist
+-$ exists target/transmut
+-$ exists target/transmut/mutants
+-$ exists target/transmut/mutated-src
+-$ exists target/transmut/reports
+-$ exists target/transmut/reports/html
+-$ exists target/transmut/reports/html/index.html
+-$ exists target/transmut/reports/json/
+-$ exists target/transmut/reports/json/Mutation-Testing-Process.json
+
+# Execute TRANSMUT-Spark plugin
+> transmut
+
+# Checks if TRANSMUT folders and reports have been created
+$ exists target/transmut
+$ exists target/transmut/mutants
+$ exists target/transmut/mutated-src
+$ exists target/transmut/reports
+$ exists target/transmut/reports/html
+$ exists target/transmut/reports/html/index.html
+$ exists target/transmut/reports/json/
+$ exists target/transmut/reports/json/Mutation-Testing-Process.json
+
+# Creates a folder to copy and save the reports of the first execution
+$ mkdir target/transmut-first-exec
+$ mkdir target/transmut-first-exec/reports
+$ mkdir target/transmut-first-exec/reports/html
+$ copy-file target/transmut/reports/html/index.html target/transmut-first-exec/reports/html/index.html
+$ mkdir target/transmut-first-exec/reports/json
+$ copy-file target/transmut/reports/json/Mutation-Testing-Process.json target/transmut-first-exec/reports/json/Mutation-Testing-Process.json
+$ exists target/transmut-first-exec
+$ exists target/transmut-first-exec/reports/html
+$ exists target/transmut-first-exec/reports/html/index.html
+$ exists target/transmut-first-exec/reports/json
+$ exists target/transmut-first-exec/reports/json/Mutation-Testing-Process.json
+
+# Delete the first transmut.conf and copy transmut-with-equivalents.conf to run transmutAlive
+$ delete transmut.conf
+$ copy-file changes/transmut-with-equivalents.conf transmut.conf
+
+# Execute transmuteAlive task
+> transmutAlive
+
+# Checks if TRANSMUT folders and reports exist
+$ exists target/transmut
+$ exists target/transmut/mutants
+$ exists target/transmut/mutated-src
+$ exists target/transmut/reports
+$ exists target/transmut/reports/html
+$ exists target/transmut/reports/html/index.html
+$ exists target/transmut/reports/json/
+$ exists target/transmut/reports/json/Mutation-Testing-Process.json
+
+# Checks if the reports of the second execution are different of the reports from the first execution
+-$ must-mirror target/transmut-first-exec/reports/json/Mutation-Testing-Process.json target/transmut/reports/json/Mutation-Testing-Process.json
+-$ must-mirror target/transmut-first-exec/reports/html/index.html target/transmut/reports/html/index.html
+

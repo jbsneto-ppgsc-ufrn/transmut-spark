@@ -14,27 +14,20 @@ object TransmutSparkRDDPlugin extends AutoPlugin {
   override def requires = JvmPlugin
   override def trigger = allRequirements
 
-  object autoImport {
-    lazy val transmutTest = taskKey[Unit]("TRANSMUT-Spark Custom Test Task") in Test
-    lazy val transmut = taskKey[Unit]("Run TRANSMUT-Spark (Mutation Testing Process)")
-    lazy val transmutAlive = taskKey[Unit]("Run TRANSMUT-Spark (Mutation Testing Process) Only For Live Mutants From The Previous Run")
-    lazy val transmutConfigFile = settingKey[File]("TRANSMUT-Spark Configuration File")
-    lazy val transmutConfig = taskKey[Config]("Load the TRANSMUT-Spark Configuration")
-  }
+  object autoImport extends TransmutSparkRDDKeys
 
   import autoImport._
 
   override def projectSettings = Seq(
+    transmut := transmutTask.value,
 
-    transmutTest := transmutTestTask.value,
-
-    transmutConfigFile := baseDirectory.value / "transmut.conf",
+    transmutAlive := transmutAliveTask.value,
 
     transmutConfig := transmutConfigTask.value,
 
-    transmut := transmutTask.value,
+    transmutConfigFile := baseDirectory.value / "transmut.conf",
 
-    transmutAlive := transmutAliveTask.value)
+    transmutTest := transmutTestTask.value)
 
   def transmutTask = Def.task {
     (compile in Compile).value // compile the project to generate semanticdb specifications
