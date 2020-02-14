@@ -11,7 +11,7 @@ import br.ufrn.dimap.forall.transmut.util.IOFiles
 import br.ufrn.dimap.forall.transmut.report.metric.MutationOperatorsMetrics
 
 object ProgramSourceHTMLReport {
-  
+
   def generateProgramSourceHtmlReportFile(directory: File, fileName: String, metrics: MetaMutantProgramSourceMetrics) {
     val content = generateProgramSourceHtmlReport(metrics)
     IOFiles.generateFileWithContent(directory, fileName, content)
@@ -199,7 +199,7 @@ object ProgramSourceHTMLReport {
        | </td>
        |</tr>""".stripMargin
   }
-  
+
   def generateMutantsHtmlTable(metrics: MetaMutantProgramSourceMetrics) = {
     val rowsString = metrics.mutantProgramsMetrics.map(generateMutantsHtmlRow).mkString("\n")
     val generalMutationScore = "%1.2f".formatLocal(Locale.US, metrics.mutationScore * 100) + "%"
@@ -240,37 +240,11 @@ object ProgramSourceHTMLReport {
        |  <td><button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modalMutant${metric.mutantId}">Show</button></td>
        |</tr>""".stripMargin
   }
-  
+
   def generateMutantsModalsHtml(metrics: MetaMutantProgramSourceMetrics) = {
-    metrics.mutantProgramsMetrics.map(generateMutantModalHtml).mkString("\n")
+    metrics.mutantProgramsMetrics.map(m => MutantHTMLReport.generateMutantModalHtml(m, false)).mkString("\n")
   }
-  
-  def generateMutantModalHtml(metric: MutantProgramMetrics) = {
-    s"""<div class="modal fade" id="modalMutant${metric.mutantId}" tabindex="-1" role="dialog" aria-labelledby="modalMutantLabel${metric.mutantId}" aria-hidden="true">
-       |<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-       |<div class="modal-content">
-       |<div class="modal-header">
-       |<h5 class="modal-title" id="exampleModalLabel">Mutant ID: <a href="../Mutants/Mutant-${metric.mutantId}.html" class="text-dark">${metric.mutantId}</a></h5>
-       |<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-       |<span aria-hidden="true">&times;</span>
-       |</button>
-       |</div>
-       |<div class="modal-body">
-       |<h5>Mutation Operator: <a href="#" class="text-dark" data-toggle="tooltip" data-placement="right" title="${metric.mutationOperatorDescription}">${metric.mutationOperatorName}</a></h5>
-       |<h5>Status: ${metric.status}</h5>
-       |<h5>Code: </h5>
-       |<pre class="brush: scala; toolbar: false;">
-       |${metric.mutantCode}
-       |</pre>
-       |</div>
-       |<div class="modal-footer">
-       |<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-       |</div>
-       |</div>
-       |</div>
-       |</div>""".stripMargin
-  }
-  
+
   def generateMutationOperatorsHtmlTable(metrics: MetaMutantProgramSourceMetrics) = {
     val mutationOperatorsMetrics = metrics.mutationOperatorsMetrics
     val rowsString = metrics.mutationOperatorsMetrics.totalMutantsPerOperator.keys.map(k => generateMutationOperatorHtmlRow(k, mutationOperatorsMetrics)).filter(s => !s.isEmpty()).mkString("\n")
@@ -320,5 +294,5 @@ object ProgramSourceHTMLReport {
        |</tr>""".stripMargin
     } else ""
   }
-  
+
 }

@@ -3,9 +3,11 @@ package br.ufrn.dimap.forall.transmut.report.html
 import br.ufrn.dimap.forall.transmut.report.metric.MutantProgramMetrics
 import br.ufrn.dimap.forall.transmut.util.IOFiles
 import java.io.File
+import br.ufrn.dimap.forall.transmut.mutation.model.MutantTransformation
+import br.ufrn.dimap.forall.transmut.mutation.model.MutantListTransformation
 
 object MutantHTMLReport {
-  
+
   def generateMutantHtmlReportFile(directory: File, fileName: String, metrics: MutantProgramMetrics) {
     val content = generateMutantHtmlReport(metrics)
     IOFiles.generateFileWithContent(directory, fileName, content)
@@ -86,7 +88,7 @@ object MutantHTMLReport {
        |<div class="col">
        |<h3 class="section-title">Original Code</h3>
        |<hr class="my-4">
-       |<pre class="brush: scala; toolbar: false;">
+       |<pre class="brush: scala; toolbar: false; highlight: [${metrics.listMutatedLinesOriginalProgram.mkString(", ")}]">
        |${metrics.originalCode}
        |</pre>
        |<hr class="my-4">
@@ -97,7 +99,7 @@ object MutantHTMLReport {
        |<div class="col">
        |<h3 class="section-title">Mutant Code</h3>
        |<hr class="my-4">
-       |<pre class="brush: scala; toolbar: false;">
+       |<pre class="brush: scala; toolbar: false; highlight: [${metrics.listMutatedLinesMutantProgram.mkString(", ")}]">
        |${metrics.mutantCode}
        |</pre>
        |<hr class="my-4">
@@ -132,4 +134,39 @@ object MutantHTMLReport {
        |</html>
     """.stripMargin
   }
+
+  def generateMutantModalHtml(metric: MutantProgramMetrics, inIndex: Boolean = false) = {
+    s"""<div class="modal fade" id="modalMutant${metric.mutantId}" tabindex="-1" role="dialog" aria-labelledby="modalMutantLabel${metric.mutantId}" aria-hidden="true">
+       |<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+       |<div class="modal-content">
+       |<div class="modal-header">
+       |<h5 class="modal-title" id="exampleModalLabel">Mutant ID: <a href="${if(inIndex) "" else "../"}Mutants/Mutant-${metric.mutantId}.html" class="text-dark">${metric.mutantId}</a></h5>
+       |<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+       |<span aria-hidden="true">&times;</span>
+       |</button>
+       |</div>
+       |<div class="modal-body">
+       |<h5>Mutation Operator: <a href="#" class="text-dark" data-toggle="tooltip" data-placement="right" title="${metric.mutationOperatorDescription}">${metric.mutationOperatorName}</a></h5>
+       |<h5>Status: ${metric.status}</h5>
+       |<hr class="my-4">
+       |<h5>Original Code: </h5>
+       |<hr class="my-4">
+       |<pre class="brush: scala; toolbar: false; highlight: [${metric.listMutatedLinesOriginalProgram.mkString(", ")}]">
+       |${metric.originalCode}
+       |</pre>
+       |<hr class="my-4">
+       |<h5>Mutant Code: </h5>
+       |<hr class="my-4">
+       |<pre class="brush: scala; toolbar: false; highlight: [${metric.listMutatedLinesMutantProgram.mkString(", ")}]">
+       |${metric.mutantCode}
+       |</pre>
+       |</div>
+       |<div class="modal-footer">
+       |<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+       |</div>
+       |</div>
+       |</div>
+       |</div>""".stripMargin
+  }
+
 }

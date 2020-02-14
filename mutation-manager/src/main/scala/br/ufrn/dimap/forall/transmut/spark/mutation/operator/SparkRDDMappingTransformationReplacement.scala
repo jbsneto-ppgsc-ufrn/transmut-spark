@@ -14,6 +14,7 @@ import br.ufrn.dimap.forall.transmut.model.BaseTypesEnum
 import br.ufrn.dimap.forall.transmut.model.TupleType
 import br.ufrn.dimap.forall.transmut.model.BaseType
 import br.ufrn.dimap.forall.transmut.model.ErrorType
+import br.ufrn.dimap.forall.transmut.model.ClassType
 
 object SparkRDDMappingTransformationReplacement extends MutationOperator[Transformation] {
 
@@ -88,24 +89,28 @@ object SparkRDDMappingTransformationReplacement extends MutationOperator[Transfo
       case BaseType(BaseTypesEnum.Boolean) => List("false", "true", "!originalValue").map(t => t.parse[Term].get)
       case BaseType(BaseTypesEnum.Char)    => List("0.toChar", "1.toChar", "Char.MaxValue", "Char.MinValue", "-originalValue").map(t => t.parse[Term].get)
       case BaseType(BaseTypesEnum.String)  => List("\"\"".parse[Term].get)
-      case ParameterizedType("Option", List(typeParam)) => {
+      case ParameterizedType(name, List(typeParam)) if name.replace('/', '.').split('.').last.replace("#", "") == "Option" => {
         val typeName = typeParam.simplifiedName
         List(s"List[$typeName]().headOption".parse[Term].get) // List[$typeName]().headOption = None (to force Option[$typeName])
       }
-      case ParameterizedType("List", List(typeParam)) => {
+      case ParameterizedType(name, List(typeParam)) if name.replace('/', '.').split('.').last.replace("#", "") == "List" => {
         val typeName = typeParam.simplifiedName
         List(s"List[$typeName](originalValue.head)", "originalValue.tail", "originalValue.reverse", s"List[$typeName]()").map(t => t.parse[Term].get)
       }
-      case ParameterizedType("Array", List(typeParam)) => {
+      case ParameterizedType(name, List(typeParam)) if name.replace('/', '.').split('.').last.replace("#", "") == "Array" => {
         val typeName = typeParam.simplifiedName
         List(s"Array[$typeName](originalValue.head)", "originalValue.tail", "originalValue.reverse", s"Array[$typeName]()").map(t => t.parse[Term].get)
       }
-      case ParameterizedType("Set", List(typeParam)) => {
+      case ParameterizedType(name, List(typeParam)) if name.replace('/', '.').split('.').last.replace("#", "") == "Set" => {
         val typeName = typeParam.simplifiedName
         List(s"Set[$typeName](originalValue.head)", "originalValue.tail", s"Set[$typeName]()").map(t => t.parse[Term].get)
       }
       case TupleType(key, value) => mappingValuesFromKeyValue(key, value)
-      case _                     => List("null".parse[Term].get)
+      case classType: ClassType => {
+        val typeName = classType.simplifiedName
+        List(s"null.asInstanceOf[$typeName]".parse[Term].get)
+      }
+      case _ => Nil
     }
   }
 
@@ -114,14 +119,14 @@ object SparkRDDMappingTransformationReplacement extends MutationOperator[Transfo
     val valueValuesTerms = mappingValuesFromType(valueType)
     val keyTerms = keyValuesTerms.map(t => {
       var term = t
-      if(term.syntax.contains("originalValue")){
+      if (term.syntax.contains("originalValue")) {
         term = term.syntax.replaceAll("originalValue", "originalValue._1").parse[Term].get
       }
       q"($term, originalValue._2)"
     })
     val valueTerms = valueValuesTerms.map(t => {
       var term = t
-      if(term.syntax.contains("originalValue")){
+      if (term.syntax.contains("originalValue")) {
         term = term.syntax.replaceAll("originalValue", "originalValue._2").parse[Term].get
       }
       q"(originalValue._1, $term)"

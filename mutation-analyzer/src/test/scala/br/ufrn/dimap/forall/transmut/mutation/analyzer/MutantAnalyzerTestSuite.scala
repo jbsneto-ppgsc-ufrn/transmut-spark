@@ -93,7 +93,7 @@ class MutantAnalyzerTestSuite extends FunSuite {
 
     val mutantsResults: List[TestResult[MutantProgramSource]] = List(mutantJTR1TestResult, mutantJTR2TestResult, mutantJTR3TestResult)
 
-    val equivalentsIds: List[Long] = List(0, 1)
+    val equivalentsIds: List[Long] = List(1, 2)
 
     val mutantsVerdicts = MutantAnalyzer.analyzeMutants(metaMutantProgramSource, mutantsResults, equivalentsIds)
 

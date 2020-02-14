@@ -2167,7 +2167,7 @@ class SparkRDDMappingTransformationReplacementTestSuite extends FunSuite {
       }"""))
   }
   
-  test("Test Case 16 - Map to Other Type (General)") {
+  test("Test Case 16 - Map to Class Type (General)") {
 
     val idGenerator = LongIdGenerator.generator
 
@@ -2213,14 +2213,14 @@ class SparkRDDMappingTransformationReplacementTestSuite extends FunSuite {
     assert(mutantNull.mutated.edges == mutantNull.original.edges)
 
     assert(mutantNull.mutated.name != mutantNull.original.name)
-    assert(mutantNull.mutated.name == "mapTonull")
+    assert(mutantNull.mutated.name == "mapTonull.asInstanceOf[Person]")
 
     assert(mutantNull.mutated.source != mutantNull.original.source)
     assert(mutantNull.original.source.isEqual(q"""val rdd2 = rdd1.map((x: String) => Person(x))"""))
     assert(mutantNull.mutated.source.isEqual(q"""val rdd2 = rdd1.map((inputParameter: String) => {
         val originalFunction = ((x: String) => Person(x))(_)
         val originalValue = originalFunction(inputParameter)
-        null
+        null.asInstanceOf[Person]
       })"""))
 
     assert(mutantNull.mutated.params.size == 1)
@@ -2230,7 +2230,7 @@ class SparkRDDMappingTransformationReplacementTestSuite extends FunSuite {
     assert(mutantNull.mutated.params(0).isEqual(q"""(inputParameter: String) => {
         val originalFunction = ((x: String) => Person(x))(_)
         val originalValue = originalFunction(inputParameter)
-        null
+        null.asInstanceOf[Person]
       }"""))
   }
 

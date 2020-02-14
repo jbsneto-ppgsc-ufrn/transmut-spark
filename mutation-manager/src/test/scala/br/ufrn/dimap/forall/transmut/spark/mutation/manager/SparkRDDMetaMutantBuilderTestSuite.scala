@@ -46,15 +46,15 @@ class SparkRDDMetaMutantBuilderTestSuite extends FunSuite {
     
     val metaMutantProgramTree = q"""
       def program(rdd1: RDD[(Long, Double)], rdd2: RDD[(Long, String)]): RDD[(Long, (Double, String))] = sys.props.get("CURRENT_MUTANT") match {
-        case Some("0") => {
+        case Some("1") => {
           val rdd3 = rdd1.leftOuterJoin(rdd2).map(tuple => (tuple._1, (tuple._2._1, tuple._2._2.getOrElse(""))))
           rdd3
         }
-        case Some("1") => {
+        case Some("2") => {
           val rdd3 = rdd1.rightOuterJoin(rdd2).map(tuple => (tuple._1, (tuple._2._1.getOrElse(0d), tuple._2._2)))
           rdd3
         }
-        case Some("2") => {
+        case Some("3") => {
           val rdd3 = rdd1.fullOuterJoin(rdd2).map(tuple => (tuple._1, (tuple._2._1.getOrElse(0d), tuple._2._2.getOrElse(""))))
           rdd3
         }
@@ -113,15 +113,15 @@ class SparkRDDMetaMutantBuilderTestSuite extends FunSuite {
       object SparkProgram {
         
         def program1(rdd1: RDD[(Long, Double)], rdd2: RDD[(Long, String)]): RDD[(Long, (Double, String))] = sys.props.get("CURRENT_MUTANT") match {
-          case Some("0") => {
+          case Some("1") => {
             val rdd3 = rdd1.leftOuterJoin(rdd2).map(tuple => (tuple._1, (tuple._2._1, tuple._2._2.getOrElse(""))))
             rdd3
           }
-          case Some("1") => {
+          case Some("2") => {
             val rdd3 = rdd1.rightOuterJoin(rdd2).map(tuple => (tuple._1, (tuple._2._1.getOrElse(0d), tuple._2._2)))
             rdd3
           }
-          case Some("2") => {
+          case Some("3") => {
             val rdd3 = rdd1.fullOuterJoin(rdd2).map(tuple => (tuple._1, (tuple._2._1.getOrElse(0d), tuple._2._2.getOrElse(""))))
             rdd3
           }
@@ -132,12 +132,12 @@ class SparkRDDMetaMutantBuilderTestSuite extends FunSuite {
         }
         
         def program2(rdd4: RDD[String]) = sys.props.get("CURRENT_MUTANT") match {
-          case Some("3") => {
+          case Some("4") => {
             val rdd5 = rdd4
             val rdd6 = rdd5.sortBy((x: String) => x)
             rdd6
           }
-         case Some("4") => {
+         case Some("5") => {
            val rdd5 = rdd4.filter((x: String) => !x.isEmpty)
            val rdd6 = rdd5
            rdd6

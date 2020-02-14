@@ -255,33 +255,7 @@ object ProgramHTMLReport {
   }
 
   def generateMutantsModalsHtml(metrics: MetaMutantProgramMetrics) = {
-    metrics.mutantsMetrics.map(generateMutantModalHtml).mkString("\n")
-  }
-
-  def generateMutantModalHtml(metric: MutantProgramMetrics) = {
-    s"""<div class="modal fade" id="modalMutant${metric.mutantId}" tabindex="-1" role="dialog" aria-labelledby="modalMutantLabel${metric.mutantId}" aria-hidden="true">
-       |<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-       |<div class="modal-content">
-       |<div class="modal-header">
-       |<h5 class="modal-title" id="exampleModalLabel">Mutant ID: <a href="../Mutants/Mutant-${metric.mutantId}.html" class="text-dark">${metric.mutantId}</a></h5>
-       |<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-       |<span aria-hidden="true">&times;</span>
-       |</button>
-       |</div>
-       |<div class="modal-body">
-       |<h5>Mutation Operator: <a href="#" class="text-dark" data-toggle="tooltip" data-placement="right" title="${metric.mutationOperatorDescription}">${metric.mutationOperatorName}</a></h5>
-       |<h5>Status: ${metric.status}</h5>
-       |<h5>Code: </h5>
-       |<pre class="brush: scala; toolbar: false;">
-       |${metric.mutantCode}
-       |</pre>
-       |</div>
-       |<div class="modal-footer">
-       |<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-       |</div>
-       |</div>
-       |</div>
-       |</div>""".stripMargin
+    metrics.mutantsMetrics.map(m => MutantHTMLReport.generateMutantModalHtml(m, false)).mkString("\n")
   }
 
   def generateTransformationsHtmlTable(metrics: MetaMutantProgramMetrics) = {
@@ -351,7 +325,7 @@ object ProgramHTMLReport {
       |  <td>${dataset.datasetType.simplifiedName}</td>
       |</tr>""".stripMargin
   }
-  
+
   def generateMutationOperatorsHtmlTable(metrics: MetaMutantProgramMetrics) = {
     val mutationOperatorsMetrics = metrics.mutationOperatorsMetrics
     val rowsString = metrics.mutationOperatorsMetrics.totalMutantsPerOperator.keys.map(k => generateMutationOperatorHtmlRow(k, mutationOperatorsMetrics)).filter(s => !s.isEmpty()).mkString("\n")

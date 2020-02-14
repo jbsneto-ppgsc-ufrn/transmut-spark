@@ -2,7 +2,7 @@ package br.ufrn.dimap.forall.transmut.util
 
 class LongIdGenerator extends IdGenerator[Long] {
   
-  private var currentId: Long = 0L
+  private var currentId: Long = 1L
   
   private def this(startsWith : Long) {
     this()
