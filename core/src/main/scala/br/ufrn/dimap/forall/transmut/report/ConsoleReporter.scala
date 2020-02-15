@@ -8,6 +8,7 @@ import br.ufrn.dimap.forall.transmut.report.metric.ProgramSourceMetrics
 import br.ufrn.dimap.forall.transmut.report.metric.MetaMutantProgramSourceMetrics
 import br.ufrn.dimap.forall.transmut.mutation.operator.MutationOperatorsEnum
 import br.ufrn.dimap.forall.transmut.report.metric.MutationTestingProcessMetrics
+import java.time.format.DateTimeFormatter
 
 object ConsoleReporter extends Reporter {
 
@@ -57,7 +58,7 @@ object ConsoleReporter extends Reporter {
   }
 
   override def onProcessEnd() {
-    val mutationTestingProcessMetrics = MutationTestingProcessMetrics(metaMutantsVerdicts, processDuration)
+    val mutationTestingProcessMetrics = MutationTestingProcessMetrics(metaMutantsVerdicts, processDuration, processStartDateTime)
     val metaMutantProgramSourcesMetrics = mutationTestingProcessMetrics.metaMutantProgramSourcesMetrics
     info("------------------------------------------------------------------------------------")
     info("MUTATION TESTING PROCESS RESULTS")
@@ -69,6 +70,8 @@ object ConsoleReporter extends Reporter {
   }
 
   def generalMutationTestingProcessReport(metric: MutationTestingProcessMetrics) {
+    info("Mutation Testing Process Start Date: " + metric.processStartDateTime.format(DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss")))
+    info("------------------------------------------------------------------------------------")
     info("Mutation Testing Process Duration: " + metric.processDuration.toSeconds + " seconds")
     info("------------------------------------------------------------------------------------")
     info("General Mutation Testing Results: ")

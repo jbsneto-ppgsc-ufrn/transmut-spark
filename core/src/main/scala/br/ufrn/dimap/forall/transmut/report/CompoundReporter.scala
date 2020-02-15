@@ -4,6 +4,7 @@ import br.ufrn.dimap.forall.transmut.mutation.model.MetaMutantProgramSource
 import br.ufrn.dimap.forall.transmut.model.ProgramSource
 import br.ufrn.dimap.forall.transmut.mutation.analyzer.MutantResult
 import br.ufrn.dimap.forall.transmut.mutation.model.MutantProgramSource
+import java.time.LocalDateTime
 
 object CompoundReporter extends Reporter {
 
@@ -24,6 +25,7 @@ object CompoundReporter extends Reporter {
   def onProcessEnd() = reporters.foreach(reporter => reporter.onProcessEnd())
   override def onAdditionalInformation(msg: String) = reporters.foreach(reporter => reporter.onAdditionalInformation(msg))
 
+  override def reportProcessStart(startDateTime: LocalDateTime) = reporters.foreach(reporter => reporter.reportProcessStart(startDateTime))
   override def reportProcessStart = reporters.foreach(reporter => reporter.reportProcessStart)
   override def reportProgramBuildStart = reporters.foreach(reporter => reporter.reportProgramBuildStart)
   override def reportProgramBuildEnd(programSources: List[ProgramSource]) = reporters.foreach(reporter => reporter.reportProgramBuildEnd(programSources))

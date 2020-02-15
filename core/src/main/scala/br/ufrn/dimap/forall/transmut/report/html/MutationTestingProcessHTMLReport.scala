@@ -10,6 +10,7 @@ import java.text.NumberFormat
 import br.ufrn.dimap.forall.transmut.report.metric.MetaMutantProgramMetrics
 import br.ufrn.dimap.forall.transmut.report.metric.MutantProgramMetrics
 import br.ufrn.dimap.forall.transmut.report.metric.MutationOperatorsMetrics
+import java.time.format.DateTimeFormatter
 
 object MutationTestingProcessHTMLReport {
 
@@ -75,6 +76,7 @@ object MutationTestingProcessHTMLReport {
        |<main role"main" class="container">  
        |<div class="starter-template">
        |  <h2><a href="index.html" class="text-dark">Mutation Testing Report</a></h2>
+       |  <h5>Process Start Date: ${metrics.processStartDateTime.format(DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss"))}</h5>
        |  <h5>Process Duration: ${metrics.processDuration.toSeconds} seconds</h5>
        |</div>    
        |<!-- Program Sources -->

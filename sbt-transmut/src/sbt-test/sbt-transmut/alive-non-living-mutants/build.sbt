@@ -1,3 +1,5 @@
+import java.nio.file._
+
 name := "transmut-plugin-tests"
 
 version := "0.1"
@@ -18,3 +20,32 @@ javaOptions ++= Seq("-Xms512M", "-Xmx2048M", "-XX:MaxPermSize=2048M", "-XX:+CMSC
 semanticdbEnabled := true
 semanticdbVersion := "4.3.0"
 semanticdbIncludeInJar := false
+
+TaskKey[Unit]("checkBeforeTransmut") := {
+    val targetFolder = target.value
+    val listFilesInTarget = IO.listFiles(targetFolder)
+    val transmutFolders = listFilesInTarget.filter(f => f.isDirectory() && f.getName.contains("transmut-"))
+    assert(transmutFolders.isEmpty)
+}
+
+TaskKey[Unit]("checkAfterTransmut") := {
+    val targetFolder = target.value
+    val listFilesInTarget = IO.listFiles(targetFolder)
+    val transmutFolders = listFilesInTarget.filter(f => f.isDirectory() && f.getName.contains("transmut-"))
+    assert(!transmutFolders.isEmpty)
+    assert(transmutFolders.size == 1)
+    val transmutFolder = transmutFolders.head
+    val transmutFolderFiles = IO.listFiles(transmutFolder)
+    assert(transmutFolderFiles.filter(f => f.getName.contains("mutants") && f.isDirectory()).size == 1)
+    assert(transmutFolderFiles.filter(f => f.getName.contains("mutated-src") && f.isDirectory()).size == 1)
+    assert(transmutFolderFiles.filter(f => f.getName.contains("reports") && f.isDirectory()).size == 1)
+    val reportsFolder = transmutFolderFiles.filter(f => f.getName.contains("reports") && f.isDirectory()).head
+    val reportsFolderFiles = IO.listFiles(reportsFolder)
+    assert(reportsFolderFiles.filter(f => f.isDirectory()).size == 2)
+    val htmlReportsFolder = reportsFolderFiles.filter(f => f.getName.contains("html") && f.isDirectory()).head
+    val htmlIndexFile = new File(htmlReportsFolder, "index.html")
+    assert(htmlIndexFile.exists() && htmlIndexFile.isFile())
+    val jsonReportsFolder = reportsFolderFiles.filter(f => f.getName.contains("json") && f.isDirectory()).head
+    val jsonIndexFile = new File(jsonReportsFolder, "Mutation-Testing-Process.json")
+    assert(jsonIndexFile.exists() && jsonIndexFile.isFile())
+}

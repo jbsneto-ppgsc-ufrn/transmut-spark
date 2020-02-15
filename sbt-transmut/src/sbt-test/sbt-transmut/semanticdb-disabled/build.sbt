@@ -18,3 +18,10 @@ javaOptions ++= Seq("-Xms512M", "-Xmx2048M", "-XX:MaxPermSize=2048M", "-XX:+CMSC
 semanticdbEnabled := false
 semanticdbVersion := "4.3.0"
 semanticdbIncludeInJar := false
+
+TaskKey[Unit]("checkBeforeTransmut") := {
+    val targetFolder = target.value
+    val listFilesInTarget = IO.listFiles(targetFolder)
+    val transmutFolders = listFilesInTarget.filter(f => f.isDirectory() && f.getName.contains("transmut-"))
+    assert(transmutFolders.isEmpty)
+}

@@ -8,8 +8,9 @@ import br.ufrn.dimap.forall.transmut.mutation.analyzer.MutantSurvived
 import br.ufrn.dimap.forall.transmut.mutation.analyzer.MutantEquivalent
 import br.ufrn.dimap.forall.transmut.mutation.analyzer.MutantError
 import scala.concurrent.duration.Duration
+import java.time.LocalDateTime
 
-case class MutationTestingProcessMetrics(metaMutantsVerdicts: List[(MetaMutantProgramSource, List[MutantResult[MutantProgramSource]])], processDuration: Duration) {
+case class MutationTestingProcessMetrics(metaMutantsVerdicts: List[(MetaMutantProgramSource, List[MutantResult[MutantProgramSource]])], processDuration: Duration, processStartDateTime: LocalDateTime) {
 
   def programSources = metaMutantsVerdicts.map(m => m._1.original)
 

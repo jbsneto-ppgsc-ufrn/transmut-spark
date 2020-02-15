@@ -7,11 +7,20 @@ import br.ufrn.dimap.forall.transmut.model.ProgramSource
 import br.ufrn.dimap.forall.transmut.mutation.analyzer.MutantResult
 import br.ufrn.dimap.forall.transmut.mutation.model.MetaMutantProgramSource
 import br.ufrn.dimap.forall.transmut.mutation.model.MutantProgramSource
+import java.time.LocalDateTime
+import java.sql.Timestamp
 
 trait Reporter {
 
+  var _processStartDateTime = LocalDateTime.now()
   var _processStartTime = 0l
   var _processEndTime = 0l
+  
+  def processStartDateTime = _processStartDateTime
+
+  def processStartDateTime_=(dateTime: LocalDateTime) = {
+    _processStartDateTime = dateTime
+  }
 
   def processStartTime = _processStartTime
 
@@ -35,10 +44,13 @@ trait Reporter {
   def onProcessEnd(): Unit
   def onAdditionalInformation(msg: String) {}
 
-  def reportProcessStart {
+  def reportProcessStart(startDateTime: LocalDateTime) {
+    processStartDateTime = startDateTime
     processStartTime = System.currentTimeMillis()
     onProcessStart
   }
+
+  def reportProcessStart: Unit = reportProcessStart(LocalDateTime.now())
 
   def reportProgramBuildStart {
     onProgramBuildStart

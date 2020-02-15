@@ -32,10 +32,14 @@ import org.scalatest.BeforeAndAfter
 import br.ufrn.dimap.forall.transmut.util.IOFiles
 import br.ufrn.dimap.forall.transmut.report.html.HTMLReporter
 import br.ufrn.dimap.forall.transmut.report.json.JSONReporter
+import br.ufrn.dimap.forall.transmut.util.DateTimeUtil
+import java.time.LocalDateTime
 
 class CompoundReporterTestSuite extends FunSuite with BeforeAndAfter with MockFactory {
 
-  val transmutTestDir = Paths.get("./bin/transmut/")
+  val dateTime = DateTimeUtil.getCurrentDateTime
+  val transmutTestBaseDir = Paths.get("./bin/")
+  val transmutTestDir = Paths.get(transmutTestBaseDir.toString(), "transmut-" + DateTimeUtil.getDatestampFromDateTime(dateTime))
 
   before {
     if (Files.exists(transmutTestDir) && Files.isRegularFile(transmutTestDir)) {
@@ -63,7 +67,8 @@ class CompoundReporterTestSuite extends FunSuite with BeforeAndAfter with MockFa
     val programNames = List("program")
     val mutationOperators = List("JTR")
 
-    implicit val configTest = Config(programSourcesNames, programNames, mutationOperators, transmutDir = transmutTestDir)
+    implicit val configTest = Config(programSourcesNames, programNames, mutationOperators, transmutBaseDir = transmutTestBaseDir)
+    configTest.processStartDateTime = dateTime
 
     val programSource = SparkRDDProgramBuilder.buildProgramSourceFromProgramNames(configTest.programs, tree, refenceTypes.toMap)
     val programSources = List(programSource)
@@ -96,7 +101,7 @@ class CompoundReporterTestSuite extends FunSuite with BeforeAndAfter with MockFa
 
     val reporterMock = mock[Reporter]
     inSequence {
-      (reporterMock.reportProcessStart _).expects()
+      (reporterMock.reportProcessStart(_: LocalDateTime)).expects(configTest.processStartDateTime)
       (reporterMock.reportProgramBuildStart _).expects()
       (reporterMock.reportProgramBuildEnd _).expects(programSources)
       (reporterMock.reportMutantGenerationStart _).expects()
@@ -107,13 +112,13 @@ class CompoundReporterTestSuite extends FunSuite with BeforeAndAfter with MockFa
     }
 
     val infoConsoleMock = mockFunction[String, Unit]
-    infoConsoleMock.expects(*).returning().atLeastTwice()
+    infoConsoleMock.expects(*).atLeastTwice()
 
     val infoHTMLMock = mockFunction[String, Unit]
-    infoHTMLMock.expects(*).returning().once()
+    infoHTMLMock.expects(*).once()
 
     val infoJSONMock = mockFunction[String, Unit]
-    infoJSONMock.expects(*).returning().once()
+    infoJSONMock.expects(*).once()
 
     val consoleReporter = ConsoleReporter(infoConsoleMock)
     val htmlReporter = HTMLReporter(infoHTMLMock)

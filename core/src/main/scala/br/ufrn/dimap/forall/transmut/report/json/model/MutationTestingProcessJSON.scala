@@ -1,6 +1,7 @@
 package br.ufrn.dimap.forall.transmut.report.json.model
 
 case class MutationTestingProcessJSON(
+  processStartDateTime:     String, // ISO DATE TIME String Format
   processDurationSeconds:   Long,
   programSources:           List[ProgramSourceJSON],
   programs:                 List[ProgramJSON],

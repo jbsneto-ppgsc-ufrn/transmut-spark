@@ -63,7 +63,7 @@ trait MutationTestingProcess {
 
   def runProcess() {
     preProcess()
-    reporter.reportProcessStart
+    reporter.reportProcessStart(config.processStartDateTime)
     // Program Sources Build Process
     reporter.reportProgramBuildStart
     programSources = programBuilder.buildProgramSources(config.sources, config.programs, config.transmutSrcDir, config.semanticdbDir)

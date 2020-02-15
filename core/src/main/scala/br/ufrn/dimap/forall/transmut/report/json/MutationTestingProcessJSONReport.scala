@@ -16,6 +16,7 @@ import io.circe.syntax._
 import io.circe.parser.decode
 import br.ufrn.dimap.forall.transmut.util.IOFiles
 import java.io.File
+import java.time.format.DateTimeFormatter
 
 object MutationTestingProcessJSONReport {
 
@@ -34,6 +35,7 @@ object MutationTestingProcessJSONReport {
 
   def generateProgramSourceJSONObjectFromMetrics(metrics: MutationTestingProcessMetrics): MutationTestingProcessJSON = {
     MutationTestingProcessJSON(
+      metrics.processStartDateTime.format(DateTimeFormatter.ISO_DATE_TIME),
       metrics.processDuration.toSeconds,
       metrics.metaMutantProgramSourcesMetrics.map(ProgramSourceJSONReport.generateProgramSourceJSONObjectFromMetrics),
       metrics.metaMutantProgramsMetrics.map(ProgramJSONReport.generateProgramJSONObjectFromMetrics),

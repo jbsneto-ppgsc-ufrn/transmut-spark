@@ -1,23 +1,9 @@
 # Before execution the TRANSMUT folder and reports should not exist
--$ exists target/transmut
--$ exists target/transmut/mutants
--$ exists target/transmut/mutated-src
--$ exists target/transmut/reports
--$ exists target/transmut/reports/html
--$ exists target/transmut/reports/html/index.html
--$ exists target/transmut/reports/json/
--$ exists target/transmut/reports/json/Mutation-Testing-Process.json
+> checkBeforeTransmut
 
 # Execute TRANSMUT-Spark plugin
 # Should fail because semanticdb is disabled in build.sbt 
 -> transmut
 
 # If transmutation plugin fails, the TRANSMUT folder and reports should not exist
--$ exists target/transmut
--$ exists target/transmut/mutants
--$ exists target/transmut/mutated-src
--$ exists target/transmut/reports
--$ exists target/transmut/reports/html
--$ exists target/transmut/reports/html/index.html
--$ exists target/transmut/reports/json/
--$ exists target/transmut/reports/json/Mutation-Testing-Process.json
+> checkBeforeTransmut

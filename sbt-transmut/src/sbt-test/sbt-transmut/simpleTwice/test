@@ -6,3 +6,9 @@
 
 # Checks if TRANSMUT folders and reports have been created
 > checkAfterTransmut
+
+# Execute TRANSMUT-Spark plugin again
+> transmut
+
+# Check if another TRANSMUT folder was created  in addition to the first one
+> checkAfterSecondTransmut

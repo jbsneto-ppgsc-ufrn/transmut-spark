@@ -26,6 +26,7 @@ import br.ufrn.dimap.forall.transmut.mutation.manager.MutationManager
 import br.ufrn.dimap.forall.transmut.mutation.manager.MetaMutantBuilder
 import br.ufrn.dimap.forall.transmut.mutation.analyzer.MutantAnalyzer
 import br.ufrn.dimap.forall.transmut.mutation.model.MetaMutantProgramSource
+import java.time.LocalDateTime
 
 class MutationTestingProcessTestSuite extends FunSuite with MockFactory {
 
@@ -82,7 +83,7 @@ class MutationTestingProcessTestSuite extends FunSuite with MockFactory {
 
     val reporterMock = mock[Reporter]
     inSequence {
-      (reporterMock.reportProcessStart _).expects()
+      (reporterMock.reportProcessStart(_: LocalDateTime)).expects(configTest.processStartDateTime)
       (reporterMock.reportProgramBuildStart _).expects()
       (reporterMock.reportProgramBuildEnd _).expects(programSources)
       (reporterMock.reportMutantGenerationStart _).expects()

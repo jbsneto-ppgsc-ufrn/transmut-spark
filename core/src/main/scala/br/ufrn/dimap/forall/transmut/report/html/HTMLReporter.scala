@@ -49,7 +49,7 @@ object HTMLReporter extends Reporter {
   }
 
   override def onProcessEnd() {
-    val mutationTestingProcessMetrics = MutationTestingProcessMetrics(metaMutantsVerdicts, processDuration)
+    val mutationTestingProcessMetrics = MutationTestingProcessMetrics(metaMutantsVerdicts, processDuration, processStartDateTime)
     generateMutationTestingProcessReport(mutationTestingProcessMetrics)
     generateProgramSourceReports(mutationTestingProcessMetrics)
     generateProgramReports(mutationTestingProcessMetrics)
