@@ -21,11 +21,11 @@ object SparkRDDJoinTransformationReplacement extends MutationOperator[Transforma
       val original = element.asInstanceOf[SparkRDDBinaryTransformation]
 
       original.name match {
-        case "join" => List(joinToLeftOuterJoinMutant(original, idGen), joinToRightOuterJoinMutant(original, idGen), joinToFullOuterJoinMutant(original, idGen))
-        case "leftOuterJoin" => List(leftOuterJoinToJoinMutant(original, idGen), leftOuterJoinToRightOuterJoinMutant(original, idGen), leftOuterJoinToFullOuterJoinMutant(original, idGen))
+        case "join"           => List(joinToLeftOuterJoinMutant(original, idGen), joinToRightOuterJoinMutant(original, idGen), joinToFullOuterJoinMutant(original, idGen))
+        case "leftOuterJoin"  => List(leftOuterJoinToJoinMutant(original, idGen), leftOuterJoinToRightOuterJoinMutant(original, idGen), leftOuterJoinToFullOuterJoinMutant(original, idGen))
         case "rightOuterJoin" => List(rightOuterJoinToJoinMutant(original, idGen), rightOuterJoinToLeftOuterJoinMutant(original, idGen), rightOuterJoinToFullOuterJoinMutant(original, idGen))
-        case "fullOuterJoin" => List(fullOuterJoinToJoinMutant(original, idGen), fullOuterJoinToLeftOuterJoinMutant(original, idGen), fullOuterJoinToRightOuterJoinMutant(original, idGen))
-        case _      => throw new Exception("Not Supported Transformation")
+        case "fullOuterJoin"  => List(fullOuterJoinToJoinMutant(original, idGen), fullOuterJoinToLeftOuterJoinMutant(original, idGen), fullOuterJoinToRightOuterJoinMutant(original, idGen))
+        case _                => throw new Exception("Not Supported Transformation")
       }
     } else {
       Nil
@@ -48,7 +48,7 @@ object SparkRDDJoinTransformationReplacement extends MutationOperator[Transforma
     mutated.source = transformer(mutated.source)
     MutantTransformation(idGenerator.getId, original, mutated, mutationOperatorType)
   }
-  
+
   private def joinToRightOuterJoinMutant(original: SparkRDDBinaryTransformation, idGenerator: LongIdGenerator): MutantTransformation = {
     val mutated = original.copy()
     mutated.name = "rightOuterJoin"
@@ -65,7 +65,7 @@ object SparkRDDJoinTransformationReplacement extends MutationOperator[Transforma
     mutated.source = transformer(mutated.source)
     MutantTransformation(idGenerator.getId, original, mutated, mutationOperatorType)
   }
-  
+
   private def joinToFullOuterJoinMutant(original: SparkRDDBinaryTransformation, idGenerator: LongIdGenerator): MutantTransformation = {
     val mutated = original.copy()
     mutated.name = "fullOuterJoin"
@@ -82,7 +82,7 @@ object SparkRDDJoinTransformationReplacement extends MutationOperator[Transforma
     mutated.source = transformer(mutated.source)
     MutantTransformation(idGenerator.getId, original, mutated, mutationOperatorType)
   }
-  
+
   private def leftOuterJoinToJoinMutant(original: SparkRDDBinaryTransformation, idGenerator: LongIdGenerator): MutantTransformation = {
     val mutated = original.copy()
     mutated.name = "join"
@@ -93,13 +93,13 @@ object SparkRDDJoinTransformationReplacement extends MutationOperator[Transforma
     val transformer = new Transformer {
       override def apply(tree: Tree): Tree = tree match {
         case q"$firstDataset.leftOuterJoin($secondDataset)" => q"$firstDataset.join($secondDataset).map(tuple => (tuple._1, (tuple._2._1, Option(tuple._2._2))))"
-        case node                                  => super.apply(node)
+        case node => super.apply(node)
       }
     }
     mutated.source = transformer(mutated.source)
     MutantTransformation(idGenerator.getId, original, mutated, mutationOperatorType)
   }
-  
+
   private def leftOuterJoinToRightOuterJoinMutant(original: SparkRDDBinaryTransformation, idGenerator: LongIdGenerator): MutantTransformation = {
     val mutated = original.copy()
     mutated.name = "rightOuterJoin"
@@ -110,13 +110,13 @@ object SparkRDDJoinTransformationReplacement extends MutationOperator[Transforma
     val transformer = new Transformer {
       override def apply(tree: Tree): Tree = tree match {
         case q"$firstDataset.leftOuterJoin($secondDataset)" => q"$firstDataset.rightOuterJoin($secondDataset).map(tuple => (tuple._1, (tuple._2._1.getOrElse($firstRDDDefaultValue), Option(tuple._2._2))))"
-        case node                                  => super.apply(node)
+        case node => super.apply(node)
       }
     }
     mutated.source = transformer(mutated.source)
     MutantTransformation(idGenerator.getId, original, mutated, mutationOperatorType)
   }
-  
+
   private def leftOuterJoinToFullOuterJoinMutant(original: SparkRDDBinaryTransformation, idGenerator: LongIdGenerator): MutantTransformation = {
     val mutated = original.copy()
     mutated.name = "fullOuterJoin"
@@ -127,13 +127,13 @@ object SparkRDDJoinTransformationReplacement extends MutationOperator[Transforma
     val transformer = new Transformer {
       override def apply(tree: Tree): Tree = tree match {
         case q"$firstDataset.leftOuterJoin($secondDataset)" => q"$firstDataset.fullOuterJoin($secondDataset).map(tuple => (tuple._1, (tuple._2._1.getOrElse($firstRDDDefaultValue), tuple._2._2)))"
-        case node                                  => super.apply(node)
+        case node => super.apply(node)
       }
     }
     mutated.source = transformer(mutated.source)
     MutantTransformation(idGenerator.getId, original, mutated, mutationOperatorType)
   }
-  
+
   private def rightOuterJoinToJoinMutant(original: SparkRDDBinaryTransformation, idGenerator: LongIdGenerator): MutantTransformation = {
     val mutated = original.copy()
     mutated.name = "join"
@@ -144,13 +144,13 @@ object SparkRDDJoinTransformationReplacement extends MutationOperator[Transforma
     val transformer = new Transformer {
       override def apply(tree: Tree): Tree = tree match {
         case q"$firstDataset.rightOuterJoin($secondDataset)" => q"$firstDataset.join($secondDataset).map(tuple => (tuple._1, (Option(tuple._2._1), tuple._2._2)))"
-        case node                                  => super.apply(node)
+        case node => super.apply(node)
       }
     }
     mutated.source = transformer(mutated.source)
     MutantTransformation(idGenerator.getId, original, mutated, mutationOperatorType)
   }
-  
+
   private def rightOuterJoinToLeftOuterJoinMutant(original: SparkRDDBinaryTransformation, idGenerator: LongIdGenerator): MutantTransformation = {
     val mutated = original.copy()
     mutated.name = "leftOuterJoin"
@@ -161,13 +161,13 @@ object SparkRDDJoinTransformationReplacement extends MutationOperator[Transforma
     val transformer = new Transformer {
       override def apply(tree: Tree): Tree = tree match {
         case q"$firstDataset.rightOuterJoin($secondDataset)" => q"$firstDataset.leftOuterJoin($secondDataset).map(tuple => (tuple._1, (Option(tuple._2._1), tuple._2._2.getOrElse($secondRDDDefaultValue))))"
-        case node                                  => super.apply(node)
+        case node => super.apply(node)
       }
     }
     mutated.source = transformer(mutated.source)
     MutantTransformation(idGenerator.getId, original, mutated, mutationOperatorType)
   }
-  
+
   private def rightOuterJoinToFullOuterJoinMutant(original: SparkRDDBinaryTransformation, idGenerator: LongIdGenerator): MutantTransformation = {
     val mutated = original.copy()
     mutated.name = "fullOuterJoin"
@@ -178,13 +178,13 @@ object SparkRDDJoinTransformationReplacement extends MutationOperator[Transforma
     val transformer = new Transformer {
       override def apply(tree: Tree): Tree = tree match {
         case q"$firstDataset.rightOuterJoin($secondDataset)" => q"$firstDataset.fullOuterJoin($secondDataset).map(tuple => (tuple._1, (tuple._2._1, tuple._2._2.getOrElse($secondRDDDefaultValue))))"
-        case node                                  => super.apply(node)
+        case node => super.apply(node)
       }
     }
     mutated.source = transformer(mutated.source)
     MutantTransformation(idGenerator.getId, original, mutated, mutationOperatorType)
   }
-  
+
   private def fullOuterJoinToJoinMutant(original: SparkRDDBinaryTransformation, idGenerator: LongIdGenerator): MutantTransformation = {
     val mutated = original.copy()
     mutated.name = "join"
@@ -195,13 +195,13 @@ object SparkRDDJoinTransformationReplacement extends MutationOperator[Transforma
     val transformer = new Transformer {
       override def apply(tree: Tree): Tree = tree match {
         case q"$firstDataset.fullOuterJoin($secondDataset)" => q"$firstDataset.join($secondDataset).map(tuple => (tuple._1, (Option(tuple._2._1), Option(tuple._2._2))))"
-        case node                                  => super.apply(node)
+        case node => super.apply(node)
       }
     }
     mutated.source = transformer(mutated.source)
     MutantTransformation(idGenerator.getId, original, mutated, mutationOperatorType)
   }
-  
+
   private def fullOuterJoinToLeftOuterJoinMutant(original: SparkRDDBinaryTransformation, idGenerator: LongIdGenerator): MutantTransformation = {
     val mutated = original.copy()
     mutated.name = "leftOuterJoin"
@@ -212,13 +212,13 @@ object SparkRDDJoinTransformationReplacement extends MutationOperator[Transforma
     val transformer = new Transformer {
       override def apply(tree: Tree): Tree = tree match {
         case q"$firstDataset.fullOuterJoin($secondDataset)" => q"$firstDataset.leftOuterJoin($secondDataset).map(tuple => (tuple._1, (Option(tuple._2._1), tuple._2._2)))"
-        case node                                  => super.apply(node)
+        case node => super.apply(node)
       }
     }
     mutated.source = transformer(mutated.source)
     MutantTransformation(idGenerator.getId, original, mutated, mutationOperatorType)
   }
-  
+
   private def fullOuterJoinToRightOuterJoinMutant(original: SparkRDDBinaryTransformation, idGenerator: LongIdGenerator): MutantTransformation = {
     val mutated = original.copy()
     mutated.name = "rightOuterJoin"
@@ -229,7 +229,7 @@ object SparkRDDJoinTransformationReplacement extends MutationOperator[Transforma
     val transformer = new Transformer {
       override def apply(tree: Tree): Tree = tree match {
         case q"$firstDataset.fullOuterJoin($secondDataset)" => q"$firstDataset.rightOuterJoin($secondDataset).map(tuple => (tuple._1, (tuple._2._1, Option(tuple._2._2))))"
-        case node                                  => super.apply(node)
+        case node => super.apply(node)
       }
     }
     mutated.source = transformer(mutated.source)
@@ -252,11 +252,35 @@ object SparkRDDJoinTransformationReplacement extends MutationOperator[Transforma
       case BaseType(BaseTypesEnum.Boolean) => "false".parse[Term].get
       case BaseType(BaseTypesEnum.Char)    => "\'0\'".parse[Term].get
       case BaseType(BaseTypesEnum.String)  => "\"\"".parse[Term].get
-      case ParameterizedType("Option", _)  => "None".parse[Term].get
-      case ParameterizedType("List", _)    => "List()".parse[Term].get
-      case ParameterizedType("Array", _)   => "Array()".parse[Term].get
-      case _                               => "null".parse[Term].get
+      case ParameterizedType(name, List(typeParam)) if name.replace('/', '.').split('.').last.replace("#", "") == "Option" => {
+        val typeName = typeParam.simplifiedName
+        s"List[$typeName]().headOption".parse[Term].get // List[$typeName]().headOption = None (to force Option[$typeName])
+      }
+      case ParameterizedType(name, List(typeParam)) if name.replace('/', '.').split('.').last.replace("#", "") == "List" => {
+        val typeName = typeParam.simplifiedName
+        s"List[$typeName]()".parse[Term].get
+      }
+      case ParameterizedType(name, List(typeParam)) if name.replace('/', '.').split('.').last.replace("#", "") == "Array" => {
+        val typeName = typeParam.simplifiedName
+        s"Array[$typeName]()".parse[Term].get
+      }
+      case ParameterizedType(name, List(typeParam)) if name.replace('/', '.').split('.').last.replace("#", "") == "Set" => {
+        val typeName = typeParam.simplifiedName
+        s"Set[$typeName]()".parse[Term].get
+      }
+      case TupleType(key, value) => defaultValueFromKeyValue(key, value)
+      case classType: ClassType => {
+        val typeName = classType.simplifiedName
+        s"null.asInstanceOf[$typeName]".parse[Term].get
+      }
+      case _ => "null".parse[Term].get
     }
+  }
+
+  private def defaultValueFromKeyValue(keyType: br.ufrn.dimap.forall.transmut.model.Type, valueType: br.ufrn.dimap.forall.transmut.model.Type): Term = {
+    val keyDefaultValue = defaultValueFromType(keyType)
+    val valueDefaultValue = defaultValueFromType(valueType)
+    q"($keyDefaultValue, $valueDefaultValue)"
   }
 
 }

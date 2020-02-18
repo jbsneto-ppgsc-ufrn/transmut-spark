@@ -56,7 +56,7 @@ object ProgramSourceHTMLReport {
        |</head>
        |<body>
        |<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-       |<a class="navbar-brand" href="#">TRANSMUT-Spark</a>
+       |<a class="navbar-brand" href="../index.html">TRANSMUT-Spark</a>
        |<div class="collapse navbar-collapse" id="navbarNav">
        |  <ul class="navbar-nav mr-auto">
        |    <li class="nav-item dropdown">
