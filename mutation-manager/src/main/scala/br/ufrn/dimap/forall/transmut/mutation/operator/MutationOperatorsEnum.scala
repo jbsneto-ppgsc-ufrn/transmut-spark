@@ -17,8 +17,10 @@ object MutationOperatorsEnum extends Enumeration {
   val ATR = Value("Aggregation Transformation Replacement")
   val JTR = Value("Join Transformation Replacement")
   val OTD = Value("Order Transformation Deletion")
+  val NFTP = Value("Negation of Filter Transformation Predicate")
+  val OTI = Value("Order Transformation Inversion")
   
-  def ALL: List[MutationOperatorsEnum] = List(UTS, BTS, UTR, BTR, UTD, MTR, FTD, STR, DTD, DTI, ATR, JTR, OTD)
+  def ALL: List[MutationOperatorsEnum] = List(UTS, BTS, UTR, BTR, UTD, MTR, FTD, STR, DTD, DTI, ATR, JTR, OTD, NFTP, OTI)
   
   def mutationOperatorsEnumFromName(operatorName: String): MutationOperatorsEnum = operatorName match {
     case "UTS" => UTS
@@ -34,6 +36,8 @@ object MutationOperatorsEnum extends Enumeration {
     case "ATR" => ATR
     case "DTI" => DTI
     case "JTR" => JTR
+    case "NFTP" => NFTP
+    case "OTI" => OTI
     case _ => throw new Exception("Inexistent Mutation Operator")
   }
   
@@ -51,6 +55,8 @@ object MutationOperatorsEnum extends Enumeration {
     case ATR => "ATR"
     case DTI => "DTI"
     case JTR => "JTR"
+    case NFTP => "NFTP"
+    case OTI => "OTI"
     case _ => throw new Exception("Inexistent Mutation Operator")
   }
   
@@ -68,6 +74,8 @@ object MutationOperatorsEnum extends Enumeration {
     case ATR => "Aggregation Transformation Replacement"
     case DTI => "Distinct Transformation Insertion"
     case JTR => "Join Transformation Replacement"
+    case NFTP => "Negation of Filter Transformation Predicate"
+    case OTI => "Order Transformation Inversion"
     case _ => throw new Exception("Inexistent Mutation Operator")
   }
   

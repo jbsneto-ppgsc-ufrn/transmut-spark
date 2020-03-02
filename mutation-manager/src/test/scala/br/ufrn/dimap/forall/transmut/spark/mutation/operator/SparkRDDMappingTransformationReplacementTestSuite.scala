@@ -1273,7 +1273,7 @@ class SparkRDDMappingTransformationReplacementTestSuite extends FunSuite {
 
     assert(mutantTrue.mutated.params.size == 1)
     assert(mutantTrue.original.params.size == 1)
-    assert(!mutantTrue.mutated.params(0).isEqual(mutantFalse.original.params(0)))
+    assert(!mutantTrue.mutated.params(0).isEqual(mutantTrue.original.params(0)))
     assert(mutantTrue.original.params(0).isEqual(q"""(x: String) => !x.isEmpty"""))
     assert(mutantTrue.mutated.params(0).isEqual(q"""(inputParameter: String) => {
         val originalFunction = ((x: String) => !x.isEmpty)(_)
@@ -1303,7 +1303,7 @@ class SparkRDDMappingTransformationReplacementTestSuite extends FunSuite {
 
     assert(mutantNegation.mutated.params.size == 1)
     assert(mutantNegation.original.params.size == 1)
-    assert(!mutantNegation.mutated.params(0).isEqual(mutantFalse.original.params(0)))
+    assert(!mutantNegation.mutated.params(0).isEqual(mutantNegation.original.params(0)))
     assert(mutantNegation.original.params(0).isEqual(q"""(x: String) => !x.isEmpty"""))
     assert(mutantNegation.mutated.params(0).isEqual(q"""(inputParameter: String) => {
         val originalFunction = ((x: String) => !x.isEmpty)(_)

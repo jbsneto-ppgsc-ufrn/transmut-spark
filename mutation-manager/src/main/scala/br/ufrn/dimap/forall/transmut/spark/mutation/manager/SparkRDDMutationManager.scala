@@ -90,6 +90,16 @@ object SparkRDDMutationManager extends MutationManager {
               mutants ++= SparkRDDJoinTransformationReplacement.generateMutants(transformation, idGenerator)
             }
           }
+          case NFTP => {
+            transformations.foreach { transformation =>
+              mutants ++= SparkRDDNegationFilterTransformationPredicate.generateMutants(transformation, idGenerator)
+            }
+          }
+          case OTI => {
+            transformations.foreach { transformation =>
+              mutants ++= SparkRDDOrderTransformationInversion.generateMutants(transformation, idGenerator)
+            }
+          }
         }
       }
       val mutantPrograms = mutants.map(mutantTransformation => {

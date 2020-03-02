@@ -183,7 +183,7 @@ class SparkRDDMutationManagerTestSuite extends FunSuite {
     assert(mutantBTR2.mutated.tree.isEqual(treeBTR2))
   }
 
-  test("Test Case 3 - Transformation Mutation Operators - Unary Transformations - Filter, Map, Sort (FTD, MTR, OTD)") {
+  test("Test Case 3 - Transformation Mutation Operators - Unary Transformations - Filter, Map, Sort (FTD, MTR, OTD, NFTP, OTI)") {
 
     val idGenerator = LongIdGenerator.generator
 
@@ -208,13 +208,15 @@ class SparkRDDMutationManagerTestSuite extends FunSuite {
 
     val programSource = SparkRDDProgramBuilder.buildProgramSourceFromProgramNames(programNames, tree, refenceTypes.toMap)
 
-    val programSourceMutants = SparkRDDMutationManager.generateMutantsFromProgramSource(programSource, List(FTD, MTR, OTD))
+    val programSourceMutants = SparkRDDMutationManager.generateMutantsFromProgramSource(programSource, List(FTD, MTR, OTD, NFTP, OTI))
 
-    assert(programSourceMutants.size == 3)
+    assert(programSourceMutants.size == 5)
 
     val mutantFTD = programSourceMutants(0)
     val mutantMTR = programSourceMutants(1)
     val mutantOTD = programSourceMutants(2)
+    val mutantNFTP = programSourceMutants(3)
+    val mutantOTI = programSourceMutants(4)
 
     assert(mutantFTD.original == programSource)
     val treeFTD: Tree = q"""
@@ -261,6 +263,38 @@ class SparkRDDMutationManagerTestSuite extends FunSuite {
       }"""
     assert(mutantOTD.mutationOperator == OTD)
     assert(mutantOTD.mutated.tree.isEqual(treeOTD))
+    
+    assert(mutantNFTP.original == programSource)
+    val treeNFTP: Tree = q"""
+      import org.apache.spark.rdd.RDD
+      object SparkProgram {
+        def program(rdd1: RDD[String]) = {
+          val rdd2 = rdd1.filter((inputParameter: String) => {
+            val originalFunction = ((x: String) => !x.isEmpty)(_)
+            val originalValue = originalFunction(inputParameter)
+            !originalValue
+          })  
+          val rdd3 = rdd2.map((x: String) => x + "test")
+          val rdd4 = rdd3.sortBy((x: String) => x)
+          rdd4
+        }
+      }"""
+    assert(mutantNFTP.mutationOperator == NFTP)
+    assert(mutantNFTP.mutated.tree.isEqual(treeNFTP))
+    
+    assert(mutantOTI.original == programSource)
+    val treeOTI: Tree = q"""
+      import org.apache.spark.rdd.RDD
+      object SparkProgram {
+        def program(rdd1: RDD[String]) = {
+          val rdd2 = rdd1.filter((x: String) => !x.isEmpty)
+          val rdd3 = rdd2.map((x: String) => x + "test")
+          val rdd4 = rdd3.sortBy((x: String) => x, false)
+          rdd4
+        }
+      }"""
+    assert(mutantOTI.mutationOperator == OTI)
+    assert(mutantOTI.mutated.tree.isEqual(treeOTI))
   }
 
   test("Test Case 4 - Transformation Mutation Operators - Unary Transformations - Aggregation, Distinct (ATR, DTI)") {
