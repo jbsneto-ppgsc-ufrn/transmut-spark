@@ -42,7 +42,7 @@ class CompoundReporterTestSuite extends FunSuite with BeforeAndAfter with MockFa
   val transmutTestDir = Paths.get(transmutTestBaseDir.toString(), "transmut-" + DateTimeUtil.getDatestampFromDateTime(dateTime))
 
   before {
-    if (Files.exists(transmutTestDir) && Files.isRegularFile(transmutTestDir)) {
+    if (Files.exists(transmutTestDir) && Files.isDirectory(transmutTestDir)) {
       IOFiles.deleteFile(transmutTestDir.toFile())
     }
   }

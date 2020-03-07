@@ -13,6 +13,7 @@ libraryDependencies ++= Seq(
 )
 
 fork in Test := false
+parallelExecution in Test := false
 
 javaOptions in Compile ++= Seq("-Xms1G", "-Xmx4G", "-XX:MaxPermSize=4G", "-XX:+CMSClassUnloadingEnabled")
 
