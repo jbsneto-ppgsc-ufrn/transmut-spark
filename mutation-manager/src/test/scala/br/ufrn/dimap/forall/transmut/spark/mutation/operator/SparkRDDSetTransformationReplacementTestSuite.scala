@@ -122,20 +122,18 @@ class SparkRDDSetTransformationReplacementTestSuite extends FunSuite {
 
     val mutants = SparkRDDSetTransformationReplacement.generateMutants(original, idGenerator)
     
-    assert(mutants.size == 5)
+    assert(mutants.size == 4)
     
     val mutantIntersection = mutants(0)
     val mutantSubtract = mutants(1)
     val mutantFirstDataset = mutants(2)
     val mutantSecondDataset = mutants(3)
-    val mutantCommutative = mutants(4)
     
     // Mutation Operator Type Verification
     assert(mutantIntersection.mutationOperator == MutationOperatorsEnum.STR)
     assert(mutantSubtract.mutationOperator == MutationOperatorsEnum.STR)
     assert(mutantFirstDataset.mutationOperator == MutationOperatorsEnum.STR)
     assert(mutantSecondDataset.mutationOperator == MutationOperatorsEnum.STR)
-    assert(mutantCommutative.mutationOperator == MutationOperatorsEnum.STR)
 
     // Intersection Mutant
     assert(mutantIntersection.original == original)
@@ -203,24 +201,6 @@ class SparkRDDSetTransformationReplacementTestSuite extends FunSuite {
     assert(mutantSecondDataset.mutated.params != mutantSecondDataset.original.params)    
     assert(mutantSecondDataset.mutated.params.isEmpty)
 
-    // Commutative Mutant
-    assert(mutantCommutative.original == original)
-    assert(mutantCommutative.mutated != original)
-
-    assert(mutantCommutative.mutated.id == mutantCommutative.original.id)
-    assert(mutantCommutative.mutated.edges == mutantCommutative.original.edges)
-
-    assert(mutantCommutative.mutated.name != mutantCommutative.original.name)
-    assert(mutantCommutative.mutated.name == (mutantCommutative.original.name + "Commutative"))
-
-    assert(mutantCommutative.mutated.source != mutantCommutative.original.source)
-    assert(mutantCommutative.original.source.isEqual(q"val rdd3 = rdd1.union(rdd2)"))
-    assert(mutantCommutative.mutated.source.isEqual(q"val rdd3 = rdd2.union(rdd1)"))
-
-    assert(mutantCommutative.mutated.params != mutantCommutative.original.params)
-    assert(mutantCommutative.mutated.params.size == 1)
-    assert(mutantCommutative.mutated.params.head.isEqual(q"rdd1"))
-    
   }
   
   test("Test Case 4 - Intersection Transformation") {
@@ -259,20 +239,18 @@ class SparkRDDSetTransformationReplacementTestSuite extends FunSuite {
 
     val mutants = SparkRDDSetTransformationReplacement.generateMutants(original, idGenerator)
     
-    assert(mutants.size == 5)
+    assert(mutants.size == 4)
     
     val mutantUnion = mutants(0)
     val mutantSubtract = mutants(1)
     val mutantFirstDataset = mutants(2)
     val mutantSecondDataset = mutants(3)
-    val mutantCommutative = mutants(4)
     
     // Mutation Operator Type Verification
     assert(mutantUnion.mutationOperator == MutationOperatorsEnum.STR)
     assert(mutantSubtract.mutationOperator == MutationOperatorsEnum.STR)
     assert(mutantFirstDataset.mutationOperator == MutationOperatorsEnum.STR)
     assert(mutantSecondDataset.mutationOperator == MutationOperatorsEnum.STR)
-    assert(mutantCommutative.mutationOperator == MutationOperatorsEnum.STR)
 
     // Union Mutant
     assert(mutantUnion.original == original)
@@ -340,24 +318,6 @@ class SparkRDDSetTransformationReplacementTestSuite extends FunSuite {
     assert(mutantSecondDataset.mutated.params != mutantSecondDataset.original.params)    
     assert(mutantSecondDataset.mutated.params.isEmpty)
 
-    // Commutative Mutant
-    assert(mutantCommutative.original == original)
-    assert(mutantCommutative.mutated != original)
-
-    assert(mutantCommutative.mutated.id == mutantCommutative.original.id)
-    assert(mutantCommutative.mutated.edges == mutantCommutative.original.edges)
-
-    assert(mutantCommutative.mutated.name != mutantCommutative.original.name)
-    assert(mutantCommutative.mutated.name == (mutantCommutative.original.name + "Commutative"))
-
-    assert(mutantCommutative.mutated.source != mutantCommutative.original.source)
-    assert(mutantCommutative.original.source.isEqual(q"val rdd3 = rdd1.intersection(rdd2)"))
-    assert(mutantCommutative.mutated.source.isEqual(q"val rdd3 = rdd2.intersection(rdd1)"))
-
-    assert(mutantCommutative.mutated.params != mutantCommutative.original.params)
-    assert(mutantCommutative.mutated.params.size == 1)
-    assert(mutantCommutative.mutated.params.head.isEqual(q"rdd1"))
-    
   }
   
   test("Test Case 5 - Subtract Transformation") {

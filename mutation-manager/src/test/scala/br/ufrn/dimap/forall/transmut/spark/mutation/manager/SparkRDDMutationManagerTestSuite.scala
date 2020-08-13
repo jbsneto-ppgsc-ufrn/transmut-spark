@@ -437,14 +437,13 @@ class SparkRDDMutationManagerTestSuite extends FunSuite {
 
     val programSourceMutants = SparkRDDMutationManager.generateMutantsFromProgramSource(programSource, List(STR, DTD))
 
-    assert(programSourceMutants.size == 6)
+    assert(programSourceMutants.size == 5)
 
     val mutantSTR1 = programSourceMutants(0)
     val mutantSTR2 = programSourceMutants(1)
     val mutantSTR3 = programSourceMutants(2)
     val mutantSTR4 = programSourceMutants(3)
-    val mutantSTR5 = programSourceMutants(4)
-    val mutantDTD = programSourceMutants(5)
+    val mutantDTD = programSourceMutants(4)
 
     assert(mutantSTR1.original == programSource)
     val treeSTR1: Tree = q"""
@@ -497,19 +496,6 @@ class SparkRDDMutationManagerTestSuite extends FunSuite {
       }"""
     assert(mutantSTR4.mutationOperator == STR)
     assert(mutantSTR4.mutated.tree.isEqual(treeSTR4))
-
-    assert(mutantSTR5.original == programSource)
-    val treeSTR5: Tree = q"""
-      import org.apache.spark.rdd.RDD
-      object SparkProgram {
-        def program(rdd1: RDD[Int], rdd2: RDD[Int]) = {
-          val rdd3 = rdd2.union(rdd1)
-          val rdd4 = rdd3.distinct
-          rdd4
-        }
-      }"""
-    assert(mutantSTR5.mutationOperator == STR)
-    assert(mutantSTR5.mutated.tree.isEqual(treeSTR5))
 
     assert(mutantDTD.original == programSource)
     val treeDTD: Tree = q"""

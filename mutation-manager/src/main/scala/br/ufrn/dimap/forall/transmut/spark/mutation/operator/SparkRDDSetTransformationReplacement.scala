@@ -19,8 +19,8 @@ object SparkRDDSetTransformationReplacement extends MutationOperator[Transformat
       val original = element.asInstanceOf[SparkRDDBinaryTransformation]
 
       original.name match {
-        case "union"        => List(intersectionMutant(original, idGen), subtractMutant(original, idGen), firstDatasetMutant(original, idGen), secondDatasetMutant(original, idGen), commutativeMutant(original, idGen))
-        case "intersection" => List(unionMutant(original, idGen), subtractMutant(original, idGen), firstDatasetMutant(original, idGen), secondDatasetMutant(original, idGen), commutativeMutant(original, idGen))
+        case "union"        => List(intersectionMutant(original, idGen), subtractMutant(original, idGen), firstDatasetMutant(original, idGen), secondDatasetMutant(original, idGen))
+        case "intersection" => List(unionMutant(original, idGen), subtractMutant(original, idGen), firstDatasetMutant(original, idGen), secondDatasetMutant(original, idGen))
         case "subtract"     => List(unionMutant(original, idGen), intersectionMutant(original, idGen), firstDatasetMutant(original, idGen), secondDatasetMutant(original, idGen), commutativeMutant(original, idGen))
         case _              => throw new Exception("Not Supported Transformation")
       }
