@@ -7,7 +7,7 @@ import br.ufrn.dimap.forall.transmut.mutation.analyzer.MutantResult
 import br.ufrn.dimap.forall.transmut.mutation.model.MutantProgramSource
 import br.ufrn.dimap.forall.transmut.mutation.analyzer.MutantKilled
 import br.ufrn.dimap.forall.transmut.mutation.analyzer.MutantError
-import br.ufrn.dimap.forall.transmut.mutation.analyzer.MutantSurvived
+import br.ufrn.dimap.forall.transmut.mutation.analyzer.MutantLived
 import br.ufrn.dimap.forall.transmut.mutation.analyzer.MutantEquivalent
 import br.ufrn.dimap.forall.transmut.mutation.model.MutantProgram
 
@@ -28,7 +28,7 @@ case class MetaMutantProgramSourceMetrics(metaMutant: MetaMutantProgramSource, m
   def mutationOperatorsMetrics = MutationOperatorsMetrics(mutantProgramsMetrics)
   
   def mutantProgramVerdicts: List[MutantResult[MutantProgram]] = mutantsVerdicts.map(r => r match {
-    case MutantSurvived(m)   => MutantSurvived(m.mutantProgram)
+    case MutantLived(m)   => MutantLived(m.mutantProgram)
     case MutantEquivalent(m) => MutantEquivalent(m.mutantProgram)
     case MutantKilled(m)     => MutantKilled(m.mutantProgram)
     case MutantError(m)      => MutantError(m.mutantProgram)
@@ -53,12 +53,12 @@ case class MetaMutantProgramSourceMetrics(metaMutant: MetaMutantProgramSource, m
 
   def totalKilledMutants = killedMutants.size
 
-  def survivedMutants = mutantsVerdicts.filter(r => r match {
-    case MutantSurvived(m) => true
+  def livedMutants = mutantsVerdicts.filter(r => r match {
+    case MutantLived(m) => true
     case _                 => false
   }).map(mr => mr.mutant)
 
-  def totalSurvivedMutants = survivedMutants.size
+  def totalLivedMutants = livedMutants.size
 
   def equivalentMutants = mutantsVerdicts.filter(r => r match {
     case MutantEquivalent(m) => true

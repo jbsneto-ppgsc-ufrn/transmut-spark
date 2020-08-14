@@ -4,7 +4,7 @@ import br.ufrn.dimap.forall.transmut.mutation.analyzer.MutantResult
 import br.ufrn.dimap.forall.transmut.mutation.model.MetaMutantProgramSource
 import br.ufrn.dimap.forall.transmut.mutation.model.MutantProgramSource
 import br.ufrn.dimap.forall.transmut.mutation.analyzer.MutantKilled
-import br.ufrn.dimap.forall.transmut.mutation.analyzer.MutantSurvived
+import br.ufrn.dimap.forall.transmut.mutation.analyzer.MutantLived
 import br.ufrn.dimap.forall.transmut.mutation.analyzer.MutantEquivalent
 import br.ufrn.dimap.forall.transmut.mutation.analyzer.MutantError
 import scala.concurrent.duration.Duration
@@ -43,12 +43,12 @@ case class MutationTestingProcessMetrics(metaMutantsVerdicts: List[(MetaMutantPr
 
   def totalKilledMutants = killedMutants.size
 
-  def survivedMutants = mutantProgramSourcesResults.filter(r => r match {
-    case MutantSurvived(m) => true
+  def livedMutants = mutantProgramSourcesResults.filter(r => r match {
+    case MutantLived(m) => true
     case _                 => false
   }).map(mr => mr.mutant)
 
-  def totalSurvivedMutants = survivedMutants.size
+  def totalLivedMutants = livedMutants.size
 
   def equivalentMutants = mutantProgramSourcesResults.filter(r => r match {
     case MutantEquivalent(m) => true

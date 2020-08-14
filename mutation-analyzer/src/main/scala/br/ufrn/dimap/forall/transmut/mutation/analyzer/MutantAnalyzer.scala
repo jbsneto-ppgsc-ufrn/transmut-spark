@@ -18,7 +18,7 @@ object MutantAnalyzer {
       MutantEquivalent(testResult.element)
     } else {
       testResult match {
-        case TestSuccess(element) => MutantSurvived(element)
+        case TestSuccess(element) => MutantLived(element)
         case TestFailed(element)  => MutantKilled(element)
         case _                    => MutantError(testResult.element)
       }

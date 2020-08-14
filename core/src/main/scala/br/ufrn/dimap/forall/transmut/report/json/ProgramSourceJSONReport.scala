@@ -43,7 +43,7 @@ object ProgramSourceJSONReport {
       metrics.totalTransformations,
       metrics.totalMutants,
       metrics.totalKilledMutants,
-      metrics.totalSurvivedMutants,
+      metrics.totalLivedMutants,
       metrics.totalEquivalentMutants,
       metrics.totalErrorMutants,
       metrics.mutationScore)

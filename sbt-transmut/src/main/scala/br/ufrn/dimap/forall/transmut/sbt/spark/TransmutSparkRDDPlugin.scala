@@ -88,7 +88,7 @@ object TransmutSparkRDDPlugin extends AutoPlugin {
             // Read the previous JSON report
             val mutationTestingProcessJSON = MutationTestingProcessJSONReport.readMutationTestingProcessJSONReportFile(mutationTestingProcessJSONFile)
             // Get the list of living mutants from previous run
-            val livingMutantsIds = mutationTestingProcessJSON.mutants.filter(m => m.status == "Survived").map(m => m.id)
+            val livingMutantsIds = mutationTestingProcessJSON.mutants.filter(m => m.status == "Lived").map(m => m.id)
             // Check if there is any living mutant to run the process
             if (!livingMutantsIds.isEmpty) {
               runProcess = true

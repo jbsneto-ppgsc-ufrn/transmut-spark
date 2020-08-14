@@ -59,7 +59,7 @@ class MutantAnalyzerTestSuite extends FunSuite {
     assert(mutantsVerdicts._2.size == 3)
     assert(mutantsVerdicts._2(0) == MutantKilled(mutantJTR1))
     assert(mutantsVerdicts._2(1) == MutantKilled(mutantJTR2))
-    assert(mutantsVerdicts._2(2) == MutantSurvived(mutantJTR3))
+    assert(mutantsVerdicts._2(2) == MutantLived(mutantJTR3))
   }
 
   test("Test Case 2 - Analyze Mutants With Equivalent and Error Tests") {

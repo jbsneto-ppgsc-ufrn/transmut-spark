@@ -185,7 +185,8 @@ object ProgramHTMLReport {
   }
 
   def generateTotalMetricsHtmlTable(metrics: MetaMutantProgramMetrics) = {
-    val mutationScore = "%1.2f".formatLocal(Locale.US, metrics.mutationScore * 100) + "%"
+    val mutationScoreBar = "%1.2f".formatLocal(Locale.US, metrics.mutationScore * 100) + "%"
+    val mutationScore = "%1.2f".formatLocal(Locale.US, metrics.mutationScore)
     val mutationScoreStyle = if (metrics.mutationScore >= 0.8) "bg-success" else if (metrics.mutationScore >= 0.5) "bg-warning" else "bg-danger"
     s"""<table class="table table-striped table-hover">
        |<thead class="thead-dark"><tr><th scope="col">#</th><th scope="col">Total</th></tr></thead>
@@ -194,13 +195,13 @@ object ProgramHTMLReport {
        |  <tr><th scope="row">Transformations</th><td>${metrics.totalTransformations}</td></tr>
        |  <tr><th scope="row">Mutants</th><td>${metrics.totalMutants}</td></tr>
        |  <tr><th scope="row">Killed Mutants</th><td>${metrics.totalKilledMutants}</td></tr>
-       |  <tr><th scope="row">Survived Mutants</th><td>${metrics.totalSurvivedMutants}</td></tr>
+       |  <tr><th scope="row">Lived Mutants</th><td>${metrics.totalLivedMutants}</td></tr>
        |  <tr><th scope="row">Equivalent Mutants</th><td>${metrics.totalEquivalentMutants}</td></tr>
        |  <tr><th scope="row">Error Mutants</th><td>${metrics.totalErrorMutants}</td></tr>
        |  <tr><th scope="row">Mutation Score</th>
        |  <td>
        |    <div class="progress">
-       |      <div class="progress-bar progress-bar-striped ${mutationScoreStyle}" role="progressbar" style="width: ${mutationScore}" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"><span class="font-weight-bold text-dark">${mutationScore}</span></div>
+       |      <div class="progress-bar progress-bar-striped ${mutationScoreStyle}" role="progressbar" style="width: ${mutationScoreBar}" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"><span class="font-weight-bold text-dark">${mutationScore}</span></div>
        |    </div>
        |  </td>
        |  </tr>
@@ -217,7 +218,8 @@ object ProgramHTMLReport {
 
   def generateMutantsHtmlTable(metrics: MetaMutantProgramMetrics) = {
     val rowsString = metrics.mutantsMetrics.map(generateMutantsHtmlRow).mkString("\n")
-    val generalMutationScore = "%1.2f".formatLocal(Locale.US, metrics.mutationScore * 100) + "%"
+    val generalMutationScoreBar = "%1.2f".formatLocal(Locale.US, metrics.mutationScore * 100) + "%"
+    val generalMutationScore = "%1.2f".formatLocal(Locale.US, metrics.mutationScore)
     val mutationScoreStyle = if (metrics.mutationScore >= 0.8) "bg-success" else if (metrics.mutationScore >= 0.5) "bg-warning" else "bg-danger"
     s"""<table class="display table table-striped table-hover" id="mutantsTable">
       |  <thead class="thead-dark">
@@ -236,7 +238,7 @@ object ProgramHTMLReport {
       |      <th scope="row" colspan="2">Mutation Score</th>
       |      <td colspan="2">
       |        <div class="progress">
-      |          <div class="progress-bar progress-bar-striped ${mutationScoreStyle}" role="progressbar" style="width: ${generalMutationScore}" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"><span class="font-weight-bold text-dark">${generalMutationScore}</span></div>
+      |          <div class="progress-bar progress-bar-striped ${mutationScoreStyle}" role="progressbar" style="width: ${generalMutationScoreBar}" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"><span class="font-weight-bold text-dark">${generalMutationScore}</span></div>
       |        </div>
       |      </td>
       |    </tr>
@@ -335,7 +337,7 @@ object ProgramHTMLReport {
       |      <th scope="col">Mutation Operator</th>
       |      <th scope="col">Mutants</th>
       |      <th scope="col">Killed</th>
-      |      <th scope="col">Survived</th>
+      |      <th scope="col">Lived</th>
       |      <th scope="col">Equivalent</th>
       |      <th scope="col">Error</th>
       |      </tr>
@@ -348,7 +350,7 @@ object ProgramHTMLReport {
       |      <th scope="row">Total</th>
       |      <td>${metrics.totalMutants}</td>
       |      <td>${metrics.totalKilledMutants}</td>
-      |      <td>${metrics.totalSurvivedMutants}</td>
+      |      <td>${metrics.totalLivedMutants}</td>
       |      <td>${metrics.totalEquivalentMutants}</td>
       |      <td>${metrics.totalErrorMutants}</td>
       |    </tr>
@@ -360,7 +362,7 @@ object ProgramHTMLReport {
   def generateMutationOperatorHtmlRow(mutationOperator: String, mutationOperatorsMetrics: MutationOperatorsMetrics) = {
     val totalMutants = mutationOperatorsMetrics.totalMutantsPerOperator.get(mutationOperator).getOrElse(0)
     val totalKilledMutants = mutationOperatorsMetrics.totalKilledMutantsPerOperator.get(mutationOperator).getOrElse(0)
-    val totalSurvivedMutants = mutationOperatorsMetrics.totalSurvivedMutantsPerOperator.get(mutationOperator).getOrElse(0)
+    val totalLivedMutants = mutationOperatorsMetrics.totalLivedMutantsPerOperator.get(mutationOperator).getOrElse(0)
     val totalEquivalentMutants = mutationOperatorsMetrics.totalEquivalentMutantsPerOperator.get(mutationOperator).getOrElse(0)
     val totalErrorMutants = mutationOperatorsMetrics.totalErrorMutantsPerOperator.get(mutationOperator).getOrElse(0)
     val mutationOperatorDescription = mutationOperatorsMetrics.descriptionPerOperator.getOrElse(mutationOperator, "")
@@ -369,7 +371,7 @@ object ProgramHTMLReport {
        |  <th scope="row"><a href="#" class="text-dark" data-toggle="tooltip" data-placement="right" title="${mutationOperatorDescription}">${mutationOperator}</a></th>
        |  <td>${totalMutants}</td>
        |  <td>${totalKilledMutants}</td>
-       |  <td>${totalSurvivedMutants}</td>
+       |  <td>${totalLivedMutants}</td>
        |  <td>${totalEquivalentMutants}</td>
        |  <td>${totalErrorMutants}</td>
        |</tr>""".stripMargin

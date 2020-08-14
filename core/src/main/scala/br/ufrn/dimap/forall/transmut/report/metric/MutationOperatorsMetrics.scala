@@ -8,7 +8,7 @@ case class MutationOperatorsMetrics(mutantsMetrics: List[MutantProgramMetrics]) 
 
   def totalKilledMutantsPerOperator = MutationOperatorsEnum.ALL.map(op => (MutationOperatorsEnum.mutationOperatorsNameFromEnum(op), mutantsMetrics.filter(m => m.mutationOperator == op && m.status == "Killed").size)).toMap
 
-  def totalSurvivedMutantsPerOperator = MutationOperatorsEnum.ALL.map(op => (MutationOperatorsEnum.mutationOperatorsNameFromEnum(op), mutantsMetrics.filter(m => m.mutationOperator == op && m.status == "Survived").size)).toMap
+  def totalLivedMutantsPerOperator = MutationOperatorsEnum.ALL.map(op => (MutationOperatorsEnum.mutationOperatorsNameFromEnum(op), mutantsMetrics.filter(m => m.mutationOperator == op && m.status == "Lived").size)).toMap
 
   def totalEquivalentMutantsPerOperator = MutationOperatorsEnum.ALL.map(op => (MutationOperatorsEnum.mutationOperatorsNameFromEnum(op), mutantsMetrics.filter(m => m.mutationOperator == op && m.status == "Equivalent").size)).toMap
 
