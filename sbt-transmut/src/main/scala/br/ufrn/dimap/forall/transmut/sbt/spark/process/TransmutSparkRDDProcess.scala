@@ -27,6 +27,8 @@ class TransmutSparkRDDProcess(state: State, logger: Logger)(implicit val config:
   def programBuilder = SparkRDDProgramBuilder
 
   def mutantManager = SparkRDDMutationManager
+  
+  def mutantReducer = SparkRDDMutantReducer
 
   def metaMutantBuilder = SparkRDDMetaMutantBuilder
 

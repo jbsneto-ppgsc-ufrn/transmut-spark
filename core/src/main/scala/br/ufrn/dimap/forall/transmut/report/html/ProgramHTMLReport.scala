@@ -12,6 +12,7 @@ import br.ufrn.dimap.forall.transmut.model.Program
 import br.ufrn.dimap.forall.transmut.model.Edge
 import br.ufrn.dimap.forall.transmut.model.DirectionsEnum
 import br.ufrn.dimap.forall.transmut.report.metric.MutationOperatorsMetrics
+import br.ufrn.dimap.forall.transmut.report.metric.RemovedMutantMetrics
 
 object ProgramHTMLReport {
 
@@ -71,6 +72,7 @@ object ProgramHTMLReport {
        |        <a class="dropdown-item" href="#datasets">Datasets</a>
        |        <a class="dropdown-item" href="#transformations">Transformations</a>
        |        <a class="dropdown-item" href="#mutants">Mutants</a>
+       |        <a class="dropdown-item" href="#removedMutants">Removed Mutants</a>
        |        <a class="dropdown-item" href="#mutationOperators">Mutation Operators</a>
        |      </div>
        |    </li>
@@ -142,6 +144,15 @@ object ProgramHTMLReport {
        |<hr class="my-4">
        |</div>
        |</div>
+       |<!-- Removed Mutants -->
+       |<div class="row" id="removedMutants">
+       |<div class="col">
+       |<h3 class="section-title">Removed Mutants</h3>
+       |<hr class="my-4">
+       |${generateRemovedMutantsHtmlTable(metrics)}
+       |<hr class="my-4">
+       |</div>
+       |</div>
        |<!-- Mutation Operators -->
        |<div class="row" id="mutationOperators">
        |<div class="col">
@@ -153,6 +164,8 @@ object ProgramHTMLReport {
        |</div>
        |<!-- Mutant Modals -->
        |${generateMutantsModalsHtml(metrics)}
+       |<!-- Removed Mutant Modals -->
+       |${generateRemovedMutantsModalsHtml(metrics)}
        |</main>
        |<!-- Optional JavaScript -->
        |<!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -198,6 +211,7 @@ object ProgramHTMLReport {
        |  <tr><th scope="row">Lived Mutants</th><td>${metrics.totalLivedMutants}</td></tr>
        |  <tr><th scope="row">Equivalent Mutants</th><td>${metrics.totalEquivalentMutants}</td></tr>
        |  <tr><th scope="row">Error Mutants</th><td>${metrics.totalErrorMutants}</td></tr>
+       |  <tr><th scope="row">Removed Mutants</th><td>${metrics.totalRemovedMutants}</td></tr>
        |  <tr><th scope="row">Mutation Score</th>
        |  <td>
        |    <div class="progress">
@@ -255,9 +269,46 @@ object ProgramHTMLReport {
        |  <td><button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modalMutant${metric.mutantId}">Show</button></td>
        |</tr>""".stripMargin
   }
+  
+  def generateRemovedMutantsHtmlTable(metrics: MetaMutantProgramMetrics) = {
+    val rowsString = metrics.removedMutantsMetrics.map(generateRemovedMutantsHtmlRow).mkString("\n")
+    s"""<table class="display table table-striped table-hover" id="removedMutantsTable">
+      |  <thead class="thead-dark">
+      |    <tr>
+      |      <th scope="col">ID</th>
+      |      <th scope="col">Mutation Operator</th>
+      |      <th scope="col">Reduction Rule</th>
+      |      <th scope="col">Code</th>
+      |     </tr>
+      |  </thead>
+      |  <tbody>
+      |    ${rowsString}
+      |  </tbody>
+      |  <tfoot class="text-light bg-secondary font-weight-bold">
+      |    <tr>
+      |      <th scope="row" colspan="2">Total Removed Mutants</th>
+      |      <td colspan="2">${metrics.totalRemovedMutants}</td>
+      |    </tr>
+      |  </tfoot>
+      |</table>   
+   """.stripMargin
+  }
+
+  def generateRemovedMutantsHtmlRow(metric: RemovedMutantMetrics) = {
+    s"""<tr>
+       |  <th scope="row"><a href="../RemovedMutants/Removed-Mutant-${metric.mutantId}.html" class="text-dark">${metric.mutantId}</a></th>
+       |  <td><a href="#" class="text-dark" data-toggle="tooltip" data-placement="right" title="${metric.mutationOperatorDescription}">${metric.mutationOperatorName}</a></td>
+       |  <td>${metric.reductionRuleName}</td>
+       |  <td><button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modalMutant${metric.mutantId}">Show</button></td>
+       |</tr>""".stripMargin
+  }
 
   def generateMutantsModalsHtml(metrics: MetaMutantProgramMetrics) = {
     metrics.mutantsMetrics.map(m => MutantHTMLReport.generateMutantModalHtml(m, false)).mkString("\n")
+  }
+  
+  def generateRemovedMutantsModalsHtml(metrics: MetaMutantProgramMetrics) = {
+    metrics.removedMutantsMetrics.map(m => RemovedMutantHTMLReport.generateRemovedMutantModalHtml(m, false)).mkString("\n")
   }
 
   def generateTransformationsHtmlTable(metrics: MetaMutantProgramMetrics) = {
@@ -340,6 +391,7 @@ object ProgramHTMLReport {
       |      <th scope="col">Lived</th>
       |      <th scope="col">Equivalent</th>
       |      <th scope="col">Error</th>
+      |      <th scope="col">Removed</th>
       |      </tr>
       |  </thead>
       |  <tbody>
@@ -353,6 +405,7 @@ object ProgramHTMLReport {
       |      <td>${metrics.totalLivedMutants}</td>
       |      <td>${metrics.totalEquivalentMutants}</td>
       |      <td>${metrics.totalErrorMutants}</td>
+      |      <td>${metrics.totalRemovedMutants}</td>
       |    </tr>
       |  </tfoot>
       |</table>   
@@ -365,8 +418,9 @@ object ProgramHTMLReport {
     val totalLivedMutants = mutationOperatorsMetrics.totalLivedMutantsPerOperator.get(mutationOperator).getOrElse(0)
     val totalEquivalentMutants = mutationOperatorsMetrics.totalEquivalentMutantsPerOperator.get(mutationOperator).getOrElse(0)
     val totalErrorMutants = mutationOperatorsMetrics.totalErrorMutantsPerOperator.get(mutationOperator).getOrElse(0)
+    val totalRemovedMutants = mutationOperatorsMetrics.totalRemovedMutantsPerOperator.get(mutationOperator).getOrElse(0)
     val mutationOperatorDescription = mutationOperatorsMetrics.descriptionPerOperator.getOrElse(mutationOperator, "")
-    if (totalMutants > 0) {
+    if (totalMutants > 0 || totalRemovedMutants > 0) {
       s"""<tr>
        |  <th scope="row"><a href="#" class="text-dark" data-toggle="tooltip" data-placement="right" title="${mutationOperatorDescription}">${mutationOperator}</a></th>
        |  <td>${totalMutants}</td>
@@ -374,6 +428,7 @@ object ProgramHTMLReport {
        |  <td>${totalLivedMutants}</td>
        |  <td>${totalEquivalentMutants}</td>
        |  <td>${totalErrorMutants}</td>
+       |  <td>${totalRemovedMutants}</td>
        |</tr>""".stripMargin
     } else ""
   }

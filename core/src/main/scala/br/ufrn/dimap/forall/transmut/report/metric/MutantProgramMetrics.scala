@@ -57,7 +57,7 @@ case class MutantProgramMetrics(mutant: MutantProgram, mutantVerdict: MutantResu
   }
 
   def status = mutantVerdict match {
-    case MutantLived(m)   => "Lived"
+    case MutantLived(m)      => "Lived"
     case MutantEquivalent(m) => "Equivalent"
     case MutantKilled(m)     => "Killed"
     case _                   => "Error"

@@ -9,41 +9,44 @@ import br.ufrn.dimap.forall.transmut.mutation.analyzer.MutantKilled
 import br.ufrn.dimap.forall.transmut.mutation.analyzer.MutantError
 import br.ufrn.dimap.forall.transmut.mutation.analyzer.MutantLived
 import br.ufrn.dimap.forall.transmut.mutation.analyzer.MutantEquivalent
+import br.ufrn.dimap.forall.transmut.mutation.reduction.MutantRemoved
 
-case class MetaMutantProgramMetrics(metaMutant: MetaMutantProgram, mutantsVerdicts: List[MutantResult[MutantProgram]]) {
-  
+case class MetaMutantProgramMetrics(metaMutant: MetaMutantProgram, mutantsVerdicts: List[MutantResult[MutantProgram]], removedMutantsList: List[MutantRemoved]) {
+
   def id = metaMutant.id
-  
+
   def originalProgram = metaMutant.original
-  
+
   def name = originalProgram.name
-  
+
   def code = originalProgram.tree.syntax
-  
+
   def programSource = originalProgram.programSource
-  
+
   def programSourceId = programSource.id
-  
+
   def programSourceName = programSource.source.getFileName.toString().replaceFirst(".scala", "")
-  
+
   def datasets = originalProgram.datasets
-  
+
   def totalDatasets = datasets.size
-  
+
   def transformations = originalProgram.transformations
-  
+
   def edges = originalProgram.edges
-  
+
   def totalTransformations = transformations.size
-  
+
   def mutants = metaMutant.mutants
-  
-  def totalMutants = mutants.size
-  
+
+  def totalMutants = mutants.size + removedMutants.size
+
   def mutantsMetrics = mutants.map(m => MutantProgramMetrics(m, mutantsVerdicts.filter(mr => mr.mutant.id == m.id).head))
-  
-  def mutationOperatorsMetrics = MutationOperatorsMetrics(mutantsMetrics)
-  
+
+  def removedMutantsMetrics = removedMutantsList.map(rm => RemovedMutantMetrics(rm))
+
+  def mutationOperatorsMetrics = MutationOperatorsMetrics(mutantsMetrics, removedMutantsMetrics)
+
   def killedMutants = mutantsVerdicts.filter(r => r match {
     case MutantKilled(m) => true
     case _               => false
@@ -53,7 +56,7 @@ case class MetaMutantProgramMetrics(metaMutant: MetaMutantProgram, mutantsVerdic
 
   def livedMutants = mutantsVerdicts.filter(r => r match {
     case MutantLived(m) => true
-    case _                 => false
+    case _              => false
   }).map(mr => mr.mutant)
 
   def totalLivedMutants = livedMutants.size
@@ -72,6 +75,10 @@ case class MetaMutantProgramMetrics(metaMutant: MetaMutantProgram, mutantsVerdic
 
   def totalErrorMutants = errorMutants.size
 
-  def mutationScore = totalKilledMutants.toFloat / (totalMutants - totalEquivalentMutants)
-  
+  def removedMutants = removedMutantsList
+
+  def totalRemovedMutants = removedMutants.size
+
+  def mutationScore = totalKilledMutants.toFloat / (totalMutants - totalEquivalentMutants - totalRemovedMutants)
+
 }

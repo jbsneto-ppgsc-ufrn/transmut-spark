@@ -9,6 +9,7 @@ import br.ufrn.dimap.forall.transmut.mutation.model.MetaMutantProgramSource
 import br.ufrn.dimap.forall.transmut.mutation.model.MutantProgramSource
 import java.time.LocalDateTime
 import java.sql.Timestamp
+import br.ufrn.dimap.forall.transmut.mutation.reduction.MutantRemoved
 
 trait Reporter {
 
@@ -38,7 +39,7 @@ trait Reporter {
   def onProgramBuildStart(): Unit
   def onProgramBuildEnd(programSources: List[ProgramSource]): Unit
   def onMutantGenerationStart(): Unit
-  def onMutantGenerationEnd(metaMutants: List[MetaMutantProgramSource]): Unit
+  def onMutantGenerationEnd(metaMutants: List[MetaMutantProgramSource], removedMutants: List[MutantRemoved] = Nil): Unit
   def onMutantExecutionStart(): Unit
   def onMutantExecutionEnd(metaMutantsVerdicts: List[(MetaMutantProgramSource, List[MutantResult[MutantProgramSource]])]): Unit
   def onProcessEnd(): Unit
@@ -64,8 +65,8 @@ trait Reporter {
     onMutantGenerationStart
   }
 
-  def reportMutantGenerationEnd(metaMutants: List[MetaMutantProgramSource]) {
-    onMutantGenerationEnd(metaMutants)
+  def reportMutantGenerationEnd(metaMutants: List[MetaMutantProgramSource], removedMutants: List[MutantRemoved] = Nil) {
+    onMutantGenerationEnd(metaMutants, removedMutants)
   }
 
   def reportMutantExecutionStart {

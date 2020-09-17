@@ -10,6 +10,7 @@ import br.ufrn.dimap.forall.transmut.mutation.operator.MutationOperatorsEnum
 import br.ufrn.dimap.forall.transmut.report.metric.MutationTestingProcessMetrics
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import br.ufrn.dimap.forall.transmut.mutation.reduction.MutantRemoved
 
 object ConsoleReporter extends Reporter {
 
@@ -19,6 +20,7 @@ object ConsoleReporter extends Reporter {
   }
 
   private var programSources: List[ProgramSource] = List()
+  private var removedMutants: List[MutantRemoved] = List()
   private var metaMutants: List[MetaMutantProgramSource] = List()
   private var metaMutantsVerdicts: List[(MetaMutantProgramSource, List[MutantResult[MutantProgramSource]])] = List()
   private var info: String => Unit = println(_)
@@ -44,8 +46,9 @@ object ConsoleReporter extends Reporter {
     info("Starting the mutants and meta-mutant generation...")
   }
 
-  override def onMutantGenerationEnd(metaMutants: List[MetaMutantProgramSource]) {
+  override def onMutantGenerationEnd(metaMutants: List[MetaMutantProgramSource], removedMutants: List[MutantRemoved] = Nil) {
     this.metaMutants = metaMutants
+    this.removedMutants = removedMutants
     info("Mutants and meta-mutant generation succeeded!")
   }
 
@@ -59,7 +62,7 @@ object ConsoleReporter extends Reporter {
   }
 
   override def onProcessEnd() {
-    val mutationTestingProcessMetrics = MutationTestingProcessMetrics(metaMutantsVerdicts, processDuration, processStartDateTime)
+    val mutationTestingProcessMetrics = MutationTestingProcessMetrics(metaMutantsVerdicts, processDuration, processStartDateTime, removedMutants)
     val metaMutantProgramSourcesMetrics = mutationTestingProcessMetrics.metaMutantProgramSourcesMetrics
     info("------------------------------------------------------------------------------------")
     info("MUTATION TESTING PROCESS RESULTS")
@@ -84,7 +87,8 @@ object ConsoleReporter extends Reporter {
     info("Total Number of Lived Mutants: " + metric.totalLivedMutants)
     info("Total Number of Equivalent Mutants: " + metric.totalEquivalentMutants)
     info("Total Number of Error Mutants: " + metric.totalErrorMutants)
-    info("General Mutation Score: " + "%1.2f".formatLocal(Locale.US, metric.totalMutationScore)) 
+    info("Total Number of Removed Mutants: " + metric.totalRemovedMutants)
+    info("General Mutation Score: " + "%1.2f".formatLocal(Locale.US, metric.totalMutationScore))
     info("------------------------------------------------------------------------------------")
   }
 
@@ -113,10 +117,18 @@ object ConsoleReporter extends Reporter {
       programSourceMetric.metaMutantProgramsMetrics.foreach { programMetric =>
         info("Program: " + programMetric.name)
         info("Number of Mutants: " + programMetric.totalMutants)
+        info("Number of Removed Mutants: " + programMetric.totalRemovedMutants)
         info("Number of Mutants For Each Mutation Operator: ")
         programMetric.mutationOperatorsMetrics.totalMutantsPerOperator.foreach { op =>
           if (op._2 > 0)
             info(op._1 + ": " + op._2)
+        }
+        if (programMetric.totalRemovedMutants > 0) {
+          info("Number of Removed Mutants For Each Mutation Operator: ")
+          programMetric.mutationOperatorsMetrics.totalRemovedMutantsPerOperator.foreach { op =>
+            if (op._2 > 0)
+              info(op._1 + ": " + op._2)
+          }
         }
       }
       info("------------------------------------------------------------------------------------")
@@ -133,11 +145,13 @@ object ConsoleReporter extends Reporter {
       info("Number of Lived Mutants: " + metaMutantProgramSource.totalLivedMutants)
       info("Number of Equivalent Mutants: " + metaMutantProgramSource.totalEquivalentMutants)
       info("Number of Error Mutants: " + metaMutantProgramSource.totalErrorMutants)
+      info("Number of Removed Mutants: " + metaMutantProgramSource.totalRemovedMutants)
       info("Mutation Score: " + "%1.2f".formatLocal(Locale.US, metaMutantProgramSource.mutationScore))
       info("List of Killed Mutants IDs: " + metaMutantProgramSource.killedMutants.map(_.id).mkString(", "))
       info("List of Lived Mutants IDs: " + metaMutantProgramSource.livedMutants.map(_.id).mkString(", "))
       info("List of Equivalent Mutants IDs: " + metaMutantProgramSource.equivalentMutants.map(_.id).mkString(", "))
       info("List of Error Mutants IDs: " + metaMutantProgramSource.errorMutants.map(_.id).mkString(", "))
+      info("List of Removed Mutants IDs: " + metaMutantProgramSource.removedMutantsList.map(_.mutant.id).mkString(", "))
     }
     info("------------------------------------------------------------------------------------")
   }

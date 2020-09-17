@@ -1,6 +1,7 @@
 package br.ufrn.dimap.forall.transmut.report.json
 
 import br.ufrn.dimap.forall.transmut.report.json.MutantJSONReport._
+import br.ufrn.dimap.forall.transmut.report.json.RemovedMutantJSONReport._
 import br.ufrn.dimap.forall.transmut.report.json.MutationOperatorsJSONReport._
 import br.ufrn.dimap.forall.transmut.report.json.ProgramJSONReport._
 import br.ufrn.dimap.forall.transmut.report.json.model.EdgeJSON
@@ -37,6 +38,7 @@ object ProgramSourceJSONReport {
       metrics.sourceName,
       metrics.metaMutantProgramsMetrics.map(ProgramJSONReport.generateProgramJSONObjectFromMetrics),
       metrics.mutantProgramsMetrics.map(MutantJSONReport.generateMutantJSONObjectFromMetrics),
+      metrics.removedMutantsMetrics.map(RemovedMutantJSONReport.generateRemovedMutantJSONObjectFromMetrics),
       MutationOperatorsJSONReport.generateMutationOperatorsJSONObjectFromMetrics(metrics.mutationOperatorsMetrics),
       metrics.totalPrograms,
       metrics.totalDatasets,
@@ -46,6 +48,7 @@ object ProgramSourceJSONReport {
       metrics.totalLivedMutants,
       metrics.totalEquivalentMutants,
       metrics.totalErrorMutants,
+      metrics.totalRemovedMutants,
       metrics.mutationScore)
   }
 

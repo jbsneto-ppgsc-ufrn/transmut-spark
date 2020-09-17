@@ -9,14 +9,16 @@ case class ProgramJSON(
   transformations:          List[TransformationJSON],
   edges:                    List[EdgeJSON],
   mutants:                  List[MutantJSON],
+  removedMutants:           List[RemovedMutantJSON],
   mutationOperatorsMetrics: MutationOperatorsJSON,
   totalDatasets:            Int,
   totalTransformations:     Int,
   totalMutants:             Int,
   totalKilledMutants:       Int,
-  totalSurvivedMutants:     Int,
+  totalLivedMutants:        Int,
   totalEquivalentMutants:   Int,
   totalErrorMutants:        Int,
+  totalRemovedMutants:      Int,
   mutationScore:            Float)
 
 case class DatasetJSON(

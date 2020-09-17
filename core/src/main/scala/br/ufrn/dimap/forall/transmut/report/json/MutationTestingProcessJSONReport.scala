@@ -1,6 +1,7 @@
 package br.ufrn.dimap.forall.transmut.report.json
 
 import br.ufrn.dimap.forall.transmut.report.json.MutantJSONReport._
+import br.ufrn.dimap.forall.transmut.report.json.RemovedMutantJSONReport._
 import br.ufrn.dimap.forall.transmut.report.json.MutationOperatorsJSONReport._
 import br.ufrn.dimap.forall.transmut.report.json.ProgramJSONReport._
 import br.ufrn.dimap.forall.transmut.report.json.ProgramSourceJSONReport._
@@ -9,14 +10,15 @@ import br.ufrn.dimap.forall.transmut.report.json.model.ProgramSourceJSON
 import br.ufrn.dimap.forall.transmut.report.metric.MetaMutantProgramSourceMetrics
 import br.ufrn.dimap.forall.transmut.report.metric.MutationTestingProcessMetrics
 import br.ufrn.dimap.forall.transmut.report.json.model.MutationTestingProcessJSON
+import br.ufrn.dimap.forall.transmut.util.IOFiles
 
 import io.circe._
 import io.circe.generic.semiauto._
 import io.circe.syntax._
 import io.circe.parser.decode
-import br.ufrn.dimap.forall.transmut.util.IOFiles
-import java.io.File
+
 import java.time.format.DateTimeFormatter
+import java.io.File
 
 object MutationTestingProcessJSONReport {
 
@@ -40,6 +42,7 @@ object MutationTestingProcessJSONReport {
       metrics.metaMutantProgramSourcesMetrics.map(ProgramSourceJSONReport.generateProgramSourceJSONObjectFromMetrics),
       metrics.metaMutantProgramsMetrics.map(ProgramJSONReport.generateProgramJSONObjectFromMetrics),
       metrics.mutantProgramsMetrics.map(MutantJSONReport.generateMutantJSONObjectFromMetrics),
+      metrics.removedMutantsMetrics.map(RemovedMutantJSONReport.generateRemovedMutantJSONObjectFromMetrics),
       MutationOperatorsJSONReport.generateMutationOperatorsJSONObjectFromMetrics(metrics.mutationOperatorsMetrics),
       metrics.totalMetaMutanProgramSources,
       metrics.totalMetaMutantPrograms,
@@ -50,6 +53,7 @@ object MutationTestingProcessJSONReport {
       metrics.totalLivedMutants,
       metrics.totalEquivalentMutants,
       metrics.totalErrorMutants,
+      metrics.totalRemovedMutants,
       metrics.totalMutationScore)
   }
 

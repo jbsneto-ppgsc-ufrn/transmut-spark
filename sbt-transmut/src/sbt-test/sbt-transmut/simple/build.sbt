@@ -48,4 +48,17 @@ TaskKey[Unit]("checkAfterTransmut") := {
     val jsonReportsFolder = reportsFolderFiles.filter(f => f.getName.contains("json") && f.isDirectory()).head
     val jsonIndexFile = new File(jsonReportsFolder, "Mutation-Testing-Process.json")
     assert(jsonIndexFile.exists() && jsonIndexFile.isFile())
+
+    // Check if the reduction has not been applied (that is, there are no files in the RemovedMutants folder)
+    val htmlReportsFolderFiles = IO.listFiles(htmlReportsFolder)
+    assert(htmlReportsFolderFiles.filter(f => f.isDirectory()).size == 4)
+    val htmlRemovedMutantsReportsFolder = htmlReportsFolderFiles.filter(f => f.getName.contains("RemovedMutants") && f.isDirectory()).head
+    val htmlRemovedMutantsReportsFolderFiles = IO.listFiles(htmlRemovedMutantsReportsFolder)
+    assert(htmlRemovedMutantsReportsFolderFiles.isEmpty)
+
+    val jsonReportsFolderFiles = IO.listFiles(jsonReportsFolder)
+    assert(jsonReportsFolderFiles.filter(f => f.isDirectory()).size == 4)
+    val jsonRemovedMutantsReportsFolder = jsonReportsFolderFiles.filter(f => f.getName.contains("RemovedMutants") && f.isDirectory()).head
+    val jsonRemovedMutantsReportsFolderFiles = IO.listFiles(jsonRemovedMutantsReportsFolder)
+    assert(jsonRemovedMutantsReportsFolderFiles.isEmpty)
 }

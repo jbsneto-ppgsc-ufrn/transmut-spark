@@ -27,10 +27,12 @@ import br.ufrn.dimap.forall.transmut.mutation.manager.MetaMutantBuilder
 import br.ufrn.dimap.forall.transmut.mutation.analyzer.MutantAnalyzer
 import br.ufrn.dimap.forall.transmut.mutation.model.MetaMutantProgramSource
 import java.time.LocalDateTime
+import br.ufrn.dimap.forall.transmut.mutation.manager.MutantReducer
+import br.ufrn.dimap.forall.transmut.mutation.reduction.MutantRemoved
 
 class MutationTestingProcessTestSuite extends FunSuite with MockFactory {
 
-  test("Tast Case 1 - Mutation Testing Process") {
+  test("Tast Case 1 - Mutation Testing Process Without Reduction") {
 
     val tree: Tree = q"""
       import org.apache.spark.rdd.RDD
@@ -50,7 +52,7 @@ class MutationTestingProcessTestSuite extends FunSuite with MockFactory {
     val programNames = List("program")
     val mutationOperators = List("JTR")
 
-    val configTest = Config(programSourcesNames, programNames, mutationOperators)
+    val configTest = Config(programSourcesNames, programNames, mutationOperators, enableReduction = false)
 
     val programSource = SparkRDDProgramBuilder.buildProgramSourceFromProgramNames(configTest.programs, tree, refenceTypes.toMap)
     val programSources = List(programSource)
@@ -64,6 +66,9 @@ class MutationTestingProcessTestSuite extends FunSuite with MockFactory {
     (mutantManagerMock.defaultMutantsIdGenerator _).expects().returning(defaultMutantsIdGenerator)
     (mutantManagerMock.generateMutantsFromProgramSource(_: ProgramSource, _: List[MutationOperatorsEnum], _: LongIdGenerator)).expects(programSource, configTest.mutationOperatorsList, *).returning(programSourceMutants).once()
 
+    val mutantReducerMock = mock[MutantReducer]
+    val removedMutants: List[MutantRemoved] = Nil
+    
     val metaMutantProgramSource = SparkRDDMetaMutantBuilder.buildMetaMutantProgramSourceFromMutantProgramSources(programSource, programSourceMutants)
     val metaMutantProgramSources = List(metaMutantProgramSource)
 
@@ -77,7 +82,7 @@ class MutationTestingProcessTestSuite extends FunSuite with MockFactory {
     val metaMutantsTestResult = (metaMutantProgramSource, List(TestFailed(mutantJTR1), TestError(mutantJTR2), TestSuccess(mutantJTR3)))
 
     val mutantRunnerMock = mock[MutantRunner]
-    (mutantRunnerMock.runMutationTestProcess _).expects(metaMutantProgramSource, configTest.equivalentMutants, configTest.isTestOnlyLivingMutants, configTest.livingMutants).returning(metaMutantsTestResult)
+    (mutantRunnerMock.runMutationTestProcess _).expects(metaMutantProgramSource, configTest.equivalentMutants, configTest.isTestOnlyLivingMutants, configTest.livingMutants, configTest.isForceExecutionEnabled, configTest.forceExecution).returning(metaMutantsTestResult)
 
     val mutantsVerdicts = List(MutantAnalyzer.analyzeMutants(metaMutantsTestResult._1, metaMutantsTestResult._2, configTest.equivalentMutants))
 
@@ -87,7 +92,7 @@ class MutationTestingProcessTestSuite extends FunSuite with MockFactory {
       (reporterMock.reportProgramBuildStart _).expects()
       (reporterMock.reportProgramBuildEnd _).expects(programSources)
       (reporterMock.reportMutantGenerationStart _).expects()
-      (reporterMock.reportMutantGenerationEnd _).expects(metaMutantProgramSources)
+      (reporterMock.reportMutantGenerationEnd _).expects(metaMutantProgramSources, removedMutants)
       (reporterMock.reportMutantExecutionStart _).expects()
       (reporterMock.reportMutantExecutionEnd _).expects(mutantsVerdicts)
       (reporterMock.reportProcessEnd _).expects()
@@ -98,6 +103,7 @@ class MutationTestingProcessTestSuite extends FunSuite with MockFactory {
       def reporter = reporterMock
       def programBuilder = programBuilderMock
       def mutantManager = mutantManagerMock
+      def mutantReducer = mutantReducerMock
       def metaMutantBuilder = metaMutantBuilderMock
       def mutantRunner = mutantRunnerMock
     }

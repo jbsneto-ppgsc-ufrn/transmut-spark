@@ -31,10 +31,10 @@ class SbtSparkRDDRunner(state: State)(implicit val config: Config) extends Mutan
     testResult
   }
 
-  def runMutantTest(mutant: MutantProgramSource, equivalentMutants: List[Long], testOnlyLivingMutants: Boolean = false, livingMutants: List[Long] = List()): TestResult[MutantProgramSource] = {
+  def runMutantTest(mutant: MutantProgramSource, equivalentMutants: List[Long], testOnlyLivingMutants: Boolean = false, livingMutants: List[Long] = List(), forceExecutionEnabled: Boolean = false, forceExecution: List[Long] = List()): TestResult[MutantProgramSource] = {
     if (!equivalentMutants.contains(mutant.id)) {
-      if (testOnlyLivingMutants) {
-        if (livingMutants.contains(mutant.id)) {
+      if (testOnlyLivingMutants || forceExecutionEnabled) {
+        if (livingMutants.contains(mutant.id) || forceExecution.contains(mutant.id)) {
           val extracted = Project.extract(state)
           val mutantSetting: Def.Setting[_] = javaOptions in Test += s"-DCURRENT_MUTANT=${String.valueOf(mutant.id)}"
           val mutantState = extracted.appendWithSession(settings :+ mutantSetting, state)

@@ -1,0 +1,10 @@
+package br.ufrn.dimap.forall.transmut.report.json.model
+
+case class RemovedMutantJSON(
+  id:                          Long,
+  originalProgramId:           Long,
+  mutationOperator:            String,
+  mutationOperatorDescription: String,
+  mutantCode:                  String,
+  originalCode:                String,
+  reductionRule:               String)

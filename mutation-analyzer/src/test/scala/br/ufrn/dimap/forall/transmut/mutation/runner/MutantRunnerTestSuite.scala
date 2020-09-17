@@ -56,7 +56,7 @@ class MutantRunnerTestSuite extends FunSuite with MockFactory {
 
     val mutantRunner = new MutantRunner {
       def runOriginalTest(programSource: ProgramSource): TestResult[ProgramSource] = runOriginalTestMock(programSource)
-      def runMutantTest(mutant: MutantProgramSource, equivalentMutants: List[Long], testOnlyLivingMutants: Boolean = false, livingMutants: List[Long] = List()): TestResult[MutantProgramSource] = runMutantTestMock(mutant, equivalentMutants, testOnlyLivingMutants, livingMutants)
+      def runMutantTest(mutant: MutantProgramSource, equivalentMutants: List[Long], testOnlyLivingMutants: Boolean = false, livingMutants: List[Long] = List(), forceExecutionEnabled: Boolean = false, forceExecution: List[Long] = List()): TestResult[MutantProgramSource] = runMutantTestMock(mutant, equivalentMutants, testOnlyLivingMutants, livingMutants)
     }
 
     val testsVerdicts = mutantRunner.runMutationTestProcess(metaMutantProgramSource, equivalentMutants, false, List())
@@ -103,7 +103,7 @@ class MutantRunnerTestSuite extends FunSuite with MockFactory {
 
     val mutantRunner = new MutantRunner {
       def runOriginalTest(programSource: ProgramSource): TestResult[ProgramSource] = runOriginalTestMock(programSource)
-      def runMutantTest(mutant: MutantProgramSource, equivalentMutants: List[Long], testOnlyLivingMutants: Boolean = false, livingMutants: List[Long] = List()): TestResult[MutantProgramSource] = runMutantTestMock(mutant, equivalentMutants, testOnlyLivingMutants, livingMutants)
+      def runMutantTest(mutant: MutantProgramSource, equivalentMutants: List[Long], testOnlyLivingMutants: Boolean = false, livingMutants: List[Long] = List(), forceExecutionEnabled: Boolean = false, forceExecution: List[Long] = List()): TestResult[MutantProgramSource] = runMutantTestMock(mutant, equivalentMutants, testOnlyLivingMutants, livingMutants)
     }
 
     assertThrows[OriginalTestExecutionException] {

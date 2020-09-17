@@ -11,6 +11,7 @@ import br.ufrn.dimap.forall.transmut.report.metric.MetaMutantProgramMetrics
 import br.ufrn.dimap.forall.transmut.report.metric.MutantProgramMetrics
 import br.ufrn.dimap.forall.transmut.report.metric.MutationOperatorsMetrics
 import java.time.format.DateTimeFormatter
+import br.ufrn.dimap.forall.transmut.report.metric.RemovedMutantMetrics
 
 object MutationTestingProcessHTMLReport {
 
@@ -67,6 +68,7 @@ object MutationTestingProcessHTMLReport {
        |        <a class="dropdown-item" href="#programSources">Program Sources</a>
        |        <a class="dropdown-item" href="#programs">Programs</a>
        |        <a class="dropdown-item" href="#mutants">Mutants</a>
+       |        <a class="dropdown-item" href="#removedMutants">Mutants</a>
        |        <a class="dropdown-item" href="#mutationOperators">Mutation Operators</a>
        |      </div>
        |    </li>
@@ -106,6 +108,15 @@ object MutationTestingProcessHTMLReport {
        |<hr class="my-4">
        |</div>
        |</div>
+       |<!-- Removed Mutants -->
+       |<div class="row" id="removedMutants">
+       |<div class="col">
+       |<h3 class="section-title">Removed Mutants</h3>
+       |<hr class="my-4">
+       |${generateRemovedMutantsHtmlTable(metrics)}
+       |<hr class="my-4">
+       |</div>
+       |</div>
        |<!-- Mutation Operators -->
        |<div class="row" id="mutationOperators">
        |<div class="col">
@@ -117,6 +128,8 @@ object MutationTestingProcessHTMLReport {
        |</div>
        |<!-- Mutant Modals -->
        |${generateMutantsModalsHtml(metrics)}
+       |<!-- Removed Mutant Modals -->
+       |${generateRemovedMutantsModalsHtml(metrics)}
        |</main>
        |<!-- Optional JavaScript -->
        |<!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -163,6 +176,7 @@ object MutationTestingProcessHTMLReport {
       |      <th scope="col">Lived</th>
       |      <th scope="col">Equivalent</th>
       |      <th scope="col">Error</th>
+      |      <th scope="col">Removed</th>
       |      <th scope="col">Mutation Score</th>
       |      </tr>
       |  </thead>
@@ -179,6 +193,7 @@ object MutationTestingProcessHTMLReport {
       |      <td>${metrics.totalLivedMutants}</td>
       |      <td>${metrics.totalEquivalentMutants}</td>
       |      <td>${metrics.totalErrorMutants}</td>
+      |      <td>${metrics.totalRemovedMutants}</td>
       |      <td>
       |        <div class="progress">
       |          <div class="progress-bar progress-bar-striped ${mutationScoreStyle}" role="progressbar" style="width: ${generalMutationScoreBar}" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"><span class="font-weight-bold text-dark">${generalMutationScore}</span></div>
@@ -203,6 +218,7 @@ object MutationTestingProcessHTMLReport {
        |  <td>${metric.totalLivedMutants}</td>
        |  <td>${metric.totalEquivalentMutants}</td>
        |  <td>${metric.totalErrorMutants}</td>
+       |  <td>${metric.totalRemovedMutants}</td>
        |  <td>
        |    <div class="progress">
        |      <div class="progress-bar progress-bar-striped ${mutationScoreStyle}" role="progressbar" style="width: ${mutationScoreBar}" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"><span class="font-weight-bold text-dark">${mutationScore}</span></div>
@@ -228,6 +244,7 @@ object MutationTestingProcessHTMLReport {
       |      <th scope="col">Lived</th>
       |      <th scope="col">Equivalent</th>
       |      <th scope="col">Error</th>
+      |      <th scope="col">Removed</th>
       |      <th scope="col">Mutation Score</th>
       |      </tr>
       |  </thead>
@@ -245,6 +262,7 @@ object MutationTestingProcessHTMLReport {
       |      <td>${metrics.totalLivedMutants}</td>
       |      <td>${metrics.totalEquivalentMutants}</td>
       |      <td>${metrics.totalErrorMutants}</td>
+      |      <td>${metrics.totalRemovedMutants}</td>
       |      <td>
       |        <div class="progress">
       |          <div class="progress-bar progress-bar-striped ${mutationScoreStyle}" role="progressbar" style="width: ${generalMutationScoreBar}" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"><span class="font-weight-bold text-dark">${generalMutationScore}</span></div>
@@ -270,6 +288,7 @@ object MutationTestingProcessHTMLReport {
        |  <td>${metric.totalLivedMutants}</td>
        |  <td>${metric.totalEquivalentMutants}</td>
        |  <td>${metric.totalErrorMutants}</td>
+       |  <td>${metric.totalRemovedMutants}</td>
        |  <td>
        |    <div class="progress">
        |      <div class="progress-bar progress-bar-striped ${mutationScoreStyle}" role="progressbar" style="width: ${mutationScoreBar}" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"><span class="font-weight-bold text-dark">${mutationScore}</span></div>
@@ -319,9 +338,48 @@ object MutationTestingProcessHTMLReport {
        |  <td><button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modalMutant${metric.mutantId}">Show</button></td>
        |</tr>""".stripMargin
   }
+  
+  def generateRemovedMutantsHtmlTable(metrics: MutationTestingProcessMetrics) = {
+    val rowsString = metrics.removedMutantsMetrics.map(generateRemovedMutantsHtmlRow).mkString("\n")
+    s"""<table class="display table table-striped table-hover" id="removedMutantsTable">
+      |  <thead class="thead-dark">
+      |    <tr>
+      |      <th scope="col">ID</th>
+      |      <th scope="col">Program</th>
+      |      <th scope="col">Mutation Operator</th>
+      |      <th scope="col">Reduction Rule</th>
+      |      <th scope="col">Code</th>
+      |     </tr>
+      |  </thead>
+      |  <tbody>
+      |    ${rowsString}
+      |  </tbody>
+      |  <tfoot class="text-light bg-secondary font-weight-bold">
+      |    <tr>
+      |      <th scope="row" colspan="2">Total Removed Mutants</th>
+      |      <td colspan="3">${metrics.totalRemovedMutants}</td>
+      |    </tr>
+      |  </tfoot>
+      |</table>   
+   """.stripMargin
+  }
+
+  def generateRemovedMutantsHtmlRow(metric: RemovedMutantMetrics) = {
+    s"""<tr>
+       |  <th scope="row"><a href="RemovedMutants/Removed-Mutant-${metric.mutantId}.html" class="text-dark">${metric.mutantId}</a></th>
+       |  <td><a href="Programs/Program-${metric.originalProgramId}.html" class="text-dark">${metric.name}</a></td>
+       |  <td><a href="#" class="text-dark" data-toggle="tooltip" data-placement="right" title="${metric.mutationOperatorDescription}">${metric.mutationOperatorName}</a></td>
+       |  <td>${metric.reductionRuleName}</td>
+       |  <td><button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modalMutant${metric.mutantId}">Show</button></td>
+       |</tr>""".stripMargin
+  }
 
   def generateMutantsModalsHtml(metrics: MutationTestingProcessMetrics) = {
     metrics.mutantProgramsMetrics.map(m => MutantHTMLReport.generateMutantModalHtml(m, true)).mkString("\n")
+  }
+  
+  def generateRemovedMutantsModalsHtml(metrics: MutationTestingProcessMetrics) = {
+    metrics.removedMutantsMetrics.map(m => RemovedMutantHTMLReport.generateRemovedMutantModalHtml(m, true)).mkString("\n")
   }
 
   def generateMutationOperatorsHtmlTable(metrics: MutationTestingProcessMetrics) = {
@@ -336,6 +394,7 @@ object MutationTestingProcessHTMLReport {
       |      <th scope="col">Lived</th>
       |      <th scope="col">Equivalent</th>
       |      <th scope="col">Error</th>
+      |      <th scope="col">Removed</th>
       |      </tr>
       |  </thead>
       |  <tbody>
@@ -349,6 +408,7 @@ object MutationTestingProcessHTMLReport {
       |      <td>${metrics.totalLivedMutants}</td>
       |      <td>${metrics.totalEquivalentMutants}</td>
       |      <td>${metrics.totalErrorMutants}</td>
+      |      <td>${metrics.totalRemovedMutants}</td>
       |    </tr>
       |  </tfoot>
       |</table>   
@@ -361,8 +421,9 @@ object MutationTestingProcessHTMLReport {
     val totalLivedMutants = mutationOperatorsMetrics.totalLivedMutantsPerOperator.get(mutationOperator).getOrElse(0)
     val totalEquivalentMutants = mutationOperatorsMetrics.totalEquivalentMutantsPerOperator.get(mutationOperator).getOrElse(0)
     val totalErrorMutants = mutationOperatorsMetrics.totalErrorMutantsPerOperator.get(mutationOperator).getOrElse(0)
+    val totalRemovedMutants = mutationOperatorsMetrics.totalRemovedMutantsPerOperator.get(mutationOperator).getOrElse(0)
     val mutationOperatorDescription = mutationOperatorsMetrics.descriptionPerOperator.getOrElse(mutationOperator, "")
-    if (totalMutants > 0) {
+    if (totalMutants > 0 || totalRemovedMutants > 0) {
       s"""<tr>
        |  <th scope="row"><a href="#" class="text-dark" data-toggle="tooltip" data-placement="right" title="${mutationOperatorDescription}">${mutationOperator}</a></th>
        |  <td>${totalMutants}</td>
@@ -370,6 +431,7 @@ object MutationTestingProcessHTMLReport {
        |  <td>${totalLivedMutants}</td>
        |  <td>${totalEquivalentMutants}</td>
        |  <td>${totalErrorMutants}</td>
+       |  <td>${totalRemovedMutants}</td>
        |</tr>""".stripMargin
     } else ""
   }

@@ -1,10 +1,12 @@
 package br.ufrn.dimap.forall.transmut.report
 
-import br.ufrn.dimap.forall.transmut.mutation.model.MetaMutantProgramSource
+import java.time.LocalDateTime
+
 import br.ufrn.dimap.forall.transmut.model.ProgramSource
 import br.ufrn.dimap.forall.transmut.mutation.analyzer.MutantResult
+import br.ufrn.dimap.forall.transmut.mutation.model.MetaMutantProgramSource
 import br.ufrn.dimap.forall.transmut.mutation.model.MutantProgramSource
-import java.time.LocalDateTime
+import br.ufrn.dimap.forall.transmut.mutation.reduction.MutantRemoved
 
 object CompoundReporter extends Reporter {
 
@@ -19,7 +21,7 @@ object CompoundReporter extends Reporter {
   def onProgramBuildStart() = reporters.foreach(reporter => reporter.onProgramBuildStart())
   def onProgramBuildEnd(programSources: List[ProgramSource]) = reporters.foreach(reporter => reporter.onProgramBuildEnd(programSources))
   def onMutantGenerationStart() = reporters.foreach(reporter => reporter.onMutantGenerationStart())
-  def onMutantGenerationEnd(metaMutants: List[MetaMutantProgramSource]) = reporters.foreach(reporter => reporter.onMutantGenerationEnd(metaMutants))
+  def onMutantGenerationEnd(metaMutants: List[MetaMutantProgramSource], removedMutants: List[MutantRemoved] = Nil) = reporters.foreach(reporter => reporter.onMutantGenerationEnd(metaMutants, removedMutants))
   def onMutantExecutionStart() = reporters.foreach(reporter => reporter.onMutantExecutionStart())
   def onMutantExecutionEnd(metaMutantsVerdicts: List[(MetaMutantProgramSource, List[MutantResult[MutantProgramSource]])]) = reporters.foreach(reporter => reporter.onMutantExecutionEnd(metaMutantsVerdicts))
   def onProcessEnd() = reporters.foreach(reporter => reporter.onProcessEnd())
@@ -30,7 +32,7 @@ object CompoundReporter extends Reporter {
   override def reportProgramBuildStart = reporters.foreach(reporter => reporter.reportProgramBuildStart)
   override def reportProgramBuildEnd(programSources: List[ProgramSource]) = reporters.foreach(reporter => reporter.reportProgramBuildEnd(programSources))
   override def reportMutantGenerationStart = reporters.foreach(reporter => reporter.reportMutantGenerationStart)
-  override def reportMutantGenerationEnd(metaMutants: List[MetaMutantProgramSource]) = reporters.foreach(reporter => reporter.reportMutantGenerationEnd(metaMutants))
+  override def reportMutantGenerationEnd(metaMutants: List[MetaMutantProgramSource], removedMutants: List[MutantRemoved] = Nil) = reporters.foreach(reporter => reporter.reportMutantGenerationEnd(metaMutants, removedMutants))
   override def reportMutantExecutionStart = reporters.foreach(reporter => reporter.reportMutantExecutionStart)
   override def reportMutantExecutionEnd(metaMutantsVerdicts: List[(MetaMutantProgramSource, List[MutantResult[MutantProgramSource]])]) = reporters.foreach(reporter => reporter.reportMutantExecutionEnd(metaMutantsVerdicts))
   override def reportProcessEnd = reporters.foreach(reporter => reporter.reportProcessEnd)

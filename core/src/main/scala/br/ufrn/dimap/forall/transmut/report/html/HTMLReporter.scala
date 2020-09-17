@@ -8,6 +8,7 @@ import br.ufrn.dimap.forall.transmut.mutation.model.MutantProgramSource
 import br.ufrn.dimap.forall.transmut.report.Reporter
 import br.ufrn.dimap.forall.transmut.report.metric.MutationTestingProcessMetrics
 import br.ufrn.dimap.forall.transmut.util.IOFiles
+import br.ufrn.dimap.forall.transmut.mutation.reduction.MutantRemoved
 
 object HTMLReporter extends Reporter {
 
@@ -23,6 +24,7 @@ object HTMLReporter extends Reporter {
   }
 
   private var programSources: List[ProgramSource] = List()
+  private var removedMutants: List[MutantRemoved] = List()
   private var metaMutants: List[MetaMutantProgramSource] = List()
   private var metaMutantsVerdicts: List[(MetaMutantProgramSource, List[MutantResult[MutantProgramSource]])] = List()
   private var info: String => Unit = println(_)
@@ -38,7 +40,8 @@ object HTMLReporter extends Reporter {
 
   override def onMutantGenerationStart() {}
 
-  override def onMutantGenerationEnd(metaMutants: List[MetaMutantProgramSource]) {
+  override def onMutantGenerationEnd(metaMutants: List[MetaMutantProgramSource], removedMutants: List[MutantRemoved] = Nil) {
+    this.removedMutants = removedMutants
     this.metaMutants = metaMutants
   }
 
@@ -49,11 +52,12 @@ object HTMLReporter extends Reporter {
   }
 
   override def onProcessEnd() {
-    val mutationTestingProcessMetrics = MutationTestingProcessMetrics(metaMutantsVerdicts, processDuration, processStartDateTime)
+    val mutationTestingProcessMetrics = MutationTestingProcessMetrics(metaMutantsVerdicts, processDuration, processStartDateTime, removedMutants)
     generateMutationTestingProcessReport(mutationTestingProcessMetrics)
     generateProgramSourceReports(mutationTestingProcessMetrics)
     generateProgramReports(mutationTestingProcessMetrics)
     generateMutantReports(mutationTestingProcessMetrics)
+    generateRemovedMutantReports(mutationTestingProcessMetrics)
     info("HTML reports generated in " + config.transmutHtmlReportsDir.toString())
   }
 
@@ -74,11 +78,18 @@ object HTMLReporter extends Reporter {
       ProgramHTMLReport.generateProgramHtmlReportFile(programsDir, s"Program-${metrics.id}.html", metrics)
     }
   }
-  
+
   def generateMutantReports(mutationTestingProcessMetrics: MutationTestingProcessMetrics) {
     val mutantsDir = IOFiles.generateDirectory(config.transmutHtmlReportsDir.toFile(), "Mutants")
     mutationTestingProcessMetrics.mutantProgramsMetrics.foreach { metrics =>
       MutantHTMLReport.generateMutantHtmlReportFile(mutantsDir, s"Mutant-${metrics.mutantId}.html", metrics)
+    }
+  }
+
+  def generateRemovedMutantReports(mutationTestingProcessMetrics: MutationTestingProcessMetrics) {
+    val mutantsDir = IOFiles.generateDirectory(config.transmutHtmlReportsDir.toFile(), "RemovedMutants")
+    mutationTestingProcessMetrics.removedMutantsMetrics.foreach { metrics =>
+      RemovedMutantHTMLReport.generateRemovedMutantHtmlReportFile(mutantsDir, s"Removed-Mutant-${metrics.mutantId}.html", metrics)
     }
   }
 

@@ -20,6 +20,7 @@ object MutationOperatorsJSONReport {
       metrics.totalLivedMutantsPerOperator,
       metrics.totalEquivalentMutantsPerOperator,
       metrics.totalErrorMutantsPerOperator,
+      metrics.totalRemovedMutantsPerOperator,
       metrics.descriptionPerOperator)
   }
 

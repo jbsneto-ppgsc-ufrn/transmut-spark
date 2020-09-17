@@ -6,6 +6,7 @@ case class MutationTestingProcessJSON(
   programSources:           List[ProgramSourceJSON],
   programs:                 List[ProgramJSON],
   mutants:                  List[MutantJSON],
+  removedMutants:           List[RemovedMutantJSON],
   mutationOperatorsMetrics: MutationOperatorsJSON,
   totalProgramSources:      Int,
   totalPrograms:            Int,
@@ -13,7 +14,8 @@ case class MutationTestingProcessJSON(
   totalTransformations:     Int,
   totalMutants:             Int,
   totalKilledMutants:       Int,
-  totalSurvivedMutants:     Int,
+  totalLivedMutants:        Int,
   totalEquivalentMutants:   Int,
   totalErrorMutants:        Int,
+  totalRemovedMutants:      Int,
   totalMutationScore:       Float)

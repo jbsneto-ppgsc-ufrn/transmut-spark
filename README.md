@@ -25,7 +25,7 @@ addSbtPlugin("br.ufrn.dimap.forall" % "sbt-transmut" % "0.1-SNAPSHOT")
 
 To use TRANSMUT-Spark, enter `transmut` in the sbt console or `sbt transmut` in the terminal inside the folder of the project with the programs to be mutated. It triggers the execution of TRANSMUT-Spark that will look for the `transmut.conf` configuration file in the root of the project and run the entire process. 
 
-Additionally, there is also the `transmutAlive` command that can be executed after a first execution of `transmut`. The `transmutAlive` considers the results of the last execution of TRANSMUT-Spark to execute only the surviving mutants of the last execution again. This command is useful to analyze only the surviving mutants without having to run all the generated mutants. To run `transmutAlive`, the options `sources`, `programs` and `mutation-operators` in the configurations must be the same as in the configurations of the last run.
+Additionally, there is also the `transmutAlive` command that can be executed after a first execution of `transmut`. The `transmutAlive` considers the results of the last execution of TRANSMUT-Spark to execute only the lived mutants of the last execution again. This command is useful to analyze only the lived mutants without having to run all the generated mutants. To run `transmutAlive`, the options `sources`, `programs`, `mutation-operators`, `enable-reduction` and `reduction-rules` in the configurations must be the same as in the configurations of the last run. In addition, the `transmutAlive` command can also be used to force the execution of mutants that have been removed by the reduction module. For this, a list of mutants to force execution must be added (`force-execution`). Thus, the `transmutAlive` command will only execute if there are lived mutants from the last execution or if there are removed mutants to force execution, otherwise the command will not execute.
 
 ### Outputs
 
@@ -48,7 +48,7 @@ The successful execution of TRANSMUT-Spark will generate the folder `transmut-$d
 
 Configurations of TRANSMUT-Spark are set in the `transmut.conf` file in the root of the project. This file is mandatory because at least one program source and one program must be specified to run the process. The file is in the HOCON format and all configuration options should be in the "transmut" namespace. For example:
 
-```
+```javascript
 transmut {
     sources: [ "WordCount.scala" ],
     programs: [ "wordCount" ]
@@ -71,17 +71,35 @@ transmut {
 	* **Default:** `[ "ALL" ]`
 	* **Example:** `mutation-operators: [ "DTI", "ATR", "JTR" ]`
 * `equivalent-mutants`
-	* **Description:** list of equivalent mutants IDs. This list must be updated after a first run of the tool and an analysis of the survived mutants if they are identified as equivalent. If the list of programs, original program codes and/or list of mutation operators are not changed, different executions of TRANSMUT-Spark will always generate the same mutants and with the same IDs. Mutants in this list are not executed in the tests and are marked as equivalent in the reports.
+	* **Description:** list of equivalent mutants IDs. This list must be updated after a first run of the tool and an analysis of the survived mutants if they are identified as equivalent. If the list of programs, original program codes, list of mutation operators, enable reduction flag and/or list of reduction rules are not changed, different executions of TRANSMUT-Spark will always generate the same mutants and with the same IDs. Mutants in this list are not executed in the tests and are marked as equivalent in the reports.
 	* **Mandatory:** No
 	* **Default:** ` [] `
 	* **Example:** `equivalent-mutants: [ 3, 5, 6 ]`
-	* **Warning:** if the list of programs, original program codes and/or list of mutation operators are changed after a run, the generated mutants and IDs may differ from those generated in the previous run in a new run.
+	* **Warning:** if the list of programs, original program codes, list of mutation operators, enable reduction flag and/or list of reduction rules are changed after a run, the generated mutants and IDs may differ from those generated in the previous run in a new run.
 * `test-only`
 	* **Description:** list of test classes to be executed. If the list is empty, all tests of the project are executed. The full name of the test classes must be entered (package + class name).
 	* **Mandatory:** No
 	* **Default:** ` [] `
 	* **Example:** `test-only: [ "examples.WordCountTest" ]`
 	* **Warning:** run all tests of the project (in case of `test-only` is empty) can be a slow process on big projects or projects with many other tests that are not related with the programs to be mutated. In this case, specifying the test classes to be executed is recommended to speed up the process.
+* `enable-reduction`
+	* **Description:** flag (Boolean value) indicating whether the mutant reduction module will be executed or not.
+	* **Mandatory:** No
+	* **Default:** ` true `
+	* **Example:** `enable-reduction: false`
+	* **Warning:** The reduction module will only be executed if the flag is true. In addition, if the `transmutAlive` command is executed, the value of `enable-reduction` must be the same as the previous execution.
+* `reduction-rules`
+	* **Description:** list of reduction rules to be applied by the mutants reduction module. Only the reduction rules in the list are applied by the module.
+	* **Mandatory:** No
+	* **Default:** `[ "ALL" ]`
+	* **Example:** `reduction-rules: [ "UTDE", "DTIE" ]`
+	* **Warning:** These reduction rules will be applied only if `enable-reduction: true`.  
+* `force-execution`
+	* **Description:** list of mutants IDs that were removed by the reduction module in a previous run that you want to force execution. This list must be updated after a first run of the tool and an analysis of the removed mutants if they are identified as relevants. If the list of programs, original program codes, list of mutation operators, enable reduction flag and/or list of reduction rules are not changed, different executions of TRANSMUT-Spark will always generate the same mutants and with the same IDs (including the removed mutants). Mutants in this list leave the list of removed mutants and are forced to run.
+	* **Mandatory:** No
+	* **Default:** ` [] `
+	* **Example:** `force-execution: [ 3, 5, 6 ]`
+	* **Warning:** if the list of programs, original program codes, list of mutation operators, enable reduction flag and/or reduction rules are changed after a run, the generated mutants and IDs may differ from those generated in the previous run in a new run. The removed mutants in this list are only forced to execute with the `transmutAlive` command.
 * `src-dir`
 	* **Description:** The directory containing the sources of the programs to be mutated.
 	* **Mandatory:** No
@@ -123,6 +141,25 @@ List of mutation operators supported by TRANSMUT-Spark.
 | OTI      | Order Transformation Inversion              |
 
 In the list of mutation operators in configurations (`mutation-operators`), use "ALL" as an alias to apply all mutation operators.
+
+The description and more details about these mutation operators can be found in the paper [Mutation Operators for Large Scale Data Processing Programs in Spark](https://link.springer.com/chapter/10.1007/978-3-030-49435-3_30).
+
+### Mutants Reduction
+
+TRANSMUT-Spark has a module that applies reduction rules to reduce the number of mutants to be executed in the process. The objective of this module is to reduce the number of equivalent, redundant and inefficient mutants. It is important to note that this does not mean that all equivalent, redundant or inefficient mutants will be removed, but only those that fit the reduction rules. The reduction rules were defined based on results of experiments and theoretical analysis of some mutation operators. The reduction module is optional, it will only be executed if `enable-reduction: true`. The list of reduction rules follows below, the reduction rules to be applied can be defined in the configuration (`reduction-rules`).
+
+| Rule | Description                                                                                                                                                                                                                                                                                                                                                 |
+|------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| UTDE | Removes mutants generated with the mutation operators FTD, DTD and OTD when the UTD operator has also been applied.                                                                                                                                                                                                                                         |
+| MTRR | Removes the following mutants generated with the MTR operator: mutants that map to $Max$ and $Min$, when the mapping is to a numerical type; mutants that map to " ", when the mapping is to the type string; mutants that map to $x.reverse$, when the mapping is to a collection type; and mutants that map to $null$, when the mapping is to any other type. |
+| FTDS | Removes mutants generated with the mutation operator NFTP when the FTD or UTD operators have also been applied.                                                                                                                                                                                                                                             |
+| OTDS | Removes mutants generated with the mutation operator OTI when the OTD or UTD operators have also been applied.                                                                                                                                                                                                                                              |
+| DTIE | Removes mutants generated with the mutation operator DTI when the *distinct* transformation has been inserted after grouping or aggregation transformations.                                                                                                                                                                                         |
+| ATRC | Removes the commutative replacement mutants ($f_m(x,y) = f(y, x)$) generated with the ATR mutation operator.                                                                                                                                                                                                                                                |
+
+In the list of reduction rules in configurations (`reduction-rules`), use "ALL" as an alias to apply all reduction rules.
+
+The removed mutants can be seen in the reports generated by the tool. They are on a different list because they have not been executed. The removed mutants can be forced to be executed using the `transmutAlive` command and the `force-execution` parameter in configurations. This list should only contain mutants that have been removed and is independent of the list of equivalent mutants.
 
 
 ### Restrictions

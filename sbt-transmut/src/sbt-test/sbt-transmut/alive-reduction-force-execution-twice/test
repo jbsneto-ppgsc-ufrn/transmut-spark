@@ -1,0 +1,30 @@
+# Before execution the TRANSMUT folder and reports should not exist
+> checkBeforeTransmut
+
+# Execute TRANSMUT-Spark plugin
+> transmut
+
+# Checks if TRANSMUT folders and reports have been created
+> checkAfterTransmut
+
+# Delete the first transmut.conf and copy transmut-with-force-execution.conf to run transmutAlive
+$ delete transmut.conf
+$ copy-file changes/transmut-with-force-execution.conf transmut.conf
+
+# Execute transmuteAlive task
+> transmutAlive
+
+# Check if another TRANSMUT folder was created  in addition to the first one
+> checkAfterSecondTransmut
+
+# Checks if the reports of the second execution are different of the reports from the first execution
+> checkDifferentReportsFromTwoExecutionsTransmut
+
+# Execute transmuteAlive task for the second time
+> transmutAlive
+
+# Checks if there is only two TRANSMUT folder, a third folder must not be generated
+> checkAfterSecondTransmut
+
+# Checks if the reports of the second execution are different of the reports from the first execution (again)
+> checkDifferentReportsFromTwoExecutionsTransmut

@@ -11,13 +11,15 @@ import br.ufrn.dimap.forall.transmut.report.json.model.ProgramJSON
 import br.ufrn.dimap.forall.transmut.report.json.model.TransformationJSON
 import br.ufrn.dimap.forall.transmut.report.metric.MetaMutantProgramMetrics
 import br.ufrn.dimap.forall.transmut.report.json.MutantJSONReport._
+import br.ufrn.dimap.forall.transmut.report.json.RemovedMutantJSONReport._
 import br.ufrn.dimap.forall.transmut.report.json.MutationOperatorsJSONReport._
+import br.ufrn.dimap.forall.transmut.util.IOFiles
 
 import io.circe._
 import io.circe.generic.semiauto._
 import io.circe.syntax._
 import io.circe.parser.decode
-import br.ufrn.dimap.forall.transmut.util.IOFiles
+
 import java.io.File
 
 object ProgramJSONReport {
@@ -54,6 +56,7 @@ object ProgramJSONReport {
       metrics.transformations.map(generateTransformationJSONFromTransformation),
       metrics.edges.map(generateEdgeJSONFromEdge),
       metrics.mutantsMetrics.map(MutantJSONReport.generateMutantJSONObjectFromMetrics),
+      metrics.removedMutantsMetrics.map(RemovedMutantJSONReport.generateRemovedMutantJSONObjectFromMetrics),
       MutationOperatorsJSONReport.generateMutationOperatorsJSONObjectFromMetrics(metrics.mutationOperatorsMetrics),
       metrics.totalDatasets,
       metrics.totalTransformations,
@@ -62,6 +65,7 @@ object ProgramJSONReport {
       metrics.totalLivedMutants,
       metrics.totalEquivalentMutants,
       metrics.totalErrorMutants,
+      metrics.totalRemovedMutants,
       metrics.mutationScore)
   }
 

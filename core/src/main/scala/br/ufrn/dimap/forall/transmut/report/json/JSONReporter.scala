@@ -8,6 +8,7 @@ import br.ufrn.dimap.forall.transmut.mutation.model.MutantProgramSource
 import br.ufrn.dimap.forall.transmut.report.Reporter
 import br.ufrn.dimap.forall.transmut.report.metric.MutationTestingProcessMetrics
 import br.ufrn.dimap.forall.transmut.util.IOFiles
+import br.ufrn.dimap.forall.transmut.mutation.reduction.MutantRemoved
 
 object JSONReporter extends Reporter {
 
@@ -23,6 +24,7 @@ object JSONReporter extends Reporter {
   }
 
   private var programSources: List[ProgramSource] = List()
+  private var removedMutants: List[MutantRemoved] = List()
   private var metaMutants: List[MetaMutantProgramSource] = List()
   private var metaMutantsVerdicts: List[(MetaMutantProgramSource, List[MutantResult[MutantProgramSource]])] = List()
   private var info: String => Unit = println(_)
@@ -38,7 +40,8 @@ object JSONReporter extends Reporter {
 
   override def onMutantGenerationStart() {}
 
-  override def onMutantGenerationEnd(metaMutants: List[MetaMutantProgramSource]) {
+  override def onMutantGenerationEnd(metaMutants: List[MetaMutantProgramSource], removedMutants: List[MutantRemoved]) {
+    this.removedMutants = removedMutants
     this.metaMutants = metaMutants
   }
 
@@ -49,11 +52,12 @@ object JSONReporter extends Reporter {
   }
 
   override def onProcessEnd() {
-    val mutationTestingProcessMetrics = MutationTestingProcessMetrics(metaMutantsVerdicts, processDuration, processStartDateTime)
+    val mutationTestingProcessMetrics = MutationTestingProcessMetrics(metaMutantsVerdicts, processDuration, processStartDateTime, removedMutants)
     generateMutationTestingProcessReport(mutationTestingProcessMetrics)
     generateProgramSourceReports(mutationTestingProcessMetrics)
     generateProgramReports(mutationTestingProcessMetrics)
     generateMutantReports(mutationTestingProcessMetrics)
+    generateRemovedMutantReports(mutationTestingProcessMetrics)
     info("JSON reports generated in " + config.transmutJSONReportsDir.toString())
   }
 
@@ -75,6 +79,13 @@ object JSONReporter extends Reporter {
     val mutantsDir = IOFiles.generateDirectory(config.transmutJSONReportsDir.toFile(), "Mutants")
     mutationTestingProcessMetrics.mutantProgramsMetrics.foreach { metrics =>
       MutantJSONReport.generateMutantJSONReportFile(mutantsDir, s"Mutant-${metrics.mutantId}.json", metrics)
+    }
+  }
+  
+  def generateRemovedMutantReports(mutationTestingProcessMetrics: MutationTestingProcessMetrics) {
+    val removedMutantsDir = IOFiles.generateDirectory(config.transmutJSONReportsDir.toFile(), "RemovedMutants")
+    mutationTestingProcessMetrics.removedMutantsMetrics.foreach { metrics =>
+      RemovedMutantJSONReport.generateRemovedMutantJSONReportFile(removedMutantsDir, s"Removed-Mutant-${metrics.mutantId}.json", metrics)
     }
   }
 

@@ -34,6 +34,8 @@ import br.ufrn.dimap.forall.transmut.report.html.HTMLReporter
 import br.ufrn.dimap.forall.transmut.report.json.JSONReporter
 import br.ufrn.dimap.forall.transmut.util.DateTimeUtil
 import java.time.LocalDateTime
+import br.ufrn.dimap.forall.transmut.mutation.manager.MutantReducer
+import br.ufrn.dimap.forall.transmut.mutation.reduction.MutantRemoved
 
 class CompoundReporterTestSuite extends FunSuite with BeforeAndAfter with MockFactory {
 
@@ -47,7 +49,7 @@ class CompoundReporterTestSuite extends FunSuite with BeforeAndAfter with MockFa
     }
   }
 
-  test("Tast Case 1 - Mutation Testing Process With Compound Reporters (Console, HTML and JSON)") {
+  test("Tast Case 1 - Mutation Testing Process Without Reduction and With Compound Reporters (Console, HTML and JSON)") {
 
     val tree: Tree = q"""
       import org.apache.spark.rdd.RDD
@@ -67,7 +69,7 @@ class CompoundReporterTestSuite extends FunSuite with BeforeAndAfter with MockFa
     val programNames = List("program")
     val mutationOperators = List("JTR")
 
-    implicit val configTest = Config(programSourcesNames, programNames, mutationOperators, transmutBaseDir = transmutTestBaseDir)
+    implicit val configTest = Config(programSourcesNames, programNames, mutationOperators, transmutBaseDir = transmutTestBaseDir, enableReduction = false)
     configTest.processStartDateTime = dateTime
 
     val programSource = SparkRDDProgramBuilder.buildProgramSourceFromProgramNames(configTest.programs, tree, refenceTypes.toMap)
@@ -82,6 +84,9 @@ class CompoundReporterTestSuite extends FunSuite with BeforeAndAfter with MockFa
     (mutantManagerMock.defaultMutantsIdGenerator _).expects().returning(defaultMutantsIdGenerator)
     (mutantManagerMock.generateMutantsFromProgramSource(_: ProgramSource, _: List[MutationOperatorsEnum], _: LongIdGenerator)).expects(programSource, configTest.mutationOperatorsList, *).returning(programSourceMutants).once()
 
+    val mutantReducerMock = mock[MutantReducer]
+    val removedMutants: List[MutantRemoved] = Nil
+    
     val metaMutantProgramSource = SparkRDDMetaMutantBuilder.buildMetaMutantProgramSourceFromMutantProgramSources(programSource, programSourceMutants)
     val metaMutantProgramSources = List(metaMutantProgramSource)
 
@@ -95,7 +100,7 @@ class CompoundReporterTestSuite extends FunSuite with BeforeAndAfter with MockFa
     val metaMutantsTestResult = (metaMutantProgramSource, List(TestFailed(mutantJTR1), TestError(mutantJTR2), TestSuccess(mutantJTR3)))
 
     val mutantRunnerMock = mock[MutantRunner]
-    (mutantRunnerMock.runMutationTestProcess _).expects(metaMutantProgramSource, configTest.equivalentMutants, configTest.isTestOnlyLivingMutants, configTest.livingMutants).returning(metaMutantsTestResult)
+    (mutantRunnerMock.runMutationTestProcess _).expects(metaMutantProgramSource, configTest.equivalentMutants, configTest.isTestOnlyLivingMutants, configTest.livingMutants, configTest.isForceExecutionEnabled, configTest.forceExecution).returning(metaMutantsTestResult)
 
     val mutantsVerdicts = List(MutantAnalyzer.analyzeMutants(metaMutantsTestResult._1, metaMutantsTestResult._2, configTest.equivalentMutants))
 
@@ -105,7 +110,7 @@ class CompoundReporterTestSuite extends FunSuite with BeforeAndAfter with MockFa
       (reporterMock.reportProgramBuildStart _).expects()
       (reporterMock.reportProgramBuildEnd _).expects(programSources)
       (reporterMock.reportMutantGenerationStart _).expects()
-      (reporterMock.reportMutantGenerationEnd _).expects(metaMutantProgramSources)
+      (reporterMock.reportMutantGenerationEnd _).expects(metaMutantProgramSources, removedMutants)
       (reporterMock.reportMutantExecutionStart _).expects()
       (reporterMock.reportMutantExecutionEnd _).expects(mutantsVerdicts)
       (reporterMock.reportProcessEnd _).expects()
@@ -131,6 +136,7 @@ class CompoundReporterTestSuite extends FunSuite with BeforeAndAfter with MockFa
       def reporter = compoundReporter
       def programBuilder = programBuilderMock
       def mutantManager = mutantManagerMock
+      def mutantReducer = mutantReducerMock
       def metaMutantBuilder = metaMutantBuilderMock
       def mutantRunner = mutantRunnerMock
     }
